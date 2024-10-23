@@ -190,3 +190,25 @@ AI 모델 학습은 그 과정이 복잡하고 추상적이어서, 초심자들�
 **3. 학습 결과**
 
 <img width="600" src="./assets/result-page.png">
+
+<br/>
+
+# 🖥 명세서 수정 & 발표 자료 제작 | 📅 10.23 (수)
+
+## 1. 요구사항 명세서
+
+<img width="600" src="./assets/명세서-1.png">
+
+<br/>
+
+<img width="600" src="./assets/명세서-2.png">
+
+<br/>
+
+## 2. 발표 자료 제작
+
+<img width="600" src="./assets/발표 자료-1.png">
+
+<br/>
+
+<img width="600" src="./assets/발표 자료-2.png">
