@@ -212,3 +212,25 @@ AI 모델 학습은 그 과정이 복잡하고 추상적이어서, 초심자들�
 <br/>
 
 <img width="600" src="./assets/발표 자료-2.png">
+
+<br/>
+
+# 🖥 모듈 목록 명세 | 📅 10.24 (목)
+
+## 1. 프로젝트
+
+<br/>
+
+<img width="600" src="./assets/프로젝트 관련 모듈.jpg">
+
+## 2. 블록 코딩
+
+<br/>
+
+<img width="600" src="./assets/블록 코딩 관련 모듈.jpg">
+
+## 3. 학습
+
+<br/>
+
+<img width="600" src="./assets/학습 관련 모듈.jpg">
