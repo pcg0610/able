@@ -1,6 +1,9 @@
-name: C:\Users\SSAFY\Project\S11P31A305\backend\.conda
+name: able
 channels:
   - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+  - https://repo.anaconda.com/pkgs/msys2
 dependencies:
   - bzip2=1.0.8
   - ca-certificates=2024.9.24
@@ -21,6 +24,7 @@ dependencies:
       - anyio==4.6.2.post1
       - certifi==2024.8.30
       - click==8.1.7
+      - colorama==0.4.6
       - decorator==5.1.1
       - dnspython==2.7.0
       - email-validator==2.2.0
@@ -62,4 +66,3 @@ dependencies:
       - uvicorn==0.32.0
       - watchfiles==0.24.0
       - websockets==13.1
-prefix: C:\Users\SSAFY\Project\S11P31A305\backend\.conda
