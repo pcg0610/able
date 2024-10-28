@@ -418,5 +418,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/python,cuda,visualstudiocode,pycharm+all,opencv,windows,macos,linux,venv,matlab
 
 .conda
-
 .vscode
+.idea
