@@ -1,0 +1,10 @@
+{
+    "id": "operation1",
+    "type": "Operation",
+    "name": "cat",
+    "description": "Addition operation for combining layers or values.",
+    "args": [
+        "input1",
+        "input2"
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "id": "optimizer1",
+    "type": "Optimizer",
+    "name": "SGD",
+    "description": "Implements stochastic gradient descent (optionally with momentum).",
+    "args": [
+        "params",
+        "lr",
+        "momentum",
+        "dampening",
+        "weight_decay",
+        "nesterov",
+        "*",
+        "maximize",
+        "foreach",
+        "differentiable",
+        "fused"
+    ]
+}
