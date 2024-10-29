@@ -8,3 +8,5 @@ class BlockType(Enum):
     OPERATION = "Operation"
     OPTIMIZER = "Optimizer"
     MODULE = "Module"
+    DATA = "Data"
+    INTERPRETER = "Interpreter"
