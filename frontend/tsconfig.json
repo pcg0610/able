@@ -9,7 +9,9 @@
       "@assets/*": ["src/assets/*"],
       "@pages/*": ["src/pages/*"],
       "@shared/*": ["src/shared/*"],
-      "@widgets/*": ["src/widgets/*"]
+      "@widgets/*": ["src/widgets/*"],
+      "@icons/*": ["src/icons/*"],
+      "@images/*": ["src/images/*"]
     },
     "target": "ES2020",
     "useDefineForClassFields": true,
