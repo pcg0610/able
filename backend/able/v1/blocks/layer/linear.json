@@ -1,0 +1,13 @@
+{
+    "id": "layer4",
+    "type": "Layer",
+    "name": "Linear",
+    "description": "Applies an affine linear transformation to the incoming data.",
+    "args": [
+        "in_features",
+        "out_features",
+        "bias",
+        "device",
+        "dtype"
+    ]
+}

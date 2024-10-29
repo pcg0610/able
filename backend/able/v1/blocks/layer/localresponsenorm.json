@@ -1,0 +1,12 @@
+{
+    "id": "layer5",
+    "type": "Layer",
+    "name": "LocalResponseNorm",
+    "description": "Applies local response normalization over an input signal.",
+    "args": [
+        "size",
+        "alpha",
+        "beta",
+        "k"
+    ]
+}

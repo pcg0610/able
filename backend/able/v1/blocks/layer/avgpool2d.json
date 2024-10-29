@@ -1,0 +1,14 @@
+{
+    "id": "layer2",
+    "type": "Layer",
+    "name": "AvgPool2d",
+    "description": "Applies a 2D average pooling over an input signal composed of several input planes.",
+    "args": [
+        "kernel_size",
+        "stride",
+        "padding",
+        "ceil_mode",
+        "count_include_pad",
+        "divisor_override"
+    ]
+}
