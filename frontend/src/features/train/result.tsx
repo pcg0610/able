@@ -13,30 +13,33 @@ const Result: React.FC = () => {
    return (
       <S.Container>
          <S.Header>
-            <h1>모델 배포하기</h1>
-            <button>모델 배포하기</button>
+            <S.ReleaseButton>모델 배포하기</S.ReleaseButton>
          </S.Header>
          <S.GridContainer>
-            <S.GraphCard>
-               <LossGraph />
-               <S.GraphTitle>Training and validation loss</S.GraphTitle>
-            </S.GraphCard>
-            <S.GraphCard>
-               <EpochGraph />
-               <S.GraphTitle>Epoch Accuracy</S.GraphTitle>
-            </S.GraphCard>
-            <S.GraphCard>
-               <ConfusionMatrix />
-               <S.GraphTitle>Confusion Matrix</S.GraphTitle>
-            </S.GraphCard>
-            <S.GraphCard>
-               <F1Score />
-               <S.GraphTitle>F1-Score</S.GraphTitle>
-            </S.GraphCard>
-            <S.GraphCard>
-               <PerformanceTable />
-               <S.GraphTitle>Performance Matrices Table</S.GraphTitle>
-            </S.GraphCard>
+            <div className="top-row">
+               <S.GraphCard>
+                  <LossGraph />
+                  <S.GraphTitle>Training and validation loss</S.GraphTitle>
+               </S.GraphCard>
+               <S.GraphCard>
+                  <EpochGraph />
+                  <S.GraphTitle>Epoch Accuracy</S.GraphTitle>
+               </S.GraphCard>
+            </div>
+            <div className="bottom-row">
+               <S.GraphCard>
+                  <ConfusionMatrix />
+                  <S.GraphTitle>Confusion Matrix</S.GraphTitle>
+               </S.GraphCard>
+               <S.GraphCard>
+                  <F1Score />
+                  <S.GraphTitle>F1-Score</S.GraphTitle>
+               </S.GraphCard>
+               <S.GraphCard>
+                  <PerformanceTable />
+                  <S.GraphTitle>Performance Matrices Table</S.GraphTitle>
+               </S.GraphCard>
+            </div>
          </S.GridContainer>
       </S.Container>
    );

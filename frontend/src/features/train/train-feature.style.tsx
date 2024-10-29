@@ -6,19 +6,26 @@ export const Container = styled.div`
 
 export const Header = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
   align-items: center;
   margin-bottom: 20px;
 `;
 
 export const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+  grid-template-rows: auto auto;
 
-  // 전체 행을 차지할 아이템 스타일
-  & > div:nth-of-type(1) {
-    grid-column: span 2;
+  & > .top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  & > .bottom-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
   }
 `;
 
@@ -36,4 +43,24 @@ export const GraphTitle = styled.h3`
   margin-top: 10px;
   font-size: 1rem;
   color: #333;
+`;
+
+export const ReleaseButton = styled.button`
+  padding: 14px 36px;
+  font-size: 18px;
+  color: #1e88e5;
+  background-color: #e3f2fd;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #bbdefb;
+  }
+
+  &:focus {
+    outline: none;
+  }
 `;
