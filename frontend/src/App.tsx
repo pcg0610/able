@@ -1,13 +1,5 @@
-import { useState } from 'react'
-import Test from
+const App = () => {
+  return <></>;
+};
 
-  function App() {
-
-    return (
-      <>
-
-      </>
-    )
-  }
-
-export default App
+export default App;
