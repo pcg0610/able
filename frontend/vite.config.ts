@@ -13,13 +13,11 @@ export default defineConfig({
         find: "@components",
         replacement: resolve(__dirname, "src/components"),
       },
-      { find: "@hooks", replacement: resolve(__dirname, "src/hooks") },
       {
-        find: "@services",
-        replacement: resolve(__dirname, "src/services"),
+        find: "@widgets",
+        replacement: resolve(__dirname, "src/widgets"),
       },
       { find: "@shared", replacement: resolve(__dirname, "src/shared") },
-      { find: "@stores", replacement: resolve(__dirname, "src/stores") },
       {
         find: "@icons",
         replacement: resolve(__dirname, "src/assets/icons"),
@@ -27,10 +25,6 @@ export default defineConfig({
       {
         find: "@images",
         replacement: resolve(__dirname, "src/assets/images"),
-      },
-      {
-        find: "@fonts",
-        replacement: resolve(__dirname, "src/assets/fonts"),
       },
     ],
   },
