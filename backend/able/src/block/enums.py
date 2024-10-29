@@ -7,4 +7,4 @@ class BlockType(Enum):
     LOSS = "Loss"
     OPERATION = "Operation"
     OPTIMIZER = "Optimizer"
-    MODEL = "Model"
+    MODULE = "Module"
