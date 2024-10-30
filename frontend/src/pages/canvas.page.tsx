@@ -1,5 +1,11 @@
+import CanvasEditor from '@features/canvas/CanvasEditor';
+
 const Canvas = () => {
-  return <div>캔버스 페이지</div>;
+  return (
+    <>
+      <CanvasEditor />
+    </>
+  );
 };
 
 export default Canvas;
