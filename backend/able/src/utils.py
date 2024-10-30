@@ -2,6 +2,7 @@ import json
 from typing import Any, Dict, Optional
 from pydantic import BaseModel
 import logging
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -25,3 +26,6 @@ def json_to_str(data: Any) -> str:
     except (TypeError, json.JSONDecodeError) as e:
         logger.error(f"JSON 직렬화 실패: {e}")
         raise
+
+def encode_image_to_base64(image_data: bytes) -> str:
+    return base64.b64encode(image_data).decode("utf-8")
