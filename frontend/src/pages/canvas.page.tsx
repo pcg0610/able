@@ -1,6 +1,6 @@
-import CanvasEditor from '@features/canvas/CanvasEditor';
+import CanvasEditor from '@/features/canvas/canvas-editor';
 
-const Canvas = () => {
+const CanvasPage = () => {
   return (
     <>
       <CanvasEditor />
@@ -8,4 +8,4 @@ const Canvas = () => {
   );
 };
 
-export default Canvas;
+export default CanvasPage;

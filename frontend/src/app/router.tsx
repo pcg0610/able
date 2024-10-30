@@ -1,15 +1,20 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import Home from '@/pages/home.page';
-import Canvas from '@pages/canvas.page';
+import HomePage from '@/pages/home.page';
+import CanvasPage from '@pages/canvas.page';
+import TrainPage from '@/pages/train/train.page';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
+    element: <HomePage />,
   },
   {
     path: '/canvas',
-    element: <Canvas />,
+    element: <CanvasPage />,
+  },
+  {
+    path: '/train',
+    element: <TrainPage />,
   },
 ]);
