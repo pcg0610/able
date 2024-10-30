@@ -1,4 +1,4 @@
-from train.utils import Trainer, find_data_block, find_interpreter_block, validate_data_path, create_data_loaders
+from .utils import Trainer, find_data_block, find_interpreter_block, validate_data_path, create_data_loaders
 from . import TrainRequestDto
 class TrainService:
     def train(self, train_request_dto: TrainRequestDto):

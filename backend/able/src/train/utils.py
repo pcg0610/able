@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split
 from . import BlockDto, EdgeDto
-from block.enums import BlockType
+from src.block.enums import BlockType
 
 MAX_LOSS = 10e8
 
