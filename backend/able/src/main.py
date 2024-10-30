@@ -9,7 +9,7 @@ from src.exceptions import BaseCustomException
 app = FastAPI()
 
 app.include_router(canvas_router)
-app.include_router(project_router, prefix="/projects")
+app.include_router(project_router, prefix="/projects", tags=["프로젝트"])
 
 
 @app.exception_handler(HTTPException)
