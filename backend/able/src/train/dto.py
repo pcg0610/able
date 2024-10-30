@@ -20,8 +20,8 @@ class TrainRequestDto(BaseModel):
     project_name: str
     epoch: int
     batch_size: int
-    blocks: list[BlockDto]
-    edges: list[EdgeDto]
+    blocks: tuple[BlockDto]
+    edges: tuple[EdgeDto]
     
 class TrainResponseDto(BaseModel):
     pass
