@@ -1,6 +1,5 @@
 import {
   ReactFlow,
-  MiniMap,
   Controls,
   Background,
   BackgroundVariant,
@@ -36,8 +35,7 @@ const CanvasEditor = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
       >
-        <Controls />
-        {/* <MiniMap /> */}
+        <Controls position='bottom-center' orientation='horizontal' />
         <Background variant={BackgroundVariant.Dots} />
       </ReactFlow>
     </div>
