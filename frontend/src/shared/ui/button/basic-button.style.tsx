@@ -4,9 +4,9 @@ export const StyledButton = styled.button<{ color: string; backgroundColor: stri
   background-color: ${(props) => props.backgroundColor};
   color: ${(props) => props.color};
   border: none;
-  border-radius: 6px;
-  padding: 14px 36px;
-  font-size: 18px;
+  border-radius: .375rem;
+  padding: .875rem 2.25rem;
+  font-size: 1.125rem;
   font-weight: bold;
   cursor: pointer;
 
