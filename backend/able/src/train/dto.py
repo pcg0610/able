@@ -5,6 +5,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class BlockDto(BaseModel):
     block_id: str
+    name: str
     type: BlockType
     position: str
     args: dict
