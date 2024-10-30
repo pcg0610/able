@@ -5,15 +5,24 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split
+from typing import Iterator
+
 from . import BlockDto, EdgeDto
 from src.block.enums import BlockType
 
 MAX_LOSS = 10e8
 
+class Logger:
+    """학습 과정을 저장하기 위한 클래스
+    """
+
+    def __init__(self):
+        pass
+
 class Trainer:
     """모델의 학습을 책임지는 클래스
     """
-    def __init__(self, model: nn.Module, train_loader: DataLoader, validate_loader: DataLoader, criterion: nn.Module, optimizer: nn.Module, save_path: str, checkpoint_interval: int = 10, device: str = 'cpu'):
+    def __init__(self, model: nn.Module, train_loader: DataLoader, validate_loader: DataLoader, criterion: nn.Module, optimizer: optim.Optimizer, logger: Logger, checkpoint_interval: int = 10, device: str = 'cpu'):
         self.model = model.to(device)
         self.train_loader = train_loader
         self.validate_loader = validate_loader
@@ -83,17 +92,11 @@ class Trainer:
             
             if best_valid_loss > valid_loss:
                 torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
-                
-class Logger:
-    """학습 과정을 저장하기 위한 클래스
-    """
-    def __init__(self):
-        pass
 
 def validate_data_path(data_path: str) -> bool:
     pass
 
-def create_data_loaders(data_path: str) -> tuple[DataLoader, DataLoader, DataLoader]:
+def create_data_loaders(data_path: str, batch_size: int) -> tuple[DataLoader, DataLoader, DataLoader]:
     pass
 
 def topological_sort(blocks: tuple[BlockDto], edges: tuple[EdgeDto]) -> tuple[BlockDto]:
@@ -135,9 +138,27 @@ def convert_block_graph_to_model(blocks: tuple[BlockDto], edges: tuple[EdgeDto])
     model = UserModel()
 
     for block in sorted_blocks:
-        model.layers.add_module(str(len(model.layers)), convert_block_to_module(block))
+        if block.type == BlockType.LAYER:
+            module = convert_layer_block_to_module(block)
+        elif block.type == BlockType.OPERATION:
+            module = convert_operation_to_module(block)
+        model.layers.add_module(str(len(model.layers)), module)
 
     return model
 
-def convert_block_to_module(block: BlockDto) -> nn.Module:
+# 블록을 nn.Module로 변환하는 함수
+def convert_layer_block_to_module(block):
+    layer_class = LAYER_MAP.get(block["type"])
+    if not layer_class:
+        raise ValueError(f"Unsupported layer type: {block['type']}")
+    return layer_class(**block["args"])  # 블록 파라미터로 인스턴스 생성
+
+# 손실 기준을 nn.Module로 변환하는 함수
+def convert_criterion_block_to_module(block):
+    criterion_class = CRITERION_MAP.get(block["type"])
+    if not criterion_class:
+        raise ValueError(f"Unsupported criterion type: {block['type']}")
+    return criterion_class()
+
+def convert_optimizer_to_optimizer(block: BlockDto, parameters: Iterator[nn.Parameter]) -> optim.Optimizer:
     pass
