@@ -13,12 +13,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 path_manager = PathManager()
-metadata = "metadata.json"
-thumbnail = "thumbnail.jpg"
+METADATA = "metadata.json"
+THUMBNAIL = "thumbnail.jpg"
 
 def create_project(project: Project) -> bool:
     project_path = path_manager.get_projects_path(project.title)
-    metadata_path = project_path / metadata
+    metadata_path = project_path / METADATA
     
     if create_directory(project_path):
         return create_file(metadata_path, json_to_str(project))
@@ -28,12 +28,10 @@ def create_project(project: Project) -> bool:
 
 
 def get_project(title: str) -> Optional[SelectedProject]:
-    metadata_path = path_manager.get_projects_path(title) / metadata
-    thumbnail_path = path_manager.get_projects_path(title) / thumbnail
+    metadata_path = path_manager.get_projects_path(title) / METADATA
+    thumbnail_path = path_manager.get_projects_path(title) / THUMBNAIL
 
     data = get_file(metadata_path)
-    if data is None:
-        return None
     
     project = SelectedProject.model_validate(str_to_json(data))
     try :
@@ -54,7 +52,7 @@ def get_projects() -> List[str]:
 def update_project(updated_project: UpdatedProject) -> bool:
     prev_project_path = path_manager.get_projects_path(updated_project.prev_title)
     new_project_path = path_manager.get_projects_path(updated_project.title)
-    metadata_path = new_project_path / metadata
+    metadata_path = new_project_path / METADATA
 
     if not (rename_path(prev_project_path, updated_project.title) 
             and updated_project.prev_title != updated_project.title) :
