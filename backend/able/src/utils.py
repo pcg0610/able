@@ -9,7 +9,7 @@ def str_to_json(content: str) -> Optional[Dict[str, Any]]:
     try:
         return json.loads(content)
     except json.JSONDecodeError as e:
-        logger.error(f"JSON 디코딩 실패: {e}")
+        logger.error(f"JSON 디코딩 실패: {e}", exc_info=True)
         return None
 
 def json_to_str(data: Any) -> str:
@@ -22,6 +22,6 @@ def json_to_str(data: Any) -> str:
 
     try:
         return json.dumps(data_dict, ensure_ascii=False, indent=4)
-    except (TypeError, json.JSONDecodeError) as e:
-        logger.error(f"JSON 직렬화 실패: {e}")
+    except (TypeError, json.JSONDecodeError, UnicodeEncodeError) as e:
+        logger.error(f"JSON 직렬화 실패: {e}", exc_info=True)
         raise

@@ -1,5 +1,13 @@
 from pydantic import BaseModel
-from typing import Dict, Any
+from train import BlockDto, EdgeDto
 
-class BlockGraphResponse(BaseModel):
-    data: Dict[str, Any]
+class GetCanvasResponse(BaseModel):
+    blocks: List[BlockDto]
+    edges: List[EdgeDto]
+
+class SaveCanvasResponse(BaseModel):
+    success: bool
+
+class SaveCanvasRequest(BaseModel):
+    blocks: List[BlockDto]
+    edges: List[EdgeDto]
