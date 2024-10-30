@@ -8,12 +8,20 @@ import EpochGraph from '@features/train/result/epoch-graph';
 import F1Score from '@features/train/result/f1-score';
 import LossGraph from '@features/train/result/loss-graph';
 import PerformanceTable from '@features/train/result/performance-table';
+import BasicButton from '@shared/ui/button/basic-button'
 
 const Result: React.FC = () => {
    return (
       <S.Container>
          <S.Header>
-            <S.ReleaseButton>모델 배포하기</S.ReleaseButton>
+            <BasicButton
+               color="#0051FF"
+               backgroundColor="#D8E6FB"
+               text="모델 배포하기"
+               onClick={() => {
+                  console.log('모델 실행 버튼 클릭됨');
+               }}
+            />
          </S.Header>
          <S.GridContainer>
             <div className="top-row">
