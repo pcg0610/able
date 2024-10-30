@@ -1,14 +1,16 @@
 import styled from '@emotion/styled';
+import { Common } from '@shared/styles/common';
 
 export const SidebarContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
-  background-color: #f9f9f9;
+  padding: 10px 0px;
+  background-color: ${Common.colors.white};
   width: 60px;
   height: 100vh;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 5px rgba(73, 73, 73, 0.1);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 export const SidebarButton = styled.button<{ active: boolean }>`
@@ -17,17 +19,11 @@ export const SidebarButton = styled.button<{ active: boolean }>`
   justify-content: center;
   width: 40px;
   height: 40px;
-  margin: 10px 0;
-  border-radius: 8px;
-  background-color: ${({ active }) => (active ? '#1e88e5' : '#fff')};
-  color: ${({ active }) => (active ? '#fff' : '#333')};
+  margin: 10px;
+  border-radius: 10px;
+  background-color: ${({ active }) => (active ? Common.colors.primary : Common.colors.white)};
+  color: ${({ active }) => (active ? Common.colors.white : Common.colors.black)};
   border: none;
   cursor: pointer;
-  font-size: 16px;
   transition: background-color 0.3s, color 0.3s;
-
-  &:hover {
-    background-color: #1e88e5;
-    color: #fff;
-  }
 `;
