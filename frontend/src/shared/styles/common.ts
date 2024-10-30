@@ -1,4 +1,4 @@
-export const Common = {
+const Common = {
   colors: {
     background: '#F8F8F8',
     black: '#1D1D20',
@@ -15,3 +15,5 @@ export const Common = {
     gray100: '#F0F1F4',
   },
 };
+
+export default Common;
