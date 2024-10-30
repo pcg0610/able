@@ -1,10 +1,10 @@
-import json
 import shutil
 import logging
-
+import io
 from pathlib import Path
-from pydantic import BaseModel
-from typing import List, Optional, Any, Dict
+from typing import List
+from PIL import Image
+from src.file.exceptions import FileNotFoundException, FileUnreadableException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,13 +16,13 @@ def create_directory(path: Path) -> bool:
             logger.info(f"디렉터리 생성 성공: {path}")
             return True
         except Exception as e:
-            logger.error(f"디렉터리 생성 실패: {e}")
+            logger.error(f"디렉터리 생성 실패: {e}", exc_info=True)
             return False
     return False
 
 def get_directory(path: Path) -> List[Path]:
     if path.exists() and path.is_dir():
-        return [item for item in path.iterdir()]
+        return list(path.iterdir())
     return []
 
 def delete_directory(path: Path) -> bool:
@@ -32,46 +32,55 @@ def delete_directory(path: Path) -> bool:
             logger.info(f"디렉터리 삭제 성공: {path}")
             return True
         except Exception as e:
-            logger.error(f"디렉터리 삭제 실패: {e}")
+            logger.error(f"디렉터리 삭제 실패: {e}", exc_info=True)
             return False
     return False
 
-def create_file(path: Path, obj: Any) -> bool:
+def create_file(path: Path, data: str) -> bool:
 
     create_directory(path.parent)
 
-    if isinstance(obj, BaseModel):
-        data = obj.model_dump()
-    else:
-        raise TypeError("객체가 Pydantic BaseModel 인스턴스여야 합니다.")
-
     try:
         with path.open("w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-        logger.info(f"파일 생성 성공: {path}")
+            f.write(data)
+        logger.info(f"파일 저장 성공: {path}")
         return True
-    except (TypeError, json.JSONDecodeError) as e:
-        logger.error(f"파일 생성 실패: {e}")
+    except TypeError as e:
+        logger.error(f"파일 저장 실패: {e}", exc_info=True)
         return False
 
-def get_file(path: Path) -> Optional[Dict[str, Any]]:
+def get_file(path: Path) -> str:
+
     if path.exists() and path.is_file():
         try:
             with path.open("r", encoding="utf-8") as f:
-                return json.load(f)
-        except json.JSONDecodeError as e:
-            logger.error(f"파일 읽기 실패: {e}")
-            return None
-    return None
+                return f.read()
+        except Exception as e:
+            raise FileUnreadableException(f"파일을 읽을 수 없습니다: {path}") from e
 
-def delete_file(path: Path) -> bool:
+    raise FileNotFoundException(f"파일을 찾을 수 없거나 접근할 수 없습니다: {path}")
+
+def read_image_file(path: Path) -> bytes:
+    if path.exists() and path.is_file():
+        try:
+            with path.open("rb") as f:
+                image_data = f.read()
+                image = Image.open(io.BytesIO(image_data))
+                image.verify()
+                return image_data
+        except Exception as e:
+            raise FileUnreadableException(f"파일을 읽을 수 없습니다: {path}") from e
+
+    raise FileNotFoundException(f"파일을 찾을 수 없거나 접근할 수 없습니다: {path}")
+
+def remove_file(path: Path) -> bool:
     if path.exists() and path.is_file():
         try:
             path.unlink()
             logger.info(f"파일 삭제 성공: {path}")
             return True
         except Exception as e:
-            logger.error(f"파일 삭제 실패: {e}")
+            logger.error(f"파일 삭제 실패: {e}", exc_info=True)
             return False
     return False
 
@@ -83,7 +92,7 @@ def rename_path(path: Path, new_name: str) -> bool:
             logger.info(f"이름 변경 성공: {path} -> {new_path}")
             return True
         except Exception as e:
-            logger.error(f"이름 변경 실패: {e}")
+            logger.error(f"이름 변경 실패: {e}", exc_info=True)
             return False
 
     logger.warning(f"이름 변경 실패: {path} -> {new_name}")

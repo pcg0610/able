@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import tsconfigPaths from "vite-tsconfig-paths";
+import svgr from "vite-plugin-svgr";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,13 +14,11 @@ export default defineConfig({
         find: "@components",
         replacement: resolve(__dirname, "src/components"),
       },
-      { find: "@hooks", replacement: resolve(__dirname, "src/hooks") },
       {
-        find: "@services",
-        replacement: resolve(__dirname, "src/services"),
+        find: "@widgets",
+        replacement: resolve(__dirname, "src/widgets"),
       },
       { find: "@shared", replacement: resolve(__dirname, "src/shared") },
-      { find: "@stores", replacement: resolve(__dirname, "src/stores") },
       {
         find: "@icons",
         replacement: resolve(__dirname, "src/assets/icons"),
@@ -28,11 +27,7 @@ export default defineConfig({
         find: "@images",
         replacement: resolve(__dirname, "src/assets/images"),
       },
-      {
-        find: "@fonts",
-        replacement: resolve(__dirname, "src/assets/fonts"),
-      },
     ],
   },
-  plugins: [react(), tsconfigPaths()],
+  plugins: [react(), tsconfigPaths(), svgr()],
 });
