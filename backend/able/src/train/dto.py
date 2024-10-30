@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from block.enums import BlockType
+from src.block.enums import BlockType
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
