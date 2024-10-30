@@ -20,6 +20,10 @@ class TrainRequestDto(BaseModel):
     project_name: str
     epoch: int
     batch_size: int
+    data: BlockDto
+    interpreter: BlockDto
+    loss: BlockDto
+    optimizer: BlockDto
     blocks: tuple[BlockDto]
     edges: tuple[EdgeDto]
     
