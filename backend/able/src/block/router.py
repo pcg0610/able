@@ -1,8 +1,14 @@
 from fastapi import APIRouter
-from src.block.schemas import SearchBlockResponse
+
+from src.block.enums import BlockType
+from src.block.schemas import BlockResponse, BlocksResponse
 
 block_router = router = APIRouter()
 
-@router.get("", response_model=SearchBlockResponse)
+@router.get("", response_model=BlocksResponse)
+def blocks_by_type(type: BlockType):
+    return BlocksResponse(blocks = find_blocks_by_type(type))
+
+@router.get("/search", response_model=BlockResponse)
 def search(keyword: str):
-    return SearchBlockResponse(block = search(keyword))
+    return BlockResponse(block = search(keyword))

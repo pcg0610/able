@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from src.block.enums import BlockType
 from pydantic import BaseModel
 
@@ -20,5 +20,8 @@ class Edge(BaseModel):
     class Config:
         frozen = True
 
-class SearchBlockResponse(BaseModel):
+class BlockResponse(BaseModel):
     block: Block
+
+class BlocksResponse(BaseModel):
+    blocks: List[Block]
