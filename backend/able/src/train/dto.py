@@ -5,6 +5,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class BlockDto(BaseModel):
     block_id: str
+    name: str
     type: BlockType
     position: str
     args: dict
@@ -20,8 +21,12 @@ class TrainRequestDto(BaseModel):
     project_name: str
     epoch: int
     batch_size: int
-    blocks: list[BlockDto]
-    edges: list[EdgeDto]
+    data: BlockDto
+    interpreter: BlockDto
+    loss: BlockDto
+    optimizer: BlockDto
+    blocks: tuple[BlockDto]
+    edges: tuple[EdgeDto]
     
 class TrainResponseDto(BaseModel):
     pass
