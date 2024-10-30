@@ -1,5 +1,4 @@
-from .utils import Trainer, find_data_block, find_interpreter_block, validate_data_path, create_data_loaders, \
-    convert_block_graph_to_model, find_loss_block, find_optimizer_block
+from .utils import Trainer, validate_data_path, create_data_loaders, convert_block_graph_to_model
 from . import TrainRequestDto
 
 def train(train_request_dto: TrainRequestDto):
@@ -10,4 +9,4 @@ def train(train_request_dto: TrainRequestDto):
 
     train_data_loader, valid_data_loader, test_data_loader = create_data_loaders(data_path)
 
-    convert_block_graph_to_model(train_request_dto.blocks, train_request_dto.edges)
+    model = convert_block_graph_to_model(train_request_dto.blocks, train_request_dto.edges)
