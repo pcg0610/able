@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
+from torch.utils.data import random_split
+from . import BlockDto, EdgeDto
+from block.enums import BlockType
 
 MAX_LOSS = 10e8
 
@@ -84,3 +87,26 @@ class Logger:
     """
     def __init__(self):
         pass
+    
+def convert_blockgraph_to_model(blocks: list[BlockDto], edges: list[EdgeDto]) -> nn.Module:
+    
+    pass
+
+def find_data_block(blocks: list[BlockDto]) -> BlockDto | None:
+    for block in blocks:
+        if block.type == BlockType.DATA:
+            return block
+    return None
+
+def find_interpreter_block(blocks: list[BlockDto]) -> BlockDto | None:
+    for block in blocks:
+        if block.type == BlockType.INTERPRETER:
+            return block
+    return None
+
+def validate_data_path(data_path: str) -> bool:
+    pass
+
+def create_data_loaders(data_path: str) -> tuple[DataLoader, DataLoader, DataLoader]:
+    
+    pass
