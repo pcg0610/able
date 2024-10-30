@@ -1,6 +1,6 @@
 from enum import Enum
 
-class BlockType(Enum):
+class BlockType(str, Enum):
     TRANSFORM = "Transform"
     LAYER = "Layer"
     ACTIVATION = "Activation"

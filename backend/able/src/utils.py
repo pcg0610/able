@@ -1,23 +1,28 @@
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from pydantic import BaseModel
 import logging
 import base64
 
 logger = logging.getLogger(__name__)
 
-def str_to_json(content: str) -> Optional[Dict[str, Any]]:
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON 디코딩 실패: {e}", exc_info=True)
-        return None
+def str_to_json(data: str) -> Dict[str, Any]:
 
-def json_to_str(data: Any) -> str:
-    if isinstance(data, BaseModel):
-        data_dict = data.model_dump()
-    elif isinstance(data, dict):
-        data_dict = data
+    if not isinstance(data, str):
+        logger.error(f"Invalid data type: Expected a JSON string, but got {type(data)}")
+        raise TypeError("Invalid data type: Expected a JSON string.")
+
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON 디코딩 실패: {e}. 데이터: {data[:50]}...", exc_info=True)
+        raise
+
+def json_to_str(obj: Any) -> str:
+    if isinstance(obj, BaseModel):
+        data_dict = obj.model_dump()
+    elif isinstance(obj, dict):
+        data_dict = obj
     else:
         raise TypeError("지원되지 않는 데이터 타입입니다. Pydantic 모델 또는 딕셔너리가 필요합니다.")
 

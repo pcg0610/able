@@ -5,12 +5,12 @@ from src.canvas.service import get_block_graph, save_block_graph
 
 canvas_router = router = APIRouter()
 
-@router.get("/projects/canvas", response_model=GetCanvasResponse)
+@router.get("", response_model=GetCanvasResponse)
 def get_canvas(project_name: str):
     data = get_block_graph(project_name)
     return GetCanvasResponse(data=data)
 
-@router.post("/projects/canvas")
+@router.post("")
 def save_canvas(project_name: str, data: SaveCanvasRequest):
 
     success = save_block_graph(project_name, data)

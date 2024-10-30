@@ -1,14 +1,14 @@
 from typing import List
 from pydantic import BaseModel
-from src.train import BlockDto, EdgeDto
+from src.block.schemas import Block, Edge
 
 class GetCanvasResponse(BaseModel):
-    blocks: List[BlockDto]
-    edges: List[EdgeDto]
+    blocks: List[Block]
+    edges: List[Edge]
 
 class SaveCanvasResponse(BaseModel):
     success: bool
 
 class SaveCanvasRequest(BaseModel):
-    blocks: List[BlockDto]
-    edges: List[EdgeDto]
+    blocks: List[Block]
+    edges: List[Edge]
