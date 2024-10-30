@@ -3,6 +3,7 @@ import {
   MiniMap,
   Controls,
   Background,
+  BackgroundVariant,
   useNodesState,
   useEdgesState,
   addEdge,
@@ -36,8 +37,8 @@ const CanvasEditor = () => {
         onConnect={onConnect}
       >
         <Controls />
-        <MiniMap />
-        <Background variant='dots' gap={12} size={1} />
+        {/* <MiniMap /> */}
+        <Background variant={BackgroundVariant.Dots} />
       </ReactFlow>
     </div>
   );
