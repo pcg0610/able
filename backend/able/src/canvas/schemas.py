@@ -1,5 +1,6 @@
+from typing import List
 from pydantic import BaseModel
-from train import BlockDto, EdgeDto
+from src.train import BlockDto, EdgeDto
 
 class GetCanvasResponse(BaseModel):
     blocks: List[BlockDto]
