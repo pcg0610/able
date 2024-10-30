@@ -3,8 +3,8 @@ import shutil
 import logging
 
 from pathlib import Path
-from pydantic import BaseModel
-from typing import List, Optional, Any, Dict
+from typing import List, Optional
+from src.file.exceptions import FileNotFoundException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,33 +36,29 @@ def delete_directory(path: Path) -> bool:
             return False
     return False
 
-def create_file(path: Path, obj: Any) -> bool:
+def create_file(path: Path, content: str) -> bool:
 
     create_directory(path.parent)
 
-    if isinstance(obj, BaseModel):
-        data = obj.model_dump()
-    else:
-        raise TypeError("객체가 Pydantic BaseModel 인스턴스여야 합니다.")
-
     try:
         with path.open("w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-        logger.info(f"파일 생성 성공: {path}")
+            f.write(content)
+        logger.info(f"파일 저장 성공: {path}")
         return True
     except (TypeError, json.JSONDecodeError) as e:
-        logger.error(f"파일 생성 실패: {e}")
+        logger.error(f"파일 저장 실패: {e}")
         return False
 
-def get_file(path: Path) -> Optional[Dict[str, Any]]:
+def get_file(path: Path) -> Optional[str]:
+
     if path.exists() and path.is_file():
         try:
             with path.open("r", encoding="utf-8") as f:
-                return json.load(f)
-        except json.JSONDecodeError as e:
-            logger.error(f"파일 읽기 실패: {e}")
-            return None
-    return None
+                return f.read()
+        except Exception as e:
+            raise FileNotFoundException(f"파일을 읽을 수 없습니다: {path}")
+
+    raise FileNotFoundException(f"파일을 찾을 수 없거나 접근할 수 없습니다: {path}")
 
 def delete_file(path: Path) -> bool:
     if path.exists() and path.is_file():
