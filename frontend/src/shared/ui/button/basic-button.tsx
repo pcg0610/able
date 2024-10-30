@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { StyledButton } from '@shared/ui/button/basic-button.style';
+import { Common } from '@shared/styles/common';
 
 interface BasicButtonProps {
   color?: string;
@@ -11,8 +12,8 @@ interface BasicButtonProps {
 }
 
 const BasicButton: React.FC<BasicButtonProps> = ({
-  color = '#0051FF',
-  backgroundColor = '#A2C5F9',
+  color = Common.colors.white,
+  backgroundColor = Common.colors.primary,
   text,
   icon,
   onClick,
