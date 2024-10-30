@@ -10,10 +10,10 @@ export const StyledButton = styled.button<{ color: string; backgroundColor: stri
   font-weight: bold;
   cursor: pointer;
 
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, filter 0.3s;
 
   &:hover {
-    background-color: #bbdefb;
+    filter: brightness(0.9) saturate(2);
   }
 
   &:focus {
