@@ -5,14 +5,13 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
-from typing import Iterator, List, Any
+from typing import Iterator, Any
 
-from . import Block, Edge
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
-from ..block.schemas import Block
+from ..block.schemas import Block, Edge
 from ..block.utils import convert_block_to_module
 
 MAX_LOSS = 10e8
