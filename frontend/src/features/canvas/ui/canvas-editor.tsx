@@ -9,7 +9,7 @@ import {
   BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import BlockNode from '@/entities/canvas/block-node';
+import BlockNode from '@/entities/block-node/block-node';
 
 const initialNodes = [
   {
@@ -54,7 +54,7 @@ const CanvasEditor = () => {
   );
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

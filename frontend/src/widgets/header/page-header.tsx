@@ -18,6 +18,7 @@ const PageHeader = ({ title, date }: PageHeaderProps) => {
     <S.Header>
       <ArrowButton
         direction='left'
+        size='md'
         color={Common.colors.white}
         onClick={handleGoBack}
       />
