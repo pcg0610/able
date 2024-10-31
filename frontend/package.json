@@ -16,6 +16,8 @@
     "@xyflow/react": "^12.3.2",
     "axios": "^1.7.7",
     "react": "^18.3.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
     "recharts": "^2.13.1",
