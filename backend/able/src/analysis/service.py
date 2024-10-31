@@ -12,6 +12,12 @@ logger = logging.getLogger(__name__)
 
 pathManager = PathManager()
 
+def get_epochs(project_name: str, result_name: str) -> List[str]:
+    epochs_path = pathManager.get_epochs_path(project_name, result_name)
+    epochs = get_directory(epochs_path)
+    return [epoch.name for epoch in epochs if epoch.is_dir()]
+
+
 def get_result(project_name: str, result_name: str, epoch_name:str, block_id: str) -> str:
     feature_map_path = pathManager.get_feature_maps_path(project_name, result_name, get_epoch_id(epoch_name))
     
