@@ -1,6 +1,6 @@
 import * as S from '@pages/canvas/canvas.style';
 
-import CanvasSidebar from '@/widgets/sidebar/canvas-sidebar';
+import CanvasSidebar from '@/features/canvas/canvas-sidebar';
 import CanvasEditor from '@features/canvas/canvas-editor';
 import PageHeader from '@widgets/header/page-header';
 
