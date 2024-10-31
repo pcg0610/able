@@ -2,15 +2,15 @@ from typing import Dict, List
 from src.block.enums import BlockType
 from src.response.schemas import ImmutableBaseModel
 
+class Arg(ImmutableBaseModel):
+    name: str
+    is_required: bool
 
 class Block(ImmutableBaseModel):
     name: str
     type: BlockType
     position: str
-    args: Dict[str, str]
-
-    class Config:
-        frozen = True
+    args: List[Arg]
 
 class Edge(ImmutableBaseModel):
     edge_id: str
