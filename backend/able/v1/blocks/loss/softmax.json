@@ -1,0 +1,9 @@
+{
+    "id": "loss1",
+    "type": "Loss",
+    "name": "Softmax",
+    "description": "Initialize internal Module state, shared by both nn.Module and ScriptModule.",
+    "args": [
+        "dim"
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "id": "layer1",
+    "type": "Layer",
+    "name": "Conv2d",
+    "description": "Applies a 2D convolution over an input signal composed of several input planes.",
+    "args": [
+        "in_channels",
+        "out_channels",
+        "kernel_size",
+        "stride",
+        "padding",
+        "dilation",
+        "groups",
+        "bias",
+        "padding_mode",
+        "device",
+        "dtype"
+    ]
+}

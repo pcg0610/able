@@ -1,0 +1,48 @@
+import logging
+from typing import List
+
+from src.block.enums import BlockType
+from src.block.exceptions import BlockNotFoundException
+from src.block.schemas import Block
+from src.file.file_utils import get_file, get_directory
+from src.file.path_manager import PathManager
+from src.utils import str_to_json
+
+logger = logging.getLogger(__name__)
+path_manager = PathManager()
+
+def find_blocks_by_type(block_type: BlockType) -> List[Block]:
+
+    block_type_dir_path = path_manager.get_block_path(block_type)
+    logger.info(f"Searching for blocks of type '{block_type.value}' in {block_type_dir_path}")
+
+    blocks_path = get_directory(block_type_dir_path)
+    if not blocks_path:
+        raise BlockNotFoundException(f"No blocks found in directory for type '{block_type.value}'")
+
+    blocks = []
+    for block_path in blocks_path:
+
+        if block_path.suffix != ".json":
+            logger.warning(f"Skipping non-JSON file: {block_path}")
+            continue
+
+        logger.debug(f"Checking path: {block_path}")
+        data = get_file(block_path)
+        blocks.append(Block(**str_to_json(data)))
+
+    return blocks
+
+def search(keyword: str) -> Block:
+
+    types_dir = get_directory(path_manager.blocks_path)
+
+    for type_dir in types_dir:
+        blocks_path = get_directory(type_dir)
+        for block_path in blocks_path:
+            logger.debug(f"Checking path: {block_path}")
+            if block_path.name == f"{keyword}.json":
+                block_data = get_file(block_path)
+                return Block(**str_to_json(block_data))
+
+    raise BlockNotFoundException(keyword)

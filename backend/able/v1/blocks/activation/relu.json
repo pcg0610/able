@@ -1,0 +1,9 @@
+{
+    "id": "activation1",
+    "type": "Activation",
+    "name": "ReLU",
+    "description": "Rectified Linear Unit activation function.",
+    "args": [
+        "inplace"
+    ]
+}
