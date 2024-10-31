@@ -162,3 +162,7 @@ def convert_criterion_block_to_module(block):
 
 def convert_optimizer_to_optimizer(block: BlockDto, parameters: Iterator[nn.Parameter]) -> optim.Optimizer:
     pass
+
+
+def convert_block_to_module():
+    return None
