@@ -10,7 +10,7 @@ import {
    Area,
 } from 'recharts';
 
-import { Common } from '@shared/styles/common';
+import Common from '@shared/styles/common';
 
 const data = [
    { epoch: 0, trainingLoss: 0.02, validationLoss: 0.12 },
@@ -35,6 +35,9 @@ const LossGraph = () => {
             <Legend
                verticalAlign="top"
                align="right"
+               //layout='vertical'
+               height={40}
+               iconSize={10}
                formatter={(value) => (
                   <span style={{ color: Common.colors.graphDetail }}>{value}</span>
                )}
@@ -47,7 +50,7 @@ const LossGraph = () => {
                type="monotone"
                dataKey="validationLoss"
                stroke={Common.colors.primary}
-               fill={Common.colors.secondaryButton}
+               fill={Common.colors.secondary}
                strokeWidth={2}
                dot={false}
                name="Smoothed validation loss"

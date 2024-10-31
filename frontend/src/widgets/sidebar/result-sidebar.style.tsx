@@ -17,9 +17,9 @@ export const SidebarButton = styled.button<{ active: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin: .625rem;
+  width: 3rem;
+  height: 3rem;
+  margin: .6rem;
   border-radius: .625rem;
   background-color: ${({ active }) => (active ? Common.colors.primary : Common.colors.white)};
   color: ${({ active }) => (active ? Common.colors.white : Common.colors.black)};

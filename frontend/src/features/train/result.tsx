@@ -1,7 +1,5 @@
-// result.tsx
-import React from 'react';
-
 import * as S from '@features/train/train-feature.style';
+import Common from '@shared/styles/common';
 
 import ConfusionMatrix from '@features/train/result/confusion-matrix';
 import EpochGraph from '@features/train/result/epoch-graph';
@@ -10,13 +8,13 @@ import LossGraph from '@features/train/result/loss-graph';
 import PerformanceTable from '@features/train/result/performance-table';
 import BasicButton from '@shared/ui/button/basic-button'
 
-const Result: React.FC = () => {
+const Result = () => {
    return (
       <S.Container>
          <S.Header>
             <BasicButton
-               color="#0051FF"
-               backgroundColor="#D8E6FB"
+               color={Common.colors.primary}
+               backgroundColor={Common.colors.secondary}
                text="모델 배포하기"
                onClick={() => {
                   console.log('모델 실행 버튼 클릭됨');
@@ -26,26 +24,26 @@ const Result: React.FC = () => {
          <S.GridContainer>
             <div className="top-row">
                <S.GraphCard>
-                  <LossGraph />
                   <S.GraphTitle>Training and validation loss</S.GraphTitle>
+                  <LossGraph />
                </S.GraphCard>
                <S.GraphCard>
-                  <EpochGraph />
                   <S.GraphTitle>Epoch Accuracy</S.GraphTitle>
+                  <EpochGraph />
                </S.GraphCard>
             </div>
             <div className="bottom-row">
                <S.GraphCard>
-                  <ConfusionMatrix />
                   <S.GraphTitle>Confusion Matrix</S.GraphTitle>
+                  <ConfusionMatrix />
                </S.GraphCard>
                <S.GraphCard>
-                  <F1Score />
                   <S.GraphTitle>F1-Score</S.GraphTitle>
+                  <F1Score />
                </S.GraphCard>
                <S.GraphCard>
-                  <PerformanceTable />
                   <S.GraphTitle>Performance Matrices Table</S.GraphTitle>
+                  <PerformanceTable />
                </S.GraphCard>
             </div>
          </S.GridContainer>
