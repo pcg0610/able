@@ -1,18 +1,16 @@
-import { useState } from 'react';
+import { ComponentType, useState } from 'react';
 
 import * as S from '@features/canvas/ui/sidebar/menu-accordion.style';
-import { MENU_ICON_MAP } from '@features/canvas/costants/block-types.constant';
 
 import ArrowButton from '@/shared/ui/button/arrow-button';
 
 interface MenuAccordionProps {
   label: string;
-  icon: keyof typeof MENU_ICON_MAP;
+  Icon?: ComponentType;
 }
 
-const MenuAccordion = ({ label, icon }: MenuAccordionProps) => {
+const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const MenuIcon = MENU_ICON_MAP[icon];
 
   const handleToggleOpen = () => {
     setIsOpen(!isOpen);
@@ -26,7 +24,7 @@ const MenuAccordion = ({ label, icon }: MenuAccordionProps) => {
     <>
       <S.Container>
         <S.LabelWrapper>
-          {icon && <MenuIcon />}
+          {Icon && <Icon />}
           {capitalizeFirstLetter(label)}
         </S.LabelWrapper>
         <ArrowButton

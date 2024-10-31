@@ -6,52 +6,40 @@ import OperationIcon from '@assets/icons/operation.svg?react';
 import OptimizerIcon from '@assets/icons/optimizer.svg?react';
 import ModuleIcon from '@assets/icons/module.svg?react';
 
-export const MENU_ICON_MAP = {
-  TransformIcon,
-  LayerIcon,
-  ActivationIcon,
-  LossIcon,
-  OperationIcon,
-  OptimizerIcon,
-  ModuleIcon,
-};
-
 export const BLOCK_MENU = [
   {
     name: 'transform',
-    icon: 'TransformIcon', // 아이콘 컴포넌트 이름
-    color: '#FF5733', // 임시 블록 색상
+    icon: TransformIcon,
+    color: '#FF686B',
   },
   {
     name: 'layer',
-    icon: 'LayerIcon',
-    color: '#33C1FF',
+    icon: LayerIcon,
+    color: '#34D399',
   },
   {
     name: 'activation',
-    icon: 'ActivationIcon',
-    color: '#75FF33',
+    icon: ActivationIcon,
+    color: '#71D334',
   },
   {
     name: 'loss',
-    icon: 'LossIcon',
-    color: '#FF33A1',
+    icon: LossIcon,
+    color: '#EE74B5',
   },
   {
     name: 'operation',
-    icon: 'OperationIcon',
-    color: '#9B33FF',
+    icon: OperationIcon,
+    color: '#A768FF',
   },
   {
     name: 'optimizer',
-    icon: 'OptimizerIcon',
-    color: '#FFD733',
+    icon: OptimizerIcon,
+    color: '#FFD00D',
   },
   {
     name: 'module',
-    icon: 'ModuleIcon',
-    color: '#33FFAA',
+    icon: ModuleIcon,
+    color: '#30AEF7',
   },
 ] as const;
-
-export type MenuName = (typeof BLOCK_MENU)[number]['name'];

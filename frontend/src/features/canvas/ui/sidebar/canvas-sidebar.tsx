@@ -6,7 +6,7 @@ const CanvasSidebar = () => {
   return (
     <S.SidebarContainer>
       {BLOCK_MENU.map((menu) => (
-        <MenuAccordion label={menu.name} icon={menu.icon} />
+        <MenuAccordion label={menu.name} Icon={menu.icon} />
       ))}
     </S.SidebarContainer>
   );
