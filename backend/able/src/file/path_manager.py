@@ -36,7 +36,7 @@ class PathManager:
 
     def get_epoch_path(self, name: str, result_name: str, epoch: int) -> Path:
         """에포크별 경로"""
-        return self.get_result_path(name, result_name) / "epochs" / f"epoch_{epoch}"
+        return self.get_train_result_path(name, result_name) / "epochs" / f"epoch_{epoch}"
 
     def get_feature_maps_path(self, name: str, result_name: str, epoch: int) -> Path:
         """특정 에포크의 피처맵 이미지 디렉터리 경로"""
