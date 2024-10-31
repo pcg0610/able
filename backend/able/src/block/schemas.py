@@ -1,10 +1,10 @@
 from typing import Dict, List
 from src.block.enums import BlockType
-from pydantic import BaseModel
+from src.response.schemas import ImmutableBaseModel
 
 
-class Block(BaseModel):
-    block_id: str
+class Block(ImmutableBaseModel):
+    name: str
     type: BlockType
     position: str
     args: Dict[str, str]
@@ -12,16 +12,13 @@ class Block(BaseModel):
     class Config:
         frozen = True
 
-class Edge(BaseModel):
+class Edge(ImmutableBaseModel):
     edge_id: str
     source: str
     target: str
 
-    class Config:
-        frozen = True
-
-class BlockResponse(BaseModel):
+class BlockResponse(ImmutableBaseModel):
     block: Block
 
-class BlocksResponse(BaseModel):
+class BlocksResponse(ImmutableBaseModel):
     blocks: List[Block]

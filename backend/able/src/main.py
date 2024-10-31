@@ -18,7 +18,7 @@ app.include_router(block_router, prefix="/block", tags=["블록"])
 
 app.include_router(project_router, prefix="/projects", tags=["프로젝트"])
 
-app.include_router(canvas_router, prefix="/project/canvas", tags=["캔버스"])
+app.include_router(canvas_router, prefix="/projects/canvas", tags=["캔버스"])
 
 @app.exception_handler(HTTPException)
 async def base_custom_exception_handler(request: Request, exc: BaseCustomException):
