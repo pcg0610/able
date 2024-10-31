@@ -11,8 +11,8 @@ from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
-from ..block.schemas import Block, Edge
-from ..block.utils import convert_block_to_module
+from src.block.schemas import Block, Edge
+from src.block.utils import convert_block_to_module
 
 MAX_LOSS = 10e8
 
@@ -48,6 +48,9 @@ class Trainer:
 
             # Forward pass
             outputs = self.model(inputs)
+
+            print(len((outputs, targets)))
+
             loss = self.criterion(outputs, targets)
 
             # Backward pass and optimize
@@ -89,14 +92,14 @@ class Trainer:
             #TODO: Logging 구현
 
             # Checkpoint (간단히 마지막 모델만 저장)
-            if epoch % self.checkpoint_interval == 0:
-                torch.save(self.model.state_dict(), f"model_checkpoint_epoch_{epoch+1}.pth")
-                
-            if best_train_loss > train_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_train_loss.pth")
-            
-            if best_valid_loss > valid_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
+            # if epoch % self.checkpoint_interval == 0:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_epoch_{epoch+1}.pth")
+            #
+            # if best_train_loss > train_loss:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_best_train_loss.pth")
+            #
+            # if best_valid_loss > valid_loss:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
 class Tester:
     pass

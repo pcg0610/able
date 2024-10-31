@@ -8,8 +8,11 @@ from src.block.router import block_router
 from src.canvas.router import router as canvas_router
 from src.project.router import router as project_router
 from src.exceptions import BaseCustomException
+from src.train.controller import train_router
 
 app = FastAPI()
+
+app.include_router(train_router, prefix="/train", tags=["학습"])
 
 app.include_router(block_router, prefix="/block", tags=["블록"])
 
@@ -26,4 +29,3 @@ async def base_custom_exception_handler(request: Request, exc: BaseCustomExcepti
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=5000, log_level="info")
-
