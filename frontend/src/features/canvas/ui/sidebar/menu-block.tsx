@@ -1,4 +1,5 @@
 import { ComponentType } from 'react';
+import { useDrag } from 'react-dnd';
 
 import * as S from '@features/canvas/ui/sidebar/menu-block.style';
 
@@ -10,8 +11,16 @@ interface MenuBlockProps {
 }
 
 const MenuBlock = ({ label, Icon }: MenuBlockProps) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'BLOCK', // 드래그 타입을 지정
+    item: { label }, // 드래그 시 전달할 데이터
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+
   return (
-    <S.Container>
+    <S.Container ref={drag} isDragging={isDragging}>
       <S.Content>
         <S.LabelWrapper>
           {Icon && <Icon />}
