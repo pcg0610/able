@@ -9,7 +9,7 @@ import {
   BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import BlockNode from '@/entities/canvas/block-node';
+import BlockNode from '@/entities/block-node/block-node';
 
 const initialNodes = [
   {
