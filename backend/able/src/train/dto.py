@@ -25,6 +25,7 @@ class TrainRequestDto(BaseModel):
     interpreter: BlockDto
     loss: BlockDto
     optimizer: BlockDto
+    transforms: tuple[BlockDto]
     blocks: tuple[BlockDto]
     edges: tuple[EdgeDto]
     
