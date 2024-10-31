@@ -12,16 +12,15 @@ class Loss(ImmutableBaseModel):
     validation: float
 
 class Accuracy(ImmutableBaseModel):
-    epoch: str
     accuracy: float
 
 class EpochResult(ImmutableBaseModel):
     epoch: str
-    performance_metrics: PerformanceMetrics
     losses: Loss
     accuracies: Accuracy
 
 class TrainResultResponse(ImmutableBaseModel):
     confusion_matrix: str
+    performance_metrics: PerformanceMetrics
     f1_score: str
     epoch_result: List[EpochResult]
