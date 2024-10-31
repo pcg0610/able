@@ -1,5 +1,4 @@
 import logging
-from src.canvas.exceptions import CanvasNotFoundException
 from src.canvas.schemas import SaveCanvasRequest, Canvas
 from src.file.file_utils import get_file, create_file
 from src.file.path_manager import PathManager

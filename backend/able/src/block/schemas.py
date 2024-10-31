@@ -1,4 +1,3 @@
-from typing import Dict, List
 from src.block.enums import BlockType
 from src.response.schemas import ImmutableBaseModel
 
@@ -10,7 +9,7 @@ class Block(ImmutableBaseModel):
     name: str
     type: BlockType
     position: str
-    args: List[Arg]
+    args: list[Arg]
 
 class Edge(ImmutableBaseModel):
     edge_id: str
@@ -21,4 +20,4 @@ class BlockResponse(ImmutableBaseModel):
     block: Block
 
 class BlocksResponse(ImmutableBaseModel):
-    blocks: List[Block]
+    blocks: list[Block]
