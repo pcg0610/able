@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { StyledButton } from '@shared/ui/button/basic-button.style';
+import { StyledButton, StyledIcon } from '@shared/ui/button/basic-button.style';
 import Common from '@shared/styles/common';
 
 interface BasicButtonProps {
@@ -24,7 +24,7 @@ const BasicButton = ({
       backgroundColor={backgroundColor}
       onClick={onClick}
     >
-      {icon && <span>{icon}</span>}
+      {icon && <StyledIcon>{icon}</StyledIcon>}
       {text}
     </StyledButton>
   );
