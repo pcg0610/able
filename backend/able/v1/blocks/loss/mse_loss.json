@@ -1,0 +1,11 @@
+{
+    "name": "mse_loss",
+    "type": "loss",
+    "args": [
+        {
+            "name": "reduction",
+            "value": "mean",
+            "is_required": false
+        }
+    ]
+}

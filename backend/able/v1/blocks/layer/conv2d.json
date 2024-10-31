@@ -1,19 +1,46 @@
 {
-    "id": "layer1",
-    "type": "Layer",
-    "name": "Conv2d",
-    "description": "Applies a 2D convolution over an input signal composed of several input planes.",
+    "name": "conv2d",
+    "type": "layer",
     "args": [
-        "in_channels",
-        "out_channels",
-        "kernel_size",
-        "stride",
-        "padding",
-        "dilation",
-        "groups",
-        "bias",
-        "padding_mode",
-        "device",
-        "dtype"
+        {
+            "name": "in_channels",
+            "value": "3",
+            "is_required": true
+        },
+        {
+            "name": "out_channels",
+            "value": "64",
+            "is_required": true
+        },
+        {
+            "name": "kernel_size",
+            "value": "3",
+            "is_required": true
+        },
+        {
+            "name": "stride",
+            "value": "1",
+            "is_required": false
+        },
+        {
+            "name": "padding",
+            "value": "0",
+            "is_required": false
+        },
+        {
+            "name": "dilation",
+            "value": "1",
+            "is_required": false
+        },
+        {
+            "name": "groups",
+            "value": "1",
+            "is_required": false
+        },
+        {
+            "name": "bias",
+            "value": "true",
+            "is_required": false
+        }
     ]
 }

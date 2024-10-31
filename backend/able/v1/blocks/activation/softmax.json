@@ -1,0 +1,11 @@
+{
+    "name": "softmax",
+    "type": "activation",
+    "args": [
+        {
+            "name": "dim",
+            "value": "1",
+            "is_required": false
+        }
+    ]
+}

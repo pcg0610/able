@@ -1,0 +1,16 @@
+{
+    "name": "dropout",
+    "type": "layer",
+    "args": [
+        {
+            "name": "p",
+            "value": "0.5",
+            "is_required": false
+        },
+        {
+            "name": "inplace",
+            "value": "false",
+            "is_required": false
+        }
+    ]
+}

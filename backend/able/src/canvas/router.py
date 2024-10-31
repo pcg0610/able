@@ -1,15 +1,32 @@
-from fastapi import APIRouter, HTTPException
+import src.canvas.service as service
 
-from src.canvas.exceptions import CanvasNotFoundException
-from src.canvas.schemas import BlockGraphResponse
-from src.canvas.service import get_block_graph
+from fastapi import APIRouter
+from src.canvas.schemas import GetCanvasResponse, SaveCanvasRequest
+from src.response.schemas import ResponseModel
+from src.response.utils import ok, created, no_content
 
-router = APIRouter()
+canvas_router = router = APIRouter()
 
-@router.get("/projects/canvas", response_model=BlockGraphResponse)
+@router.get(
+    path="",
+    response_model=ResponseModel[GetCanvasResponse],
+    summary="캔버스 조회",
+    description="현재 사용자가 생성중인 블록 그래프를 조회한다."
+)
 def get_canvas(project_name: str):
-    try:
-        data = get_block_graph(project_name)
-        return BlockGraphResponse(data = data)
-    except CanvasNotFoundException as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    canvas = service.get_canvas(project_name)
+
+    if not canvas.blocks and not canvas.edges:
+        return no_content()
+
+    return ok(data=GetCanvasResponse(canvas=canvas))
+
+@router.post(
+    path="",
+    summary="캔버스 저장",
+    description="현재 사용자가 생성중인 블록 그래프 저장한다."
+)
+def save_canvas(project_name: str, canvas: SaveCanvasRequest):
+    service.save_block_graph(project_name, canvas)
+    return created()
+

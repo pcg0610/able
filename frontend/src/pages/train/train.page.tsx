@@ -1,28 +1,26 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import * as S from '@pages/train/train.style';
+import { Container, Content } from '@pages/train/train.style';
 
-import Sidebar from '@/widgets/sidebar/result-sidebar';
-//import AnalyzeComponent from '@features/train/analyze';
-import ResultComponent from '@features/train/result';
+import Sidebar from '@widgets/sidebar/result-sidebar';
+import AnalyzeComponent from '@features/train/analyze/analyze';
+import ResultComponent from '@features/train/result/result';
 
-const TrainPage: React.FC = () => {
-  const [selectedComponent, setSelectedComponent] = useState('analyze'); // 초기값을 'analyze'로 설정
+const TrainPage = () => {
+  const [selectedComponent, setSelectedComponent] = useState('result');
 
-  // Sidebar에서 선택된 항목 변경 함수
   const handleSidebarSelection = (selection: string) => {
     setSelectedComponent(selection);
   };
 
   return (
-    <S.Container>
+    <Container>
       <Sidebar onSelectionChange={handleSidebarSelection} />
-      <S.Content>
-        {/* {selectedComponent === 'analyze' && <AnalyzeComponent />}
-            {selectedComponent === 'result' && <ResultComponent />} */}
-        <ResultComponent />
-      </S.Content>
-    </S.Container>
+      <Content>
+        {selectedComponent === 'analyze' && <AnalyzeComponent />}
+        {selectedComponent === 'result' && <ResultComponent />}
+      </Content>
+    </Container>
   );
 };
 

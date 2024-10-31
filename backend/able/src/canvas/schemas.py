@@ -1,5 +1,12 @@
-from pydantic import BaseModel
-from typing import Dict, Any
+from src.block.schemas import Block, Edge
+from src.response.schemas import ImmutableBaseModel
 
-class BlockGraphResponse(BaseModel):
-    data: Dict[str, Any]
+class Canvas(ImmutableBaseModel):
+    blocks: list[Block] = []
+    edges: list[Edge] = []
+
+class GetCanvasResponse(ImmutableBaseModel):
+    canvas: Canvas
+
+class SaveCanvasRequest(ImmutableBaseModel):
+    canvas: Canvas

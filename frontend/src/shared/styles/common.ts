@@ -8,6 +8,8 @@ const Common = {
     secondary: '#DAE8FD',
     graphDetail: '#0D356F',
 
+    accuracyGraph: '#FF7A41',
+
     gray500: '#3E3E3E',
     gray400: '#616161',
     gray300: '#B9B9B9',
