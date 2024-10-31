@@ -4,15 +4,17 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
-from torch.utils.data import random_split
-from typing import Iterator
+from torch.utils.data import random_split, Dataset, Subset
+from typing import Iterator, List, Any
 
 from . import BlockDto, EdgeDto
 from src.block.enums import BlockType
+from torchvision.datasets import ImageFolder
+from torchvision.transforms import Compose
 
 MAX_LOSS = 10e8
 
-class Logger:
+class TrainLogger:
     """학습 과정을 저장하기 위한 클래스
     """
 
@@ -22,12 +24,13 @@ class Logger:
 class Trainer:
     """모델의 학습을 책임지는 클래스
     """
-    def __init__(self, model: nn.Module, train_loader: DataLoader, validate_loader: DataLoader, criterion: nn.Module, optimizer: optim.Optimizer, logger: Logger, checkpoint_interval: int = 10, device: str = 'cpu'):
+    def __init__(self, model: nn.Module, train_loader: DataLoader, validate_loader: DataLoader, criterion: nn.Module, optimizer: optim.Optimizer, logger: TrainLogger, checkpoint_interval: int = 10, device: str = 'cpu'):
         self.model = model.to(device)
         self.train_loader = train_loader
         self.validate_loader = validate_loader
         self.criterion = criterion
         self.optimizer = optimizer
+        self.logger = logger
         self.checkpoint_interval = checkpoint_interval
         self.device = device
 
@@ -93,11 +96,17 @@ class Trainer:
             if best_valid_loss > valid_loss:
                 torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
-def validate_data_path(data_path: str) -> bool:
-    pass
+def validate_file_format(file_path: str, expected: str) -> bool:
+    return file_path.endswith(f".{expected.lower()}")
 
-def create_data_loaders(data_path: str, batch_size: int) -> tuple[DataLoader, DataLoader, DataLoader]:
-    pass
+def create_dataset(data_path: str, train_transform:Compose) -> Dataset:
+    return ImageFolder(data_path, transform=train_transform)
+
+def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
+    return random_split(dataset, [0.6, 0.2, 0.2])
 
 def topological_sort(blocks: tuple[BlockDto], edges: tuple[EdgeDto]) -> tuple[BlockDto]:
     graph = defaultdict(list)
