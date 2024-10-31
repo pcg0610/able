@@ -1,21 +1,29 @@
-import React from 'react';
-import * as S from '@features/train/result/result.style';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const PerformanceTable: React.FC = () => {
+import Common from '@shared/styles/common';
+
+const data = [
+   { name: 'Accuracy', value: 30 },
+   { name: 'Top-5\nAccuracy', value: 70 },
+   { name: 'Precision', value: 50 },
+   { name: 'Recall', value: 90 },
+];
+
+const PerformanceTable = () => {
    return (
-      <S.GraphContainer>
-         <S.GraphTitle>Training and validation loss</S.GraphTitle>
-         <S.LegendContainer>
-            <S.LegendItem>
-               <S.BlueDot /> Smoothed training loss
-            </S.LegendItem>
-            <S.LegendItem>
-               <S.BlueLine /> Smoothed validation loss
-            </S.LegendItem>
-         </S.LegendContainer>
-         {/* 임시 그래프 공간 */}
-         <S.GraphPlaceholder>그래프가 여기에 표시됩니다.</S.GraphPlaceholder>
-      </S.GraphContainer>
+      <ResponsiveContainer width="100%" height="100%">
+         <BarChart
+            data={data}
+            layout="vertical"
+            margin={{ top: 25, right: 30, left: 20, bottom: 0 }}
+         >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: Common.fontSizes.xs }} />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: Common.fontSizes.xs }} />
+            <Tooltip />
+            <Bar dataKey="value" fill="#0051FF" barSize={30} />
+         </BarChart>
+      </ResponsiveContainer>
    );
 };
 
