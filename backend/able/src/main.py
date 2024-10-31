@@ -5,16 +5,17 @@ from fastapi import FastAPI, HTTPException,Request
 from starlette.responses import JSONResponse
 
 from src.block.router import block_router
-from src.canvas.router import router as canvas_router
-from src.project.router import router as project_router
+from src.train.router import train_router
+from src.canvas.router import canvas_router
+from src.project.router import project_router
 from src.exceptions import BaseCustomException
-from src.train.controller import train_router
+
 
 app = FastAPI()
 
-app.include_router(train_router, prefix="/train", tags=["학습"])
+app.include_router(train_router, prefix="/trains", tags=["학습"])
 
-app.include_router(block_router, prefix="/block", tags=["블록"])
+app.include_router(block_router, prefix="/blocks", tags=["블록"])
 
 app.include_router(project_router, prefix="/projects", tags=["프로젝트"])
 

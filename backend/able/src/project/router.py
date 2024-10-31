@@ -6,7 +6,7 @@ from src.project.schemas import Project, UpdatedProject
 from src.response.schemas import Response
 from src.response.utils import created, ok, no_content
 
-router = APIRouter()
+project_router = router = APIRouter()
 
 @router.post("", response_model=Response)
 async def create_project(project: Project):
