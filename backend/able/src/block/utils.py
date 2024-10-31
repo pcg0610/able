@@ -1,7 +1,7 @@
 import logging
 import inspect
 import importlib
-from typing import Iterator, Union, Any, Dict, Tuple, List, Callable
+from typing import Iterator, Any, Dict, Tuple, List, Callable
 from torch import nn, optim
 from torch.fx import GraphModule
 from torch.utils.data import DataLoader
@@ -35,15 +35,9 @@ def dynamic_class_loader(module_path: str, class_name: str):
         logger.error(f"{class_name} not found in module {module_path}")
         raise ValueError(f"{class_name} not found in module {module_path}")
 
-def convert_block_to_module(block: Block, parameters: Iterator[nn.Parameter] = None) -> Union[
-    nn.Module,
-    optim.Optimizer,
-    transforms.Compose,
-    transforms.Resize,
-    DataLoader,
-    GraphModule,
-    Callable[..., Any]
-]:
+def convert_block_to_module(block: Block, parameters: Iterator[nn.Parameter] = None) -> (
+        nn.Module | optim.Optimizer | transforms.Compose | transforms.Resize | DataLoader | GraphModule | Callable[..., Any]
+):
     """ 주어진 Block 객체를 PyTorch 모듈, 옵티마이저, 또는 함수로 변환합니다. """
     module_path = MODULE_MAP.get(block.type)
     if not module_path:

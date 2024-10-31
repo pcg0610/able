@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+import src.canvas.service as service
 
+from fastapi import APIRouter
 from src.canvas.schemas import GetCanvasResponse, SaveCanvasRequest
-from src.canvas.service import get_canvas, save_block_graph
 from src.response.schemas import ResponseModel
 from src.response.utils import ok, created, no_content
 
@@ -14,7 +14,7 @@ canvas_router = router = APIRouter()
     description="현재 사용자가 생성중인 블록 그래프를 조회한다."
 )
 def get_canvas(project_name: str):
-    canvas = get_canvas(project_name)
+    canvas = service.get_canvas(project_name)
 
     if not canvas.blocks and not canvas.edges:
         return no_content()
@@ -27,6 +27,6 @@ def get_canvas(project_name: str):
     description="현재 사용자가 생성중인 블록 그래프 저장한다."
 )
 def save_canvas(project_name: str, canvas: SaveCanvasRequest):
-    save_block_graph(project_name, canvas)
+    service.save_block_graph(project_name, canvas)
     return created()
 
