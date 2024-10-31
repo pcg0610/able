@@ -8,6 +8,7 @@ from src.block.router import block_router
 from src.train.router import train_router
 from src.canvas.router import canvas_router
 from src.project.router import project_router
+from src.analysis.router import analysis_router
 from src.exceptions import BaseCustomException
 
 
@@ -20,6 +21,8 @@ app.include_router(block_router, prefix="/blocks", tags=["블록"])
 app.include_router(project_router, prefix="/projects", tags=["프로젝트"])
 
 app.include_router(canvas_router, prefix="/projects/canvas", tags=["캔버스"])
+
+app.include_router(analysis_router, prefix="/analyses", tags=["분석"])
 
 @app.exception_handler(HTTPException)
 async def base_custom_exception_handler(request: Request, exc: BaseCustomException):
