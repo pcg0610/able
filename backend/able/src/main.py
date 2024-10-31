@@ -10,11 +10,11 @@ from src.train.router import router
 
 app = FastAPI()
 
-app.include_router(block_router, prefix="/block", tags=["블록"])
+app.include_router(block_router, prefix="/blocks", tags=["블록"])
 
 app.include_router(project_router, prefix="/projects", tags=["프로젝트"])
 
-app.include_router(canvas_router, prefix="/project/canvas", tags=["캔버스"])
+app.include_router(canvas_router, prefix="/projects/canvas", tags=["캔버스"])
 
 app.include_router(router, prefix="/train", tags=["학습"])
 

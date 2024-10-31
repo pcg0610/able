@@ -17,8 +17,8 @@ def find_blocks_by_type(block_type: BlockType) -> List[Block]:
     logger.info(f"Searching for blocks of type '{block_type.value}' in {block_type_dir_path}")
 
     blocks_path = get_directory(block_type_dir_path)
-    if not blocks_path:
-        raise BlockNotFoundException(f"No blocks found in directory for type '{block_type.value}'")
+    # if not blocks_path:
+    #     raise BlockNotFoundException(f"No blocks found in directory for type '{block_type.value}'")
 
     blocks = []
     for block_path in blocks_path:

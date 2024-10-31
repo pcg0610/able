@@ -1,5 +1,5 @@
 from typing import List
-from src.schemas import ImmutableBaseModel
+from src.response.schemas import ImmutableBaseModel
 
 class PerformanceMetrics(ImmutableBaseModel):
     accuracy: str
