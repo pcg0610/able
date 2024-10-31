@@ -11,10 +11,23 @@ from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
-from ..block.schemas import Block, Edge
-from ..block.utils import convert_block_to_module
+from src.block.schemas import Block, Edge
+from src.block.utils import convert_block_to_module
+
+from .schemas import EpochResult
+from pathlib import Path
+from src.file.file_utils import create_file
+from src.file.path_manager import PathManager
+from src.utils import json_to_str
 
 MAX_LOSS = 10e8
+
+pathManager = PathManager()
+
+PERFORMANCE_METRICS = "performance_metrics.json"
+TRAINING_LOSS = "training_loss.json"
+VALIDATION_LOSS = "validation_loss.json"
+ACCURACY = "accuracy.json"
 
 class TrainLogger:
     """학습 과정을 저장하기 위한 클래스
@@ -48,6 +61,9 @@ class Trainer:
 
             # Forward pass
             outputs = self.model(inputs)
+
+            print(len((outputs, targets)))
+
             loss = self.criterion(outputs, targets)
 
             # Backward pass and optimize
@@ -89,14 +105,14 @@ class Trainer:
             #TODO: Logging 구현
 
             # Checkpoint (간단히 마지막 모델만 저장)
-            if epoch % self.checkpoint_interval == 0:
-                torch.save(self.model.state_dict(), f"model_checkpoint_epoch_{epoch+1}.pth")
-                
-            if best_train_loss > train_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_train_loss.pth")
-            
-            if best_valid_loss > valid_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
+            # if epoch % self.checkpoint_interval == 0:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_epoch_{epoch+1}.pth")
+            #
+            # if best_train_loss > train_loss:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_best_train_loss.pth")
+            #
+            # if best_valid_loss > valid_loss:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
 class Tester:
     pass
@@ -193,3 +209,11 @@ def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn
         model.layers.add_module(str(len(model.layers)), module)
 
     return model
+
+def create_epoch_log(project_name: str, result_id: str, epoch_id: int, epoch_result: EpochResult):
+    epoch_path = pathManager.get_epoch_path(project_name, result_id, epoch_id)
+
+    create_file(epoch_path / ACCURACY, json_to_str({'accuracy' : epoch_result.accuracies.accuracy}))
+    create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss' : epoch_result.losses.validation}))
+    create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss' : epoch_result.losses.training}))
+    create_file(epoch_path / PERFORMANCE_METRICS, json_to_str({'metrics':epoch_result.performance_metrics.model_dump()}))

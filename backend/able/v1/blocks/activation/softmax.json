@@ -1,0 +1,9 @@
+{
+    "id": "activation2",
+    "type": "Activation",
+    "name": "Softmax",
+    "description": "Applies the Softmax function to an n-dimensional input Tensor.",
+    "args": [
+        "dim"
+    ]
+}
