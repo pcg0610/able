@@ -2,18 +2,18 @@ from typing import List
 from src.schemas import ImmutableBaseModel
 
 class PerformanceMetrics(ImmutableBaseModel):
-    accuracy: str
-    top5_accuracy: str
-    precision: str
-    recall: str
+    accuracy: float
+    top5_accuracy: float
+    precision: float
+    recall: float
 
 class Loss(ImmutableBaseModel):
-    training: str
-    validation: str
+    training: float
+    validation: float
 
 class Accuracy(ImmutableBaseModel):
     epoch: str
-    accuracy: str
+    accuracy: float
 
 class EpochResult(ImmutableBaseModel):
     epoch: str
