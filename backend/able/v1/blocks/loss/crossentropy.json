@@ -1,0 +1,9 @@
+{
+    "id": "loss1",
+    "type": "Loss",
+    "name": "CrossEntropyLoss",
+    "description": "This criterion computes the cross entropy loss between input logits and target.",
+    "args": [
+        "dim"
+    ]
+}
