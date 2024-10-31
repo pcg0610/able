@@ -32,7 +32,7 @@ async def update_project(project: UpdatedProject):
     service.update_project(project)
     return ok(True)
 
-@router.delete("/{title}", response_model=Response,
+@router.delete("/", response_model=Response,
                summary="프로젝트 삭제", description="프로젝트 이름으로 삭제")
 async def delete_project(title: str):
     service.delete_project(title)
