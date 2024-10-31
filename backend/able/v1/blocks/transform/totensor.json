@@ -1,7 +1,11 @@
 {
-    "id": "transform1",
+    "name": "totensor",
     "type": "transform",
-    "name": "ToTensor",
-    "description": "Convert a PIL Image or ndarray to tensor and scale the values accordingly.",
-    "args": []
+    "args": [
+        {
+            "name": "dtype",
+            "value": "null",
+            "is_required": false
+        }
+    ]
 }

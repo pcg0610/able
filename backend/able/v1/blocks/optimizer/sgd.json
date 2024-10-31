@@ -1,19 +1,36 @@
 {
-    "id": "optimizer1",
-    "type": "Optimizer",
-    "name": "SGD",
-    "description": "Implements stochastic gradient descent (optionally with momentum).",
+    "name": "sgd",
+    "type": "optimizer",
     "args": [
-        "params",
-        "lr",
-        "momentum",
-        "dampening",
-        "weight_decay",
-        "nesterov",
-        "*",
-        "maximize",
-        "foreach",
-        "differentiable",
-        "fused"
+        {
+            "name": "params",
+            "value": "[]",
+            "is_required": true
+        },
+        {
+            "name": "lr",
+            "value": "0.01",
+            "is_required": true
+        },
+        {
+            "name": "momentum",
+            "value": "0",
+            "is_required": false
+        },
+        {
+            "name": "dampening",
+            "value": "0",
+            "is_required": false
+        },
+        {
+            "name": "weight_decay",
+            "value": "0",
+            "is_required": false
+        },
+        {
+            "name": "nesterov",
+            "value": "false",
+            "is_required": false
+        }
     ]
 }

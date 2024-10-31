@@ -1,10 +1,16 @@
 {
-    "id": "operation1",
-    "type": "Operation",
     "name": "cat",
-    "description": "Addition operation for combining layers or values.",
+    "type": "operation",
     "args": [
-        "input1",
-        "input2"
+        {
+            "name": "tensors",
+            "value": "[]",
+            "is_required": true
+        },
+        {
+            "name": "dim",
+            "value": "0",
+            "is_required": false
+        }
     ]
 }

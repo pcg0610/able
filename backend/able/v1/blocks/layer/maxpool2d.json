@@ -1,14 +1,36 @@
 {
-    "id": "layer3",
-    "type": "Layer",
-    "name": "MaxPool2d",
-    "description": "Applies a 2D max pooling over an input signal composed of several input planes.",
+    "name": "maxpool2d",
+    "type": "layer",
     "args": [
-        "kernel_size",
-        "stride",
-        "padding",
-        "dilation",
-        "return_indices",
-        "ceil_mode"
+        {
+            "name": "kernel_size",
+            "value": "2",
+            "is_required": true
+        },
+        {
+            "name": "stride",
+            "value": "2",
+            "is_required": false
+        },
+        {
+            "name": "padding",
+            "value": "0",
+            "is_required": false
+        },
+        {
+            "name": "dilation",
+            "value": "1",
+            "is_required": false
+        },
+        {
+            "name": "return_indices",
+            "value": "false",
+            "is_required": false
+        },
+        {
+            "name": "ceil_mode",
+            "value": "false",
+            "is_required": false
+        }
     ]
 }
