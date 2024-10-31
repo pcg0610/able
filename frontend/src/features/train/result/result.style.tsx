@@ -1,57 +1,64 @@
 import styled from '@emotion/styled';
+import Common from '@shared/styles/common';
 
-export const GraphContainer = styled.div`
-  padding: 20px;
-  border-radius: 8px;
-  background: #f9f9f9;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+export const Container = styled.div`
+  padding: 1rem 6rem 2.3rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: ${Common.colors.background};
+`;
+
+export const Header = styled.div`
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+`;
+
+export const GridContainer = styled.div`
+  display: grid;
+  gap: 1.25rem;
+  grid-template-rows: 1.1fr 1fr;
+  flex-grow: 1;
+  height: 100%;
+
+  & > .top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6rem;
+  }
+
+  & > .bottom-row {
+    display: grid;
+    grid-template-columns: 1.1fr 0.7fr 1.2fr;
+    gap: 1.6rem;
+  }
+`;
+
+export const GraphCard = styled.div`
+  background: ${Common.colors.white};
+  padding: 1.25rem;
+  border-radius: .5rem;
+  box-shadow: 0 .0625rem .25rem rgba(0, 0, 0, 0.1);
+  border: .0625rem solid ${Common.colors.gray200};
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 export const GraphTitle = styled.h3`
-  font-size: 1.2rem;
-  font-weight: 500;
+  margin: .2rem 0 .525rem .625rem;
+  margin-right: auto;
+  font-size: ${Common.fontSizes.xl};
+  font-weight: ${Common.fontWeights.medium};
   color: #333;
 `;
 
-export const LegendContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-`;
-
-export const LegendItem = styled.div`
-  display: flex;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #666;
-`;
-
-export const BlueDot = styled.span`
-  width: 10px;
-  height: 10px;
-  background-color: #1f77b4;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 5px;
-`;
-
-export const BlueLine = styled.span`
-  width: 20px;
-  height: 2px;
-  background-color: #1f77b4;
-  display: inline-block;
-  margin-right: 5px;
-`;
-
-export const GraphPlaceholder = styled.div`
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  color: #999;
-  border: 1px dashed #ddd;
-  border-radius: 8px;
-  margin-top: 20px;
+export const F1ScoreTitle = styled(GraphTitle)`
+  font-weight: ${Common.fontWeights.semiBold}; 
+  margin-left: auto;
+  font-size: ${Common.fontSizes['3xl']};
 `;

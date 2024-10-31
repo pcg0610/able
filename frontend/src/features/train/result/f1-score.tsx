@@ -1,21 +1,44 @@
-import React from 'react';
-import * as S from '@features/train/result/result.style';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
-const F1Score: React.FC = () => {
+import Common from '@shared/styles/common';
+
+const F1Score = ({ f1score }) => {
+   const data = [
+      { name: 'Score', value: f1score },
+      { name: 'Remaining', value: 1 - f1score },
+   ];
+
    return (
-      <S.GraphContainer>
-         <S.GraphTitle>Training and validation loss</S.GraphTitle>
-         <S.LegendContainer>
-            <S.LegendItem>
-               <S.BlueDot /> Smoothed training loss
-            </S.LegendItem>
-            <S.LegendItem>
-               <S.BlueLine /> Smoothed validation loss
-            </S.LegendItem>
-         </S.LegendContainer>
-         {/* 임시 그래프 공간 */}
-         <S.GraphPlaceholder>그래프가 여기에 표시됩니다.</S.GraphPlaceholder>
-      </S.GraphContainer>
+      <ResponsiveContainer width="100%" height="100%">
+         <PieChart>
+            <Pie
+               data={data}
+               innerRadius={55}
+               outerRadius={100}
+               startAngle={90}
+               endAngle={-270}
+               dataKey="value"
+            >
+               {data.map((entry, index) => (
+                  <Cell
+                     key={`cell-${index}`}
+                     fill={index == 0 ? Common.colors.graphDetail : Common.colors.gray500}
+                     fillOpacity={index === 0 ? 1 : 0.1} />
+               ))}
+            </Pie>
+            <text
+               x="50%"
+               y="50%"
+               textAnchor="middle"
+               dominantBaseline="central"
+               fontSize={Common.fontSizes.xl}
+               fontWeight={Common.fontWeights.medium}
+               fill="#000000"
+            >
+               {f1score}
+            </text>
+         </PieChart>
+      </ResponsiveContainer>
    );
 };
 
