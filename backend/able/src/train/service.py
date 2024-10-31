@@ -1,5 +1,6 @@
 from .utils import Trainer, validate_file_format, create_dataset, create_data_loader, convert_block_graph_to_model, \
-    convert_criterion_block_to_module, TrainLogger, convert_optimizer_to_optimizer, split_dataset
+    convert_criterion_block_to_module, TrainLogger, convert_optimizer_block_to_optimizer, split_dataset, \
+    create_data_preprocessor
 from . import TrainRequestDto
 
 def train(train_request_dto: TrainRequestDto):
@@ -8,7 +9,9 @@ def train(train_request_dto: TrainRequestDto):
     if not validate_file_format(data_path, "json"):
         raise Exception()
 
-    dataset = create_dataset(data_path, None)
+    transforms = create_data_preprocessor(train_request_dto.transforms)
+
+    dataset = create_dataset(data_path, transforms)
 
     train_dataset, valid_dataset, test_dataset = split_dataset(dataset)
 
@@ -18,10 +21,14 @@ def train(train_request_dto: TrainRequestDto):
 
     model = convert_block_graph_to_model(train_request_dto.blocks, train_request_dto.edges)
 
+    if model is None:
+        raise Exception()
+
     criterion = convert_criterion_block_to_module(train_request_dto.loss)
 
-    optimizer = convert_optimizer_to_optimizer(train_request_dto.optimizer, model.parameters())
+    optimizer = convert_optimizer_block_to_optimizer(train_request_dto.optimizer, model.parameters())
 
     trainer = Trainer(model, train_data_loader, valid_data_loader, criterion, optimizer, TrainLogger())
 
     trainer.train(train_request_dto.epoch)
+

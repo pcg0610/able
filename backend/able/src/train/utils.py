@@ -7,10 +7,13 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
 from typing import Iterator, List, Any
 
-from . import BlockDto, EdgeDto
+from . import Block, Edge
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
+
+from ..block.schemas import Block
+from ..block.utils import convert_block_to_module
 
 MAX_LOSS = 10e8
 
@@ -96,6 +99,9 @@ class Trainer:
             if best_valid_loss > valid_loss:
                 torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
+class Tester:
+    pass
+
 def validate_file_format(file_path: str, expected: str) -> bool:
     return file_path.endswith(f".{expected.lower()}")
 
@@ -108,7 +114,7 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def topological_sort(blocks: tuple[BlockDto], edges: tuple[EdgeDto]) -> tuple[BlockDto]:
+def topological_sort(blocks: tuple[Block], edges: tuple[Edge]) -> tuple[Block]:
     graph = defaultdict(list)
     in_degree = {block.id: 0 for block in blocks}
 
@@ -141,7 +147,38 @@ class UserModel(nn.Module):
     def forward(self, x):
         return self.forward(x)
 
-def convert_block_graph_to_model(blocks: tuple[BlockDto], edges: tuple[EdgeDto]) -> nn.Module:
+def create_data_preprocessor(transform_blocks: tuple[Block]) -> Compose:
+    return Compose([convert_block_to_module(transform_block) for transform_block in transform_blocks])
+
+def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
+
+    if layer_block.type != BlockType.LAYER:
+        return None
+
+    return convert_block_to_module(layer_block)
+
+def convert_criterion_block_to_module(loss_block: Block) -> nn.Module | None:
+
+    if loss_block.type != BlockType.LOSS:
+        return None
+
+    return convert_block_to_module(loss_block)
+
+def convert_optimizer_block_to_optimizer(optimizer_block: Block, parameters: Iterator[nn.Parameter]) -> optim.Optimizer | None:
+
+    if optimizer_block.type != BlockType.OPTIMIZER:
+        return None
+
+    return convert_block_to_module(optimizer_block, parameters)
+
+def convert_operation_block_to_module(operation_block: Block) -> nn.Module | None:
+
+    if operation_block.type != BlockType.OPERATION:
+        return None
+
+    return convert_block_to_module(operation_block)
+
+def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn.Module | None:
     sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
@@ -150,24 +187,10 @@ def convert_block_graph_to_model(blocks: tuple[BlockDto], edges: tuple[EdgeDto])
         if block.type == BlockType.LAYER:
             module = convert_layer_block_to_module(block)
         elif block.type == BlockType.OPERATION:
-            module = convert_operation_to_module(block)
+            module = convert_operation_block_to_module(block)
+        else:
+            return None
+
         model.layers.add_module(str(len(model.layers)), module)
 
     return model
-
-# 블록을 nn.Module로 변환하는 함수
-def convert_layer_block_to_module(block):
-    layer_class = LAYER_MAP.get(block["type"])
-    if not layer_class:
-        raise ValueError(f"Unsupported layer type: {block['type']}")
-    return layer_class(**block["args"])  # 블록 파라미터로 인스턴스 생성
-
-# 손실 기준을 nn.Module로 변환하는 함수
-def convert_criterion_block_to_module(block):
-    criterion_class = CRITERION_MAP.get(block["type"])
-    if not criterion_class:
-        raise ValueError(f"Unsupported criterion type: {block['type']}")
-    return criterion_class()
-
-def convert_optimizer_to_optimizer(block: BlockDto, parameters: Iterator[nn.Parameter]) -> optim.Optimizer:
-    pass
