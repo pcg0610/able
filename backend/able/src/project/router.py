@@ -2,32 +2,33 @@ import src.project.service as service
 
 from fastapi import APIRouter, status
 
-from src.project.models import Project, UpdatedProject
-from src.schemas import ResponseSchema
+from src.project.schemas import Project, UpdatedProject
+from src.response.schemas import Response
+from src.response.utils import created, ok, no_content
 
 router = APIRouter()
 
-@router.post("/create", response_model=ResponseSchema)
+@router.post("", response_model=Response)
 async def create_project(project: Project):
     service.create_project(project)
-    return ResponseSchema(status_code=status.HTTP_201_CREATED, detail="프로젝트 생성 완료")
+    return created()
 
-@router.get("/{title}", response_model=ResponseSchema)
+@router.get("/{title}", response_model=Response)
 async def get_project(title: str):
     project = service.get_project(title)
-    return ResponseSchema(status_code=status.HTTP_200_OK, detail=f"{title} 조회 성공", data=project)
+    return ok(project)
 
-@router.get("/", response_model=ResponseSchema)
+@router.get("/", response_model=Response)
 async def get_projects():
     projects = service.get_projects()
-    return ResponseSchema(status_code=status.HTTP_200_OK, detail="프로젝트 목록 조회 성공", data=projects)
+    return ok(projects)
 
-@router.put("/update", response_model=ResponseSchema)
+@router.put("", response_model=Response)
 async def update_project(project: UpdatedProject):
     service.update_project(project)
-    return ResponseSchema(status_code=status.HTTP_200_OK, detail="프로젝트 정보 수정 성공")
+    return ok(True)
 
-@router.delete("/delete/{title}", response_model=ResponseSchema)
+@router.delete("/{title}", response_model=Response)
 async def delete_project(title: str):
     service.delete_project(title)
-    return ResponseSchema(status_code=status.HTTP_200_OK, detail=f"{title} 삭제 성공")
+    return no_content()

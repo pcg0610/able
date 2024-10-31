@@ -1,12 +1,12 @@
 from enum import Enum
 
 class BlockType(str, Enum):
-    TRANSFORM = "Transform"
-    LAYER = "Layer"
-    ACTIVATION = "Activation"
-    LOSS = "Loss"
-    OPERATION = "Operation"
-    OPTIMIZER = "Optimizer"
-    MODULE = "Module"
-    DATA = "Data"
-    INTERPRETER = "Interpreter"
+    TRANSFORM = "transform"
+    LAYER = "layer"
+    ACTIVATION = "activation"
+    LOSS = "loss"
+    OPERATION = "operation"
+    OPTIMIZER = "optimizer"
+    MODULE = "module"
+    DATA = "data"
+    INTERPRETER = "interpreter"
