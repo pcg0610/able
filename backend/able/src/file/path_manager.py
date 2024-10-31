@@ -34,6 +34,10 @@ class PathManager:
         """학습 결과 경로"""
         return self.get_train_results_path(name) / result_name
 
+    def get_epochs_path(self, name:str, result_name: str):
+        """에포크 목록 경로"""
+        return self.get_train_result_path(name, result_name) / "epochs"
+
     def get_epoch_path(self, name: str, result_name: str, epoch: int) -> Path:
         """에포크별 경로"""
         return self.get_train_result_path(name, result_name) / "epochs" / f"epoch_{epoch}"
