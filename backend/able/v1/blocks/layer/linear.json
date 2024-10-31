@@ -1,13 +1,21 @@
 {
-    "id": "layer4",
-    "type": "Layer",
-    "name": "Linear",
-    "description": "Applies an affine linear transformation to the incoming data.",
+    "name": "linear",
+    "type": "layer",
     "args": [
-        "in_features",
-        "out_features",
-        "bias",
-        "device",
-        "dtype"
+        {
+            "name": "in_features",
+            "value": "128",
+            "is_required": true
+        },
+        {
+            "name": "out_features",
+            "value": "64",
+            "is_required": true
+        },
+        {
+            "name": "bias",
+            "value": "true",
+            "is_required": false
+        }
     ]
 }

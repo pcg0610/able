@@ -1,5 +1,5 @@
 {
-    "name": "sgd",
+    "name": "adam",
     "type": "optimizer",
     "args": [
         {
@@ -9,17 +9,17 @@
         },
         {
             "name": "lr",
-            "value": "0.01",
-            "is_required": true
-        },
-        {
-            "name": "momentum",
-            "value": "0",
+            "value": "0.001",
             "is_required": false
         },
         {
-            "name": "dampening",
-            "value": "0",
+            "name": "betas",
+            "value": "[0.9, 0.999]",
+            "is_required": false
+        },
+        {
+            "name": "eps",
+            "value": "1e-8",
             "is_required": false
         },
         {
@@ -28,7 +28,7 @@
             "is_required": false
         },
         {
-            "name": "nesterov",
+            "name": "amsgrad",
             "value": "false",
             "is_required": false
         }

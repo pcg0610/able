@@ -1,0 +1,26 @@
+from typing import List
+from src.response.schemas import ImmutableBaseModel
+
+class PerformanceMetrics(ImmutableBaseModel):
+    accuracy: float
+    top5_accuracy: float
+    precision: float
+    recall: float
+
+class Loss(ImmutableBaseModel):
+    training: float
+    validation: float
+
+class Accuracy(ImmutableBaseModel):
+    accuracy: float
+
+class EpochResult(ImmutableBaseModel):
+    epoch: str
+    losses: Loss
+    accuracies: Accuracy
+
+class TrainResultResponse(ImmutableBaseModel):
+    confusion_matrix: str
+    performance_metrics: PerformanceMetrics
+    f1_score: str
+    epoch_result: List[EpochResult]

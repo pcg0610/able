@@ -1,14 +1,12 @@
-from typing import List
-from pydantic import BaseModel
 from src.block.schemas import Block, Edge
+from src.response.schemas import ImmutableBaseModel
 
-class GetCanvasResponse(BaseModel):
-    blocks: List[Block]
-    edges: List[Edge]
+class Canvas(ImmutableBaseModel):
+    blocks: list[Block] = []
+    edges: list[Edge] = []
 
-class SaveCanvasResponse(BaseModel):
-    success: bool
+class GetCanvasResponse(ImmutableBaseModel):
+    canvas: Canvas
 
-class SaveCanvasRequest(BaseModel):
-    blocks: List[Block]
-    edges: List[Edge]
+class SaveCanvasRequest(ImmutableBaseModel):
+    canvas: Canvas

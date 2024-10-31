@@ -4,15 +4,31 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
-from torch.utils.data import random_split
-from typing import Iterator
+from torch.utils.data import random_split, Dataset, Subset
+from typing import Iterator, Any
 
-from . import BlockDto, EdgeDto
 from src.block.enums import BlockType
+from torchvision.datasets import ImageFolder
+from torchvision.transforms import Compose
+
+from src.block.schemas import Block, Edge
+from src.block.utils import convert_block_to_module
+
+from .schemas import EpochResult
+from pathlib import Path
+from src.file.file_utils import create_file
+from src.file.path_manager import PathManager
+from src.utils import json_to_str
 
 MAX_LOSS = 10e8
 
-class Logger:
+pathManager = PathManager()
+
+TRAINING_LOSS = "training_loss.json"
+VALIDATION_LOSS = "validation_loss.json"
+ACCURACY = "accuracy.json"
+
+class TrainLogger:
     """학습 과정을 저장하기 위한 클래스
     """
 
@@ -22,12 +38,13 @@ class Logger:
 class Trainer:
     """모델의 학습을 책임지는 클래스
     """
-    def __init__(self, model: nn.Module, train_loader: DataLoader, validate_loader: DataLoader, criterion: nn.Module, optimizer: optim.Optimizer, logger: Logger, checkpoint_interval: int = 10, device: str = 'cpu'):
+    def __init__(self, model: nn.Module, train_loader: DataLoader, validate_loader: DataLoader, criterion: nn.Module, optimizer: optim.Optimizer, logger: TrainLogger, checkpoint_interval: int = 10, device: str = 'cpu'):
         self.model = model.to(device)
         self.train_loader = train_loader
         self.validate_loader = validate_loader
         self.criterion = criterion
         self.optimizer = optimizer
+        self.logger = logger
         self.checkpoint_interval = checkpoint_interval
         self.device = device
 
@@ -43,6 +60,9 @@ class Trainer:
 
             # Forward pass
             outputs = self.model(inputs)
+
+            print(len((outputs, targets)))
+
             loss = self.criterion(outputs, targets)
 
             # Backward pass and optimize
@@ -84,22 +104,31 @@ class Trainer:
             #TODO: Logging 구현
 
             # Checkpoint (간단히 마지막 모델만 저장)
-            if epoch % self.checkpoint_interval == 0:
-                torch.save(self.model.state_dict(), f"model_checkpoint_epoch_{epoch+1}.pth")
-                
-            if best_train_loss > train_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_train_loss.pth")
-            
-            if best_valid_loss > valid_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
+            # if epoch % self.checkpoint_interval == 0:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_epoch_{epoch+1}.pth")
+            #
+            # if best_train_loss > train_loss:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_best_train_loss.pth")
+            #
+            # if best_valid_loss > valid_loss:
+            #     torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
-def validate_data_path(data_path: str) -> bool:
+class Tester:
     pass
 
-def create_data_loaders(data_path: str, batch_size: int) -> tuple[DataLoader, DataLoader, DataLoader]:
-    pass
+def validate_file_format(file_path: str, expected: str) -> bool:
+    return file_path.endswith(f".{expected.lower()}")
 
-def topological_sort(blocks: tuple[BlockDto], edges: tuple[EdgeDto]) -> tuple[BlockDto]:
+def create_dataset(data_path: str, train_transform:Compose) -> Dataset:
+    return ImageFolder(data_path, transform=train_transform)
+
+def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
+    return random_split(dataset, [0.6, 0.2, 0.2])
+
+def topological_sort(blocks: tuple[Block], edges: tuple[Edge]) -> tuple[Block]:
     graph = defaultdict(list)
     in_degree = {block.id: 0 for block in blocks}
 
@@ -132,7 +161,38 @@ class UserModel(nn.Module):
     def forward(self, x):
         return self.forward(x)
 
-def convert_block_graph_to_model(blocks: tuple[BlockDto], edges: tuple[EdgeDto]) -> nn.Module:
+def create_data_preprocessor(transform_blocks: tuple[Block]) -> Compose:
+    return Compose([convert_block_to_module(transform_block) for transform_block in transform_blocks])
+
+def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
+
+    if layer_block.type != BlockType.LAYER:
+        return None
+
+    return convert_block_to_module(layer_block)
+
+def convert_criterion_block_to_module(loss_block: Block) -> nn.Module | None:
+
+    if loss_block.type != BlockType.LOSS:
+        return None
+
+    return convert_block_to_module(loss_block)
+
+def convert_optimizer_block_to_optimizer(optimizer_block: Block, parameters: Iterator[nn.Parameter]) -> optim.Optimizer | None:
+
+    if optimizer_block.type != BlockType.OPTIMIZER:
+        return None
+
+    return convert_block_to_module(optimizer_block, parameters)
+
+def convert_operation_block_to_module(operation_block: Block) -> nn.Module | None:
+
+    if operation_block.type != BlockType.OPERATION:
+        return None
+
+    return convert_block_to_module(operation_block)
+
+def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn.Module | None:
     sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
@@ -141,24 +201,17 @@ def convert_block_graph_to_model(blocks: tuple[BlockDto], edges: tuple[EdgeDto])
         if block.type == BlockType.LAYER:
             module = convert_layer_block_to_module(block)
         elif block.type == BlockType.OPERATION:
-            module = convert_operation_to_module(block)
+            module = convert_operation_block_to_module(block)
+        else:
+            return None
+
         model.layers.add_module(str(len(model.layers)), module)
 
     return model
 
-# 블록을 nn.Module로 변환하는 함수
-def convert_layer_block_to_module(block):
-    layer_class = LAYER_MAP.get(block["type"])
-    if not layer_class:
-        raise ValueError(f"Unsupported layer type: {block['type']}")
-    return layer_class(**block["args"])  # 블록 파라미터로 인스턴스 생성
+def create_epoch_log(project_name: str, result_name: str, epoch_id: int, accuracy: float, validation_loss: float, training_loss: float):
+    epoch_path = pathManager.get_epoch_path(project_name, result_name, epoch_id)
 
-# 손실 기준을 nn.Module로 변환하는 함수
-def convert_criterion_block_to_module(block):
-    criterion_class = CRITERION_MAP.get(block["type"])
-    if not criterion_class:
-        raise ValueError(f"Unsupported criterion type: {block['type']}")
-    return criterion_class()
-
-def convert_optimizer_to_optimizer(block: BlockDto, parameters: Iterator[nn.Parameter]) -> optim.Optimizer:
-    pass
+    create_file(epoch_path / ACCURACY, json_to_str({'accuracy' : accuracy}))
+    create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss' : validation_loss}))
+    create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss' : training_loss}))
