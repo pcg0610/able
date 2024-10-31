@@ -1,9 +1,11 @@
 {
-    "id": "activation1",
-    "type": "Activation",
-    "name": "ReLU",
-    "description": "Rectified Linear Unit activation function.",
+    "name": "relu",
+    "type": "activation",
     "args": [
-        "inplace"
+        {
+            "name": "inplace",
+            "value": "false",
+            "is_required": false
+        }
     ]
 }

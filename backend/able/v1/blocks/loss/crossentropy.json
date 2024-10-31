@@ -1,9 +1,31 @@
 {
-    "id": "loss1",
-    "type": "Loss",
-    "name": "CrossEntropyLoss",
-    "description": "This criterion computes the cross entropy loss between input logits and target.",
+    "name": "crossentropy",
+    "type": "loss",
     "args": [
-        "dim"
+        {
+            "name": "weight",
+            "value": "null",
+            "is_required": false
+        },
+        {
+            "name": "size_average",
+            "value": "true",
+            "is_required": false
+        },
+        {
+            "name": "ignore_index",
+            "value": "-100",
+            "is_required": false
+        },
+        {
+            "name": "reduce",
+            "value": "true",
+            "is_required": false
+        },
+        {
+            "name": "reduction",
+            "value": "mean",
+            "is_required": false
+        }
     ]
 }
