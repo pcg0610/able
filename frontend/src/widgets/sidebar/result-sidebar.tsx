@@ -5,12 +5,12 @@ import * as S from '@widgets/sidebar/result-sidebar.style';
 import ResultIcon from '@icons/result.svg?react'
 import AnalyzeIcon from '@icons/analyze.svg?react'
 
-type ResultSidebarProps = {
+interface ResultSidebarProps {
    onSelectionChange: (selection: string) => void;
-};
+}
 
 const ResultSidebar = ({ onSelectionChange }: ResultSidebarProps) => {
-   const [activeButton, setActiveButton] = useState('analyze');
+   const [activeButton, setActiveButton] = useState('result');
 
    const handleButtonClick = (selection: string) => {
       setActiveButton(selection);
@@ -20,14 +20,14 @@ const ResultSidebar = ({ onSelectionChange }: ResultSidebarProps) => {
    return (
       <S.SidebarContainer>
          <S.SidebarButton
-            active={activeButton === 'analyze'}
-            onClick={() => handleButtonClick('analyze')}
+            active={activeButton === 'result'}
+            onClick={() => handleButtonClick('result')}
          >
             <ResultIcon width={30} height={30} />
          </S.SidebarButton>
          <S.SidebarButton
-            active={activeButton === 'result'}
-            onClick={() => handleButtonClick('result')}
+            active={activeButton === 'analyze'}
+            onClick={() => handleButtonClick('analyze')}
          >
             <AnalyzeIcon width={25} height={25} />
          </S.SidebarButton>
