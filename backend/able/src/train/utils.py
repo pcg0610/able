@@ -24,7 +24,6 @@ MAX_LOSS = 10e8
 
 pathManager = PathManager()
 
-PERFORMANCE_METRICS = "performance_metrics.json"
 TRAINING_LOSS = "training_loss.json"
 VALIDATION_LOSS = "validation_loss.json"
 ACCURACY = "accuracy.json"
@@ -210,10 +209,9 @@ def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn
 
     return model
 
-def create_epoch_log(project_name: str, result_id: str, epoch_id: int, epoch_result: EpochResult):
-    epoch_path = pathManager.get_epoch_path(project_name, result_id, epoch_id)
+def create_epoch_log(project_name: str, result_name: str, epoch_id: int, epoch_result: EpochResult):
+    epoch_path = pathManager.get_epoch_path(project_name, result_name, epoch_id)
 
     create_file(epoch_path / ACCURACY, json_to_str({'accuracy' : epoch_result.accuracies.accuracy}))
     create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss' : epoch_result.losses.validation}))
     create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss' : epoch_result.losses.training}))
-    create_file(epoch_path / PERFORMANCE_METRICS, json_to_str({'metrics':epoch_result.performance_metrics.model_dump()}))
