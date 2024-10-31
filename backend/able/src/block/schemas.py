@@ -3,6 +3,7 @@ from src.response.schemas import ImmutableBaseModel
 
 class Arg(ImmutableBaseModel):
     name: str
+    value: str
     is_required: bool
 
 class Block(ImmutableBaseModel):
