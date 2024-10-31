@@ -1,7 +1,7 @@
 import * as S from '@pages/canvas/canvas.style';
 
-import CanvasSidebar from '@/features/canvas/canvas-sidebar';
-import CanvasEditor from '@features/canvas/canvas-editor';
+import CanvasSidebar from '@features/canvas/ui/sidebar/canvas-sidebar';
+import CanvasEditor from '@features/canvas/ui/canvas-editor';
 import PageHeader from '@widgets/header/page-header';
 
 const CanvasPage = () => {
