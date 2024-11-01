@@ -1,9 +1,11 @@
 import { ComponentType, useEffect, useRef, useState } from 'react';
 
+import { useBlocks } from '@features/canvas/api/use-blocks.query';
 import * as S from '@features/canvas/ui/sidebar/menu-accordion.style';
 
 import ArrowButton from '@/shared/ui/button/arrow-button';
 import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
+import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
 
 interface MenuAccordionProps {
   label: string;
@@ -14,6 +16,9 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [contentHeight, setContentHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const { data: blocks } = useBlocks(label);
+  console.log(blocks);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -29,7 +34,7 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
       <S.Menu onClick={handleToggleOpen}>
         <S.LabelWrapper>
           {Icon && <Icon />}
-          <span>{label}</span>
+          <span>{capitalizeFirstLetter(label)}</span>
         </S.LabelWrapper>
         <ArrowButton direction={isOpen ? 'up' : 'down'} />
       </S.Menu>
