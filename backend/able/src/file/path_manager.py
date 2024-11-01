@@ -3,7 +3,7 @@ from src.block.enums import BlockType
 
 HOME_PATH = Path.home()
 APPLICATION_NAME = "able"
-VERSION = "1.0"
+VERSION = "v1"
 
 class PathManager:
 
