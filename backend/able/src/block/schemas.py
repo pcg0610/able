@@ -10,7 +10,6 @@ class Arg(ImmutableBaseModel):
 class Block(ImmutableBaseModel):
     name: str
     type: BlockType
-    position: str
     args: list[Arg]
 
 class Edge(ImmutableBaseModel):
