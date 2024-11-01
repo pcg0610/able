@@ -8,7 +8,10 @@ from typing import Generic, TypeVar
 T = TypeVar("T")
 
 class ImmutableBaseModel(BaseModel):
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(
+        frozen=True,
+        json_encoders= {UUID:str}
+    )
 
 class ResponseModel(BaseModel, Generic[T]):
     status_code: conint(gt=99, lt=600)
