@@ -2,13 +2,16 @@ import styled from '@emotion/styled';
 
 import Common from '@/shared/styles/common';
 
-export const Container = styled.div`
-  border: 0.1rem solid #34d399;
-  border-radius: 0.3125rem;
-  background-color: ${Common.colors.white};
+export const Container = styled.div<{ isDragging: boolean }>`
   width: 100%;
   position: relative;
   padding: 0.25rem 0;
+  margin-top: 0.625rem;
+
+  border: 0.1rem solid #34d399;
+  border-radius: 0.3125rem;
+  background-color: ${Common.colors.white};
+  opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
 
   &::before {
     content: '';

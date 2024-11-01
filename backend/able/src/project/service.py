@@ -2,7 +2,7 @@ from typing import List, Optional
 import logging
 
 from src.project.schemas import Project, SelectedProject, UpdatedProject
-from src.file.file_utils import create_directory, get_directory, delete_directory, create_file, get_file, rename_path, read_image_file
+from src.file.utils import create_directory, get_directory, delete_directory, create_file, get_file, rename_path, read_image_file
 from src.file.path_manager import PathManager
 from src.utils import str_to_json, json_to_str, encode_image_to_base64
 from src.project.exceptions import ProjectNameAlreadyExistsException

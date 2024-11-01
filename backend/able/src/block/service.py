@@ -4,7 +4,7 @@ from typing import List
 from src.block.enums import BlockType
 from src.block.exceptions import BlockNotFoundException
 from src.block.schemas import Block
-from src.file.file_utils import get_file, get_directory
+from src.file.utils import get_file, get_directory
 from src.file.path_manager import PathManager
 from src.utils import str_to_json
 
