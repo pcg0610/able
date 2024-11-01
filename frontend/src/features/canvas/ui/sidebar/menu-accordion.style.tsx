@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 export const Accordion = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
 `;
 
 export const Menu = styled.div`
@@ -24,12 +23,11 @@ export const LabelWrapper = styled.div`
 export const MenuBlockWrapper = styled.div<{ isOpen: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+
   overflow: hidden;
-  height: ${({ isOpen }) => (isOpen ? 'auto' : '0')};
-  animation: ${({ isOpen }) => (isOpen ? slideDown : slideUp)} 0.5s ease
+  animation: ${({ isOpen }) => (isOpen ? slideDown : slideUp)} 0.4s ease
     forwards;
-  opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
+  opacity: ${({ isOpen }) => (isOpen ? 1 : 1)};
 `;
 
 const slideDown = keyframes`
@@ -38,14 +36,14 @@ const slideDown = keyframes`
     opacity: 0;
   }
   to {
-    max-height: 200px; /* 적당한 최대 높이 */
+    max-height: 200px;
     opacity: 1;
   }
 `;
 
 const slideUp = keyframes`
   from {
-    max-height: 200px; /* 적당한 최대 높이 */
+    max-height: 200px;
     opacity: 1;
   }
   to {

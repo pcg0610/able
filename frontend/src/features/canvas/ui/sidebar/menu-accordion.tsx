@@ -30,15 +30,13 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
         </S.LabelWrapper>
         <ArrowButton direction={isOpen ? 'up' : 'down'} />
       </S.Menu>
-      {isOpen && (
-        <S.MenuBlockWrapper isOpen={isOpen}>
-          <MenuBlock label='Activation' Icon={Icon} />
-          <MenuBlock label='Activation' Icon={Icon} />
-          <MenuBlock label='Activation' Icon={Icon} />
-          <MenuBlock label='Activation' Icon={Icon} />
-          <MenuBlock label='Activation' Icon={Icon} />
-        </S.MenuBlockWrapper>
-      )}
+      <S.MenuBlockWrapper isOpen={isOpen}>
+        <MenuBlock label='Activation' Icon={Icon} />
+        <MenuBlock label='Activation' Icon={Icon} />
+        <MenuBlock label='Activation' Icon={Icon} />
+        <MenuBlock label='Activation' Icon={Icon} />
+        <MenuBlock label='Activation' Icon={Icon} />
+      </S.MenuBlockWrapper>
     </S.Accordion>
   );
 };
