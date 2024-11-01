@@ -8,5 +8,6 @@ export const PageContainer = styled.div`
 
 export const Content = styled.div`
   display: flex;
-  flex: 1;
+  flex-grow: 1;
+  overflow: hidden;
 `;
