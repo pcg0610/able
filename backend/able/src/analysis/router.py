@@ -3,6 +3,8 @@ from fastapi import APIRouter
 from src.response.schemas import ResponseModel
 from src.analysis.schemas import EpochsResponse, ImageResponse
 import src.analysis.service as service
+from src.canvas.schemas import Canvas
+from src.canvas.service import get_canvas
 from src.response.utils import ok
 
 analysis_router = router = APIRouter()
@@ -18,3 +20,9 @@ async def get_epochs(project_name: str, result_name: str):
 async def get_result(project_name: str, result_name: str, epoch_name:str, block_id: str):
     image = service.get_result(project_name, result_name, epoch_name, block_id)
     return ok(data=ImageResponse(image=image))
+
+@router.get("/canvas", response_model=ResponseModel[Canvas],
+            summary="캔버스 조회", description="프로젝트 이름을 기반으로 해당 프로젝트의 캔버스 조회")
+async def get_project_canvas(project_name: str):
+    canvas = get_canvas(project_name)
+    return ok(data=canvas)
