@@ -7,8 +7,8 @@ export const StyledButton = styled.button<{ color: string; backgroundColor: stri
   color: ${(props) => props.color};
   border: none;
   border-radius: .375rem;
-  padding: .875rem 2.25rem;
-  font-size: ${Common.fontSizes.lg};
+  padding: 0.75rem 1.875rem; 
+  font-size: ${Common.fontSizes.base};
   font-weight: ${Common.fontWeights.semiBold};
   cursor: pointer;
   display: flex;  
