@@ -1,9 +1,11 @@
-import { ComponentType, useState } from 'react';
+import { ComponentType, useEffect, useRef, useState } from 'react';
 
+import { useBlocks } from '@features/canvas/api/use-blocks.query';
 import * as S from '@features/canvas/ui/sidebar/menu-accordion.style';
 
 import ArrowButton from '@/shared/ui/button/arrow-button';
-import MenuBlock from './menu-block';
+import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
+import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
 
 interface MenuAccordionProps {
   label: string;
@@ -11,30 +13,41 @@ interface MenuAccordionProps {
 }
 
 const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [contentHeight, setContentHeight] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const { data: blocks } = useBlocks(label);
+  console.log(blocks);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [isOpen]);
 
   const handleToggleOpen = () => {
     setIsOpen(!isOpen);
   };
-
-  const capitalizeFirstLetter = (text: string) => {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  };
-
   return (
-    <>
-      <S.Menu>
+    <S.Accordion>
+      <S.Menu onClick={handleToggleOpen}>
         <S.LabelWrapper>
           {Icon && <Icon />}
-          {capitalizeFirstLetter(label)}
+          <span>{capitalizeFirstLetter(label)}</span>
         </S.LabelWrapper>
-        <ArrowButton
-          direction={isOpen ? 'up' : 'down'}
-          onClick={handleToggleOpen}
-        />
+        <ArrowButton direction={isOpen ? 'up' : 'down'} />
       </S.Menu>
-      {isOpen && <MenuBlock label='Activation' Icon={Icon} />}
-    </>
+      <S.MenuBlockWrapper
+        isOpen={isOpen}
+        contentHeight={contentHeight}
+        ref={contentRef}
+      >
+        <MenuBlock label={label} Icon={Icon} />
+        <MenuBlock label={label} Icon={Icon} />
+        <MenuBlock label={label} Icon={Icon} />
+      </S.MenuBlockWrapper>
+    </S.Accordion>
   );
 };
 

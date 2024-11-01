@@ -1,4 +1,3 @@
-// src/entities/canvas/block-node.tsx
 import { Handle, Position } from '@xyflow/react';
 import { useMemo } from 'react';
 
