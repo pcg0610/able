@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { Container, Content, MainContainer } from '@pages/train/train.style';
 
 import Sidebar from '@widgets/sidebar/result-sidebar';
-import AnalyzeComponent from '@features/train/analyze/analyze';
-import ResultComponent from '@features/train/result/result';
+import AnalyzeComponent from '@features/train/ui/analyze/analyze';
+import ResultComponent from '@features/train/ui/result/result';
 import PageHeader from '@widgets/header/page-header';
 
 const TrainPage = () => {
