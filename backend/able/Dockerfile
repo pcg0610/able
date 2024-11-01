@@ -13,9 +13,10 @@ RUN pip install --no-cache-dir -r requirements.txt && rm requirements.txt
 RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 COPY setup ./setup
+RUN python3 setup/install.py
+
 COPY src ./src
 
 EXPOSE $PORT
 
-#ENTRYPOINT ["python3", "setup/install.py"]
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
