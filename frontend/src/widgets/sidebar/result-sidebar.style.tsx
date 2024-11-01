@@ -8,7 +8,6 @@ export const SidebarContainer = styled.div`
   padding: 0.625rem 0rem;
   background-color: ${Common.colors.white};
   width: 3.75rem;
-  height: 100vh;
   box-shadow: 0.125rem 0 0.3125rem rgba(73, 73, 73, 0.1);
   border-right: 0.0625rem solid rgba(0, 0, 0, 0.1);
 `;
@@ -17,9 +16,9 @@ export const SidebarButton = styled.button<{ active: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  margin: 0.6rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  margin: 0.6rem 0.6rem 0;
   border-radius: 0.625rem;
   background-color: ${({ active }) =>
     active ? Common.colors.primary : Common.colors.white};
