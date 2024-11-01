@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List
 
 from src.file.path_manager import PathManager
-from src.file.file_utils import get_directory, read_image_file
+from src.file.utils import get_directory, read_image_file
 from src.utils import encode_image_to_base64, get_epoch_id
 
 logging.basicConfig(level=logging.INFO)

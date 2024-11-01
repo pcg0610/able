@@ -14,7 +14,7 @@ from torchvision.transforms import Compose
 from src.block.schemas import Block, Edge
 from src.block.utils import convert_block_to_module
 
-from src.file.file_utils import create_file, create_directory
+from src.file.utils import create_file, create_directory
 from src.file.path_manager import PathManager
 from src.utils import json_to_str
 from datetime import datetime

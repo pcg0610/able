@@ -1,6 +1,6 @@
 import logging
 from src.canvas.schemas import SaveCanvasRequest, Canvas
-from src.file.file_utils import get_file, create_file
+from src.file.utils import get_file, create_file
 from src.file.path_manager import PathManager
 from src.utils import str_to_json, json_to_str
 
