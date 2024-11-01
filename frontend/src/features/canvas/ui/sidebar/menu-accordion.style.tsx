@@ -1,4 +1,3 @@
-import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 export const Accordion = styled.div`
@@ -20,34 +19,14 @@ export const LabelWrapper = styled.div`
   gap: 0.375rem;
 `;
 
-export const MenuBlockWrapper = styled.div<{ isOpen: boolean }>`
+export const MenuBlockWrapper = styled.div<{
+  isOpen: boolean;
+  contentHeight: number;
+}>`
   display: flex;
   flex-direction: column;
-
   overflow: hidden;
-  animation: ${({ isOpen }) => (isOpen ? slideDown : slideUp)} 0.4s ease
-    forwards;
-  opacity: ${({ isOpen }) => (isOpen ? 1 : 1)};
-`;
-
-const slideDown = keyframes`
-  from {
-    max-height: 0;
-    opacity: 0;
-  }
-  to {
-    max-height: 200px;
-    opacity: 1;
-  }
-`;
-
-const slideUp = keyframes`
-  from {
-    max-height: 200px;
-    opacity: 1;
-  }
-  to {
-    max-height: 0;
-    opacity: 0;
-  }
+  height: ${({ isOpen, contentHeight }) =>
+    isOpen ? `${contentHeight}px` : '0'};
+  transition: height 0.3s ease;
 `;
