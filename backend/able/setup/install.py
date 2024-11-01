@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 
 APPLICATION_NAME = os.getenv("APPLICATION_NAME", "able")
-VERSION = os.getenv("VERSION", "1.0.0")
+VERSION = os.getenv("VERSION", "v1")
 
 SOURCE_DIR = Path(__file__).parent / VERSION
 TARGET_DIR = Path.home() / APPLICATION_NAME / VERSION
