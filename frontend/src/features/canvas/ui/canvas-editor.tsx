@@ -88,8 +88,36 @@ const CanvasEditor = () => {
       };
 
       setNodes((nds) => [...nds, newNode]);
+
+      // 중앙 위치 조정 후 갱신
+      adjustNodePosition(newNode.id, clientOffset);
     },
     [nodes, screenToFlowPosition, setNodes]
+  );
+
+  // 노드 위치를 중앙으로 조정하는 함수
+  const adjustNodePosition = useCallback(
+    (nodeId: string, clientOffset: { x: number; y: number }) => {
+      setTimeout(() => {
+        const element = document.querySelector(`[data-id="${nodeId}"]`);
+        if (element) {
+          const { width, height } = element.getBoundingClientRect();
+          const centeredPosition = screenToFlowPosition({
+            x: clientOffset.x - width / 2,
+            y: clientOffset.y - height / 2,
+          });
+
+          setNodes((nds) =>
+            nds.map((node) =>
+              node.id === nodeId
+                ? { ...node, position: centeredPosition }
+                : node
+            )
+          );
+        }
+      }, 0);
+    },
+    [screenToFlowPosition, setNodes]
   );
 
   // 드롭 이벤트 처리
