@@ -14,7 +14,7 @@ from torchvision.transforms import Compose
 from src.block.schemas import Block, Edge
 from src.block.utils import convert_block_to_module
 
-from src.file.file_utils import create_file
+from src.file.file_utils import create_file, create_directory
 from src.file.path_manager import PathManager
 from src.utils import json_to_str
 from datetime import datetime
@@ -46,7 +46,28 @@ class TrainLogger:
         create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss': training_loss}))
 
     def save_train_result(self, top1_accuracy: float, top5_accuracy: float, precision: float, recall: float, f1: float, fig: Figure):
-        pass
+        # 학습 결과 경로 설정
+        result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
+        create_directory(result_path)
+
+        # 성능 지표 저장 (performance_metrics.json)
+        performance_metrics_data = {
+            "metrics": {
+                "accuracy": top1_accuracy,
+                "top5_accuracy": top5_accuracy,
+                "precision": precision,
+                "recall": recall
+            }
+        }
+        create_file(result_path / "performance_metrics.json", json_to_str(performance_metrics_data))
+
+        # F1 스코어 저장 (f1_score.json)
+        f1_score_data = {"f1_score": f1}
+        create_file(result_path / "f1_score.json", json_to_str(f1_score_data))
+
+        # 혼동 행렬 저장 (confusion_matrix.jpg)
+        confusion_matrix_path = result_path / "confusion_matrix.jpg"
+        fig.savefig(confusion_matrix_path, format="jpg")
 
 class Trainer:
     """모델의 학습을 책임지는 클래스
