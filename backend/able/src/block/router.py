@@ -22,13 +22,13 @@ def find_blocks_by_type(type: BlockType):
 
 @router.get(
     path="/search",
-    response_model=BlockResponse,
+    response_model=ResponseModel[BlockResponse],
     summary="블록 검색",
     description="키워드를 가지는 블록에 대하여 검색한다."
 )
 def search(keyword: str):
     return ok(
         data=BlockResponse(
-            blocks=service.search(keyword)
+            block=service.search(keyword)
         )
     )
