@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import Common from '@shared/styles/common';
 
 export const SidebarContainer = styled.div`
-  width: 18rem;
+  width: 14.5rem;
   height: 100%;
   padding: 1rem;
   background-color: ${Common.colors.white};
@@ -17,6 +17,8 @@ export const EpochItem = styled.div`
   padding: 0.75rem;
   background-color: ${Common.colors.gray100};
   border-radius: 0.375rem;
+  font-weight: ${Common.fontWeights.regular};
+  font-size: 0.9375rem;
   cursor: pointer;
   &:hover {
     background-color: ${Common.colors.gray200};

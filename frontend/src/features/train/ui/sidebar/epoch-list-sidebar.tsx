@@ -1,4 +1,4 @@
-import { SidebarContainer, EpochItem } from "@/widgets/sidebar/epoch-list-sidebar.style";
+import { SidebarContainer, EpochItem } from "@features/train/ui/sidebar/epoch-list-sidebar.style";
 
 const EpochListSidebar = () => {
    const epochs = [
