@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -8,136 +7,29 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
-  type Node,
-  type Edge,
   type OnConnect,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useDrop } from 'react-dnd';
+
+import { useNodeDropHandler } from '@features/canvas/model/useNodeDropHandler.model';
+import { initialNodes, initialEdges } from '@features/canvas/model/initialData';
 
 import BlockNode from '@/entities/block-node/block-node';
-
-// DropItem 타입 정의
-interface DropItem {
-  type: string;
-}
-
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'custom',
-    position: { x: 0, y: 0 },
-    data: {
-      type: 'layer',
-      fields: [
-        { name: 'in_channels', required: true },
-        { name: 'out_channels', required: true },
-        { name: 'kernel_size', required: true },
-      ],
-      onFieldChange: (fieldName: string, value: string) => {
-        console.log(`Field ${fieldName} updated with value: ${value}`);
-      },
-    },
-  },
-  {
-    id: '2',
-    type: 'custom',
-    position: { x: 250, y: 0 },
-    data: {
-      type: 'activation',
-      fields: [{ name: 'activation_type', required: true }],
-      onFieldChange: (fieldName: string, value: string) => {
-        console.log(`Field ${fieldName} updated with value: ${value}`);
-      },
-    },
-  },
-];
-
-const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2' }];
 
 const CanvasEditor = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { screenToFlowPosition } = useReactFlow();
 
-  const onConnect: OnConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
-    [setEdges]
-  );
+  const onConnect: OnConnect = (connection) =>
+    setEdges((eds) => addEdge(connection, eds));
 
-  // 노드를 중앙에 맞춰 생성하는 함수
-  const addCenteredNode = useCallback(
-    (clientOffset: { x: number; y: number }, item: DropItem) => {
-      const initialPosition = screenToFlowPosition({
-        x: clientOffset.x,
-        y: clientOffset.y,
-      });
-
-      const newNode = {
-        id: `${nodes.length + 1}`,
-        type: 'custom',
-        position: initialPosition,
-        data: {
-          type: item.type,
-          fields: [
-            { name: 'in_channels', required: true },
-            { name: 'out_channels', required: true },
-            { name: 'kernel_size', required: true },
-          ],
-        },
-      };
-
-      setNodes((nds) => [...nds, newNode]);
-
-      // 중앙 위치 조정 후 갱신
-      adjustNodePosition(newNode.id, clientOffset);
-    },
-    [nodes, screenToFlowPosition, setNodes]
-  );
-
-  // 노드 위치를 중앙으로 조정하는 함수
-  const adjustNodePosition = useCallback(
-    (nodeId: string, clientOffset: { x: number; y: number }) => {
-      setTimeout(() => {
-        const element = document.querySelector(`[data-id="${nodeId}"]`);
-        if (element) {
-          const { width, height } = element.getBoundingClientRect();
-          const centeredPosition = screenToFlowPosition({
-            x: clientOffset.x - width / 2,
-            y: clientOffset.y - height / 2,
-          });
-
-          setNodes((nds) =>
-            nds.map((node) =>
-              node.id === nodeId
-                ? { ...node, position: centeredPosition }
-                : node
-            )
-          );
-        }
-      }, 0);
-    },
-    [screenToFlowPosition, setNodes]
-  );
-
-  // 드롭 이벤트 처리
-  const [, drop] = useDrop<DropItem>(
-    () => ({
-      accept: 'BLOCK',
-      drop: (item, monitor) => {
-        const clientOffset = monitor.getClientOffset();
-        if (clientOffset) {
-          addCenteredNode(clientOffset, item);
-        }
-      },
-    }),
-    [addCenteredNode]
-  );
+  const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
 
   return (
     <div
       id='canvas-container'
-      ref={drop}
+      ref={dropRef}
       style={{ width: '100%', height: '100%' }}
     >
       <ReactFlow
