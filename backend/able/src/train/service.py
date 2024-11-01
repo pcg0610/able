@@ -13,12 +13,6 @@ def train(train_request_dto: TrainRequestDto):
 
     dataset = create_dataset(data_path, transforms)
 
-    train_dataset, valid_dataset, test_dataset = split_dataset(dataset)
-
-    train_data_loader = create_data_loader(train_dataset, train_request_dto.batch_size)
-    valid_data_loader = create_data_loader(valid_dataset, train_request_dto.batch_size)
-    test_data_loader = create_data_loader(test_dataset, train_request_dto.batch_size)
-
     model = convert_block_graph_to_model(train_request_dto.blocks, train_request_dto.edges)
 
     if model is None:
@@ -28,7 +22,10 @@ def train(train_request_dto: TrainRequestDto):
 
     optimizer = convert_optimizer_block_to_optimizer(train_request_dto.optimizer, model.parameters())
 
-    trainer = Trainer(model, train_data_loader, valid_data_loader, criterion, optimizer, TrainLogger())
+    trainer = Trainer(model, dataset, criterion, optimizer, train_request_dto.batch_size, TrainLogger(train_request_dto.project_name))
 
     trainer.train(train_request_dto.epoch)
 
+    top1_accuracy, top5_accuracy, precision, recall, f1, fig = trainer.test()
+
+    trainer.logger.save_train_result(top1_accuracy, top5_accuracy, precision, recall, f1, fig)
