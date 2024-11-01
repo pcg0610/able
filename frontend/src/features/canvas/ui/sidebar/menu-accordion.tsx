@@ -1,4 +1,4 @@
-import { ComponentType, useState } from 'react';
+import { ComponentType, useEffect, useRef, useState } from 'react';
 
 import * as S from '@features/canvas/ui/sidebar/menu-accordion.style';
 
@@ -11,31 +11,36 @@ interface MenuAccordionProps {
 }
 
 const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [contentHeight, setContentHeight] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [isOpen]);
 
   const handleToggleOpen = () => {
     setIsOpen(!isOpen);
   };
-
-  const capitalizeFirstLetter = (text: string) => {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  };
-
   return (
     <S.Accordion>
       <S.Menu onClick={handleToggleOpen}>
         <S.LabelWrapper>
           {Icon && <Icon />}
-          {capitalizeFirstLetter(label)}
+          <span>{label}</span>
         </S.LabelWrapper>
         <ArrowButton direction={isOpen ? 'up' : 'down'} />
       </S.Menu>
-      <S.MenuBlockWrapper isOpen={isOpen}>
-        <MenuBlock label='Activation' Icon={Icon} />
-        <MenuBlock label='Activation' Icon={Icon} />
-        <MenuBlock label='Activation' Icon={Icon} />
-        <MenuBlock label='Activation' Icon={Icon} />
-        <MenuBlock label='Activation' Icon={Icon} />
+      <S.MenuBlockWrapper
+        isOpen={isOpen}
+        contentHeight={contentHeight}
+        ref={contentRef}
+      >
+        <MenuBlock label={label} Icon={Icon} />
+        <MenuBlock label={label} Icon={Icon} />
+        <MenuBlock label={label} Icon={Icon} />
       </S.MenuBlockWrapper>
     </S.Accordion>
   );
