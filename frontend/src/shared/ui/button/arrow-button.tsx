@@ -16,7 +16,6 @@ const ArrowButton = ({
   color = Common.colors.black,
   onClick,
 }: ArrowButtonProps) => {
-  console.log(color);
   return (
     <S.StyledButton direction={direction} size={size} onClick={onClick}>
       <ArrowIcon fill={color} />
