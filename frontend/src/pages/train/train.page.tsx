@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
-import { Container, Content } from '@pages/train/train.style';
+import { Container, Content, MainContainer } from '@pages/train/train.style';
 
 import Sidebar from '@widgets/sidebar/result-sidebar';
 import AnalyzeComponent from '@features/train/analyze/analyze';
 import ResultComponent from '@features/train/result/result';
+import PageHeader from '@widgets/header/page-header';
 
 const TrainPage = () => {
   const [selectedComponent, setSelectedComponent] = useState('result');
@@ -14,13 +15,16 @@ const TrainPage = () => {
   };
 
   return (
-    <Container>
-      <Sidebar onSelectionChange={handleSidebarSelection} />
-      <Content>
-        {selectedComponent === 'analyze' && <AnalyzeComponent />}
-        {selectedComponent === 'result' && <ResultComponent />}
-      </Content>
-    </Container>
+    <MainContainer>
+      <PageHeader title='프로젝트' date='2024.08.12' />
+      <Container>
+        <Sidebar onSelectionChange={handleSidebarSelection} />
+        <Content>
+          {selectedComponent === 'analyze' && <AnalyzeComponent />}
+          {selectedComponent === 'result' && <ResultComponent />}
+        </Content>
+      </Container>
+    </MainContainer>
   );
 };
 
