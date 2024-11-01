@@ -16,5 +16,5 @@ COPY src ./src
 
 EXPOSE $PORT
 
-ENTRYPOINT ["python3", "setup/install.py"]
+#ENTRYPOINT ["python3", "setup/install.py"]
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
