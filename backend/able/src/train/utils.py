@@ -61,7 +61,7 @@ class Trainer:
         self.checkpoint_interval = checkpoint_interval
         self.device = device
 
-    def train_epoch(self):
+    def train_epoch(self) -> float:
         self.model.train()  # 모델을 훈련 모드로 전환
         running_loss = 0.0
 
@@ -86,7 +86,7 @@ class Trainer:
 
         return epoch_loss
 
-    def validate(self):
+    def validate(self) -> float:
         self.model.eval()  # 모델을 평가 모드로 전환
         running_loss = 0.0
 
@@ -110,7 +110,7 @@ class Trainer:
         epoch_loss = running_loss / len(self.valid_data_loader)
         return correct / total, epoch_loss # valid accuracy, loss 반환
 
-    def epoch_accuracy(self):
+    def epoch_accuracy(self) -> float:
         self.model.eval()  # 모델을 평가 모드로 전환
 
         correct = 0  # 정확하게 예측한 샘플 수
@@ -128,7 +128,7 @@ class Trainer:
 
         return correct / total # train accuracy 반환
 
-    def train(self, epochs):
+    def train(self, epochs) -> None:
         best_train_loss = MAX_LOSS
         best_valid_loss = MAX_LOSS
         
@@ -152,7 +152,7 @@ class Trainer:
             if best_valid_loss > valid_loss:
                 torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
-    def test(self):
+    def test(self) -> tuple[float, float, float, float, float, Figure]:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
 
         y_true = []
@@ -194,7 +194,7 @@ class Trainer:
         return top1_correct / total, top5_correct / total, precision, recall, f1, fig
 
 
-def plot_confusion_matrix(y_true, y_pred, class_names):
+def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
     # 혼동 행렬 계산
     conf_matrix = confusion_matrix(y_true, y_pred)
 
@@ -304,3 +304,37 @@ def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn
         model.layers.add_module(block.name, module)
 
     return model
+
+def filter_blocks_connected_to_data(data_block: Block, transform_blocks: tuple[Block], loss_blocks: tuple[Block], optimizer_blocks: tuple[Block], others: tuple[Block], edges: tuple[Edge]) -> tuple[tuple[Block], tuple[Block], tuple[Block], tuple[Block]]:
+    """
+    그래프의 루트인 데이터 블록과 연결된 블록들만 반환하는 함수
+    """
+    adj_blocks = defaultdict(list)
+
+    for edge in edges:
+        adj_blocks[edge.source.block_id].append(edge.target.block_id)
+
+    visited = defaultdict(bool)
+
+    q = deque([data_block.block_id])
+
+    while q:
+        block_id = q.popleft()
+
+        if visited[block_id]:
+            continue
+
+        visited[block_id] = True
+
+        for adj_block in adj_blocks[block_id]:
+            q.append(adj_block)
+
+    conn_transform_blocks = tuple(transform_block for transform_block in transform_blocks if visited[transform_block.block_id])
+
+    conn_loss_blocks = tuple(loss_block for loss_block in loss_blocks if visited[loss_block.block_id])
+
+    conn_optimizer_blocks = tuple(optimizer_block for optimizer_block in optimizer_blocks if visited[optimizer_block.block_id])
+
+    conn_others = tuple(other for other in others if visited[other.block_id])
+
+    return conn_transform_blocks, conn_loss_blocks, conn_optimizer_blocks, conn_others

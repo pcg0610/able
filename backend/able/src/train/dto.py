@@ -7,8 +7,8 @@ class TrainRequestDto(BaseModel):
     batch_size: int
     data: Block
     interpreter: Block
-    loss: Block
-    optimizer: Block
+    loss: tuple[Block]
+    optimizer: tuple[Block]
     transforms: tuple[Block]
     blocks: tuple[Block]
     edges: tuple[Edge]
