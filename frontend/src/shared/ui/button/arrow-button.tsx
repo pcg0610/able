@@ -7,7 +7,7 @@ interface ArrowButtonProps {
   direction?: 'up' | 'down' | 'left';
   size?: 'md' | 'sm';
   color?: string;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const ArrowButton = ({

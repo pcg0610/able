@@ -3,7 +3,7 @@ import { ComponentType, useState } from 'react';
 import * as S from '@features/canvas/ui/sidebar/menu-accordion.style';
 
 import ArrowButton from '@/shared/ui/button/arrow-button';
-import MenuBlock from './menu-block';
+import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
 
 interface MenuAccordionProps {
   label: string;
@@ -22,19 +22,24 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
   };
 
   return (
-    <>
-      <S.Menu>
+    <S.Accordion>
+      <S.Menu onClick={handleToggleOpen}>
         <S.LabelWrapper>
           {Icon && <Icon />}
           {capitalizeFirstLetter(label)}
         </S.LabelWrapper>
-        <ArrowButton
-          direction={isOpen ? 'up' : 'down'}
-          onClick={handleToggleOpen}
-        />
+        <ArrowButton direction={isOpen ? 'up' : 'down'} />
       </S.Menu>
-      {isOpen && <MenuBlock label='Activation' Icon={Icon} />}
-    </>
+      {isOpen && (
+        <S.MenuBlockWrapper isOpen={isOpen}>
+          <MenuBlock label='Activation' Icon={Icon} />
+          <MenuBlock label='Activation' Icon={Icon} />
+          <MenuBlock label='Activation' Icon={Icon} />
+          <MenuBlock label='Activation' Icon={Icon} />
+          <MenuBlock label='Activation' Icon={Icon} />
+        </S.MenuBlockWrapper>
+      )}
+    </S.Accordion>
   );
 };
 

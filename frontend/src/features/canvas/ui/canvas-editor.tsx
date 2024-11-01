@@ -27,11 +27,7 @@ const CanvasEditor = () => {
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
 
   return (
-    <div
-      id='canvas-container'
-      ref={dropRef}
-      style={{ width: '100%', height: '100%' }}
-    >
+    <div ref={dropRef} style={{ width: '100%', height: '100%' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
