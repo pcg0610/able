@@ -1,7 +1,8 @@
 from . import TrainRequest
 from .utils import *
 from src.file.utils import validate_file_format
-
+from src.canvas.schemas import SaveCanvasRequest, Canvas
+from src.canvas.service import save_block_graph
 
 def train(request: TrainRequest):
 
@@ -19,7 +20,7 @@ def train(request: TrainRequest):
         data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks, request.edges
     )
 
-    #TODO: 학습할 모델 그래프 저장 기능 추가
+    save_block_graph(request.project_name, SaveCanvasRequest(canvas=Canvas(blocks=request.blocks, edges=request.edges)))
 
     transforms = create_data_preprocessor(transform_blocks)
     dataset = create_dataset(data_path, transforms)
@@ -35,5 +36,3 @@ def train(request: TrainRequest):
     trainer.train(request.epoch)
     top1_accuracy, top5_accuracy, precision, recall, f1, fig = trainer.test()
     trainer.logger.save_train_result(top1_accuracy, top5_accuracy, precision, recall, f1, fig)
-
-
