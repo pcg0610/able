@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 import Common from '@shared/styles/common';
 
 export const Container = styled.div`
-  padding: 1rem 6rem 2.3rem;
-  height: 100vh;
+  padding: 0.7rem 5.5rem 1.7rem;
+  height: calc(100vh - 2.5rem);
   display: flex;
   flex-direction: column;
   background-color: ${Common.colors.background};
@@ -13,7 +13,7 @@ export const Header = styled.div`
   display: flex;
   justify-content: end;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.7rem;
   flex-shrink: 0;
 `;
 

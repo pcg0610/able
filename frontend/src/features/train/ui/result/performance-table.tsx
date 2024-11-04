@@ -15,13 +15,13 @@ const PerformanceTable = () => {
          <BarChart
             data={data}
             layout="vertical"
-            margin={{ top: 25, right: 30, left: 20, bottom: 0 }}
+            margin={{ top: 15, right: 25, left: 10, bottom: 0 }}
          >
             <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={false} />
-            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: Common.fontSizes.xs }} />
+            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: Common.fontSizes['2xs'] }} />
             <YAxis type="category" dataKey="name" tick={{ fontSize: Common.fontSizes.xs }} />
             <Tooltip />
-            <Bar dataKey="value" fill="#0051FF" barSize={30} />
+            <Bar dataKey="value" fill={Common.colors.primary} barSize={25} />
          </BarChart>
       </ResponsiveContainer>
    );

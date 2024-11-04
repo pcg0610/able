@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import * as S from '@/features/train/result/result.style';
+import * as S from '@features/train/ui/result/result.style';
 import Common from '@shared/styles/common';
 
-import ConfusionMatrix from '@features/train/result/confusion-matrix';
-import EpochGraph from '@features/train/result/epoch-graph';
-import F1Score from '@features/train/result/f1-score';
-import LossGraph from '@features/train/result/loss-graph';
-import PerformanceTable from '@features/train/result/performance-table';
+import ConfusionMatrix from '@features/train/ui/result/confusion-matrix';
+import EpochGraph from '@features/train/ui/result/epoch-graph';
+import F1Score from '@features/train/ui/result/f1-score';
+import LossGraph from '@features/train/ui/result/loss-graph';
+import PerformanceTable from '@features/train/ui/result/performance-table';
 import BasicButton from '@shared/ui/button/basic-button'
 
 const Data = {

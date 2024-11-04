@@ -13,8 +13,8 @@ const F1Score = ({ f1score }) => {
          <PieChart>
             <Pie
                data={data}
-               innerRadius={55}
-               outerRadius={100}
+               innerRadius="50%"
+               outerRadius="95%"
                startAngle={90}
                endAngle={-270}
                dataKey="value"

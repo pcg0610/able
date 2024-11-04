@@ -16,9 +16,9 @@ const LossGraph = ({ data }) => {
 
    return (
       <ResponsiveContainer width="100%" height="100%">
-         <ComposedChart data={data} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
+         <ComposedChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={Common.colors.gray200} />
-            <XAxis dataKey="epoch" tick={{ fontSize: Common.fontSizes.xs }} />
+            <XAxis dataKey="epoch" tick={{ fontSize: Common.fontSizes['2xs'] }} />
             <YAxis domain={[0, 0.3]} tick={{ fontSize: Common.fontSizes.xs }} />
             <Tooltip />
             <Legend
