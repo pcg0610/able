@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
-from typing import Iterator, Any
+from typing import Iterator, Any, Tuple
 
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
@@ -233,9 +233,6 @@ def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
 
     return fig
 
-def validate_file_format(file_path: str, expected: str) -> bool:
-    return file_path.endswith(f".{expected.lower()}")
-
 def create_dataset(data_path: str, train_transform:Compose) -> ImageFolder:
     return ImageFolder(data_path, transform=train_transform)
 
@@ -245,7 +242,7 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def topological_sort(blocks: tuple[Block], edges: tuple[Edge]) -> tuple[Block]:
+def topological_sort(blocks: tuple[Block, ...], edges: tuple[Edge]) -> tuple[Block, ...]:
     graph = defaultdict(list)
     in_degree = {block.id: 0 for block in blocks}
 
@@ -278,7 +275,7 @@ class UserModel(nn.Module):
     def forward(self, x):
         return self.forward(x)
 
-def create_data_preprocessor(transform_blocks: tuple[Block]) -> Compose:
+def create_data_preprocessor(transform_blocks: tuple[Block, ...]) -> Compose:
     return Compose([convert_block_to_module(transform_block) for transform_block in transform_blocks])
 
 def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
@@ -309,7 +306,7 @@ def convert_operation_block_to_module(operation_block: Block) -> nn.Module | Non
 
     return convert_block_to_module(operation_block)
 
-def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn.Module | None:
+def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge]) -> nn.Module | None:
     sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
@@ -326,36 +323,63 @@ def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn
 
     return model
 
-def filter_blocks_connected_to_data(data_block: Block, transform_blocks: tuple[Block], loss_blocks: tuple[Block], optimizer_blocks: tuple[Block], others: tuple[Block], edges: tuple[Edge]) -> tuple[tuple[Block], tuple[Block], tuple[Block], tuple[Block]]:
+def split_blocks(blocks: list[Block]) -> Tuple[
+    Block | None, Tuple[Block, ...], Tuple[Block, ...], Tuple[Block, ...], Tuple[Block, ...]
+]:
+    data_block = None
+    transform_blocks, loss_blocks, optimizer_blocks, others = [], [], [], []
+
+    for block in blocks:
+        match block.type:
+            case BlockType.DATA:
+                if data_block is None:
+                    data_block = block
+                else:
+                    raise ValueError("Multiple data blocks found. Expected only one.")
+            case BlockType.TRANSFORM:
+                transform_blocks.append(block)
+            case BlockType.LOSS:
+                loss_blocks.append(block)
+            case BlockType.OPTIMIZER:
+                optimizer_blocks.append(block)
+            case _:
+                others.append(block)
+
+    return data_block, tuple(transform_blocks), tuple(loss_blocks), tuple(optimizer_blocks), tuple(others)
+
+def filter_blocks_connected_to_data(
+        data_block: Block | None,
+        transform_blocks: Tuple[Block, ...],
+        loss_blocks: Tuple[Block, ...],
+        optimizer_blocks: Tuple[Block, ...],
+        others: Tuple[Block, ...],
+        edges: Tuple[Edge, ...]
+) -> tuple[tuple[Block, ...], tuple[Block, ...], tuple[Block, ...], tuple[Block, ...]]:
     """
     그래프의 루트인 데이터 블록과 연결된 블록들만 반환하는 함수
     """
     adj_blocks = defaultdict(list)
+    is_connected = set()
 
     for edge in edges:
         adj_blocks[edge.source.block_id].append(edge.target.block_id)
 
-    visited = defaultdict(bool)
-
     q = deque([data_block.block_id])
+    is_connected.add(data_block.block_id)
 
     while q:
         block_id = q.popleft()
+        for adj_block_id in adj_blocks.get(block_id, []):
+            if adj_block_id not in is_connected:
+                is_connected.add(adj_block_id)
+                q.append(adj_block_id)
 
-        if visited[block_id]:
-            continue
+    def filter_connected(blocks: tuple[Block, ...]) -> tuple[Block, ...]:
+        return tuple(block for block in blocks if block.block_id in is_connected)
 
-        visited[block_id] = True
-
-        for adj_block in adj_blocks[block_id]:
-            q.append(adj_block)
-
-    conn_transform_blocks = tuple(transform_block for transform_block in transform_blocks if visited[transform_block.block_id])
-
-    conn_loss_blocks = tuple(loss_block for loss_block in loss_blocks if visited[loss_block.block_id])
-
-    conn_optimizer_blocks = tuple(optimizer_block for optimizer_block in optimizer_blocks if visited[optimizer_block.block_id])
-
-    conn_others = tuple(other for other in others if visited[other.block_id])
-
-    return conn_transform_blocks, conn_loss_blocks, conn_optimizer_blocks, conn_others
+    return (
+        filter_connected(transform_blocks),
+        filter_connected(loss_blocks),
+        filter_connected(optimizer_blocks),
+        filter_connected(others)
+    )
