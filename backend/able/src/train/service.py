@@ -56,7 +56,8 @@ def train(request: TrainRequest):
 
 
 def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
-    result_path = path_manager.get_train_result_path(project_name, result_name)
+    # 결과 디렉터리 경로 설정
+    result_path = path_manager.get_train_results_path(project_name) / result_name
 
     # 혼동 행렬 이미지 로드 및 인코딩
     confusion_matrix = encode_image_to_base64(result_path / "confusion_matrix.jpg")
@@ -69,14 +70,23 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     f1_score = load_json_file(result_path / "f1_score.json")["f1_score"]
 
     # 에포크 결과 로드
-    epochs_path = result_path / "epochs"
+    epochs_path = path_manager.get_epochs_path(project_name, result_name)
     epoch_results: List[EpochResult] = []
+
     for epoch_dir in epochs_path.iterdir():
         if epoch_dir.is_dir():
             epoch_id = epoch_dir.name
-            training_loss = load_json_file(epoch_dir / "training_loss.json")["loss"]
-            validation_loss = load_json_file(epoch_dir / "validation_loss.json")["loss"]
-            accuracy = load_json_file(epoch_dir / "accuracy.json")["accuracy"]
+            # 각 에포크에 해당하는 파일 경로 설정
+            training_loss_path = epoch_dir / "training_loss.json"
+            validation_loss_path = epoch_dir / "validation_loss.json"
+            accuracy_path = epoch_dir / "accuracy.json"
+
+            # 각 파일에서 필요한 데이터 로드
+            training_loss = load_json_file(training_loss_path)["loss"]
+            validation_loss = load_json_file(validation_loss_path)["loss"]
+            accuracy = load_json_file(accuracy_path)["accuracy"]
+
+            # 에포크 결과 인스턴스 생성
             epoch_result = EpochResult(
                 epoch=epoch_id,
                 losses=Loss(training=training_loss, validation=validation_loss),
@@ -84,6 +94,7 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
             )
             epoch_results.append(epoch_result)
 
+    # TrainResultResponse 반환
     return TrainResultResponse(
         confusion_matrix=confusion_matrix,
         performance_metrics=performance_metrics,
