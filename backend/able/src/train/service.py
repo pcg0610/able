@@ -47,7 +47,7 @@ def train(request: TrainRequest):
     result_name = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # 결과 및 에포크 디렉터리 생성
-    result_path = path_manager.get_train_result_path(project_name, result_name)
+    result_path = path_manager.get_train_results_path(project_name) / result_name
     epochs_path = result_path / "epochs"
     create_directory(result_path)
     create_directory(epochs_path)
