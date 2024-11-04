@@ -56,5 +56,5 @@ async def analysis(project_name: str, result_name: str, epoch_name:str, file: Up
     extractor.save_heatmap(img_path)
 
 
-    heatmap_img = encode_image_to_base64(read_image_file(img_path))
+    heatmap_img = encode_image_to_base64(read_image_file(epoch_path / "heatmap.jpg"))
     return heatmap_img
