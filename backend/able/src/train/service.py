@@ -1,8 +1,11 @@
 from . import TrainRequest
 from .utils import *
+from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format
 from src.canvas.schemas import SaveCanvasRequest, Canvas
 from src.canvas.service import save_block_graph
+
+path_manager = PathManager()
 
 def train(request: TrainRequest):
 
@@ -31,6 +34,17 @@ def train(request: TrainRequest):
 
     criterion = convert_criterion_block_to_module(loss_blocks)
     optimizer = convert_optimizer_block_to_optimizer(optimizer_blocks, model.parameters())
+
+    # TrainLogger 초기화 전 디렉터리 생성
+    project_name = request.project_name
+    result_name = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # 결과 및 에포크 디렉터리 생성
+    result_path = path_manager.get_train_result_path(project_name, result_name)
+    epochs_path = result_path / "epochs"
+    create_directory(result_path)
+    create_directory(epochs_path)
+
     trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name))
 
     trainer.train(request.epoch)
