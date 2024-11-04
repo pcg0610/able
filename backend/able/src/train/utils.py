@@ -15,6 +15,8 @@ from src.block.schemas import Block
 from src.block.utils import convert_block_to_module
 from src.canvas.schemas import Edge
 
+from src.train.schemas import TrainResultMetrics, TrainResultConfig
+
 from src.file.utils import create_file, create_directory
 from src.file.path_manager import PathManager
 from src.utils import json_to_str
@@ -39,6 +41,9 @@ class TrainLogger:
         self.project_name = project_name
         self.result_name = result_name
 
+        # 기존 경로 생성 로직 제거, 결과 및 에포크 디렉터리는 서비스에서 생성
+        self.result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
+
     def create_epoch_log(self, epoch_id: int, accuracy: float, validation_loss: float, training_loss: float):
         epoch_path = pathManager.get_epoch_path(self.project_name, self.result_name, epoch_id)
 
@@ -46,29 +51,39 @@ class TrainLogger:
         create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss': validation_loss}))
         create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss': training_loss}))
 
-    def save_train_result(self, top1_accuracy: float, top5_accuracy: float, precision: float, recall: float, f1: float, fig: Figure):
-        # 학습 결과 경로 설정
-        result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
-        create_directory(result_path)
-
+    def save_train_result(self, metrics: TrainResultMetrics, config: TrainResultConfig):
         # 성능 지표 저장 (performance_metrics.json)
         performance_metrics_data = {
             "metrics": {
-                "accuracy": top1_accuracy,
-                "top5_accuracy": top5_accuracy,
-                "precision": precision,
-                "recall": recall
+                "accuracy": metrics.top1_accuracy,
+                "top5_accuracy": metrics.top5_accuracy,
+                "precision": metrics.precision,
+                "recall": metrics.recall
             }
         }
-        create_file(result_path / "performance_metrics.json", json_to_str(performance_metrics_data))
+        create_file(self.result_path / "performance_metrics.json", json_to_str(performance_metrics_data))
 
         # F1 스코어 저장 (f1_score.json)
-        f1_score_data = {"f1_score": f1}
-        create_file(result_path / "f1_score.json", json_to_str(f1_score_data))
+        f1_score_data = {"f1_score": metrics.f1}
+        create_file(self.result_path / "f1_score.json", json_to_str(f1_score_data))
 
         # 혼동 행렬 저장 (confusion_matrix.jpg)
-        confusion_matrix_path = result_path / "confusion_matrix.jpg"
-        fig.savefig(confusion_matrix_path, format="jpg")
+        confusion_matrix_path = self.result_path / "confusion_matrix.jpg"
+        metrics.confusion_matrix.savefig(confusion_matrix_path, format="jpg")
+
+        # 데이터 정보 저장 (metadata.json)
+        metadata_info = {
+            "data_path": config.data_path,
+            "input_shape": config.input_shape,
+            "classes": config.classes
+        }
+        create_file(self.result_path / "metadata.json", json_to_str(metadata_info))
+
+        # 하이퍼 파라미터 정보 저장 (hyper_parameter.json)
+        create_file(self.result_path / "hyper_parameter.json", json_to_str(config.hyper_params))
+
+        # 블록 그래프 정보 저장 (block_graph.json)
+        create_file(self.result_path / "block_graph.json", json_to_str(config.block_graph_info))
 
 class Trainer:
     """모델의 학습을 책임지는 클래스
