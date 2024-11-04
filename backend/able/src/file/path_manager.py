@@ -30,34 +30,6 @@ class PathManager:
         """학습 결과 목록 경로"""
         return self.get_projects_path(name) / "train_results"
 
-    def get_train_result_path(self, name: str, result_name: str) -> Path:
-        """학습 결과 경로"""
-        return self.get_train_results_path(name) / result_name
-
-    def get_train_result_metadata_path(self, project_name: str, result_name: str) -> Path:
-        """학습 결과 메타데이터 경로"""
-        return self.get_train_result_path(project_name, result_name) / "metadata.json"
-
-    def get_hyperparameter_path(self, project_name: str, result_name: str) -> Path:
-        """하이퍼 파라미터 경로"""
-        return self.get_train_result_path(project_name, result_name) / "hyper_parameter.json"
-
-    def get_train_block_graph_path(self, project_name: str, result_name: str) -> Path:
-        """모델 구성 요소 정보 경로"""
-        return self.get_train_result_path(project_name, result_name) / "block_graph.json"
-
-    def get_performance_metrics_path(self, project_name: str, result_name: str) -> Path:
-        """성능 지표 테이블 경로"""
-        return self.get_train_result_path(project_name, result_name) / "performance_metrics.json"
-
-    def get_f1_score_path(self, project_name: str, result_name: str) -> Path:
-        """F1 스코어 경로"""
-        return self.get_train_result_path(project_name, result_name) / "f1_score.json"
-
-    def get_confusion_matrix_path(self, project_name: str, result_name: str) -> Path:
-        """혼동 행렬 이미지 경로"""
-        return self.get_train_result_path(project_name, result_name) / "confusion_matrix.jpg"
-
     def get_epochs_path(self, name:str, result_name: str):
         """에포크 목록 경로"""
         return self.get_train_result_path(name, result_name) / "epochs"
