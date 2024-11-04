@@ -13,7 +13,7 @@ const CanvasPage = () => {
     <DndProvider backend={HTML5Backend}>
       <ReactFlowProvider>
         <S.PageContainer>
-          <PageHeader title='프로젝트' date='2024.08.12' />
+          <PageHeader title='프로젝트' />
           <S.Content>
             <CanvasSidebar />
             <CanvasEditor />

@@ -12,6 +12,7 @@ export const Container = styled.div<{ isDragging: boolean }>`
   border-radius: 0.3125rem;
   background-color: ${Common.colors.white};
   opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
+  cursor: grab;
 
   &::before {
     content: '';
