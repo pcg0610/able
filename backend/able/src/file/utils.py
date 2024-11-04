@@ -1,8 +1,9 @@
 import shutil
 import logging
 import io
+import json
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any
 from PIL import Image
 from src.file.exceptions import FileNotFoundException, FileUnreadableException
 
@@ -100,3 +101,26 @@ def rename_path(path: Path, new_name: str) -> bool:
 
 def validate_file_format(file_path: str, expected: str) -> bool:
     return file_path.endswith(f".{expected.lower()}")
+
+# JSON 파일을 읽고 저장하는 함수 추가
+def load_json_file(file_path: Path) -> Dict[str, Any]:
+    """JSON 파일을 읽어 Dictionary로 반환"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        logger.error(f"파일을 찾을 수 없습니다: {file_path}")
+        raise FileNotFoundException(f"{file_path}을 찾을 수 없습니다.")
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON 파일 디코딩 오류: {e}")
+        raise
+
+def save_json_file(data: Dict[str, Any], file_path: Path) -> None:
+    """Dictionary를 JSON 파일로 저장"""
+    try:
+        with open(file_path, 'w', encoding='utf-8') as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+        logger.info(f"JSON 파일 저장 성공: {file_path}")
+    except Exception as e:
+        logger.error(f"JSON 파일 저장 오류: {e}")
+        raise
