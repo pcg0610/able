@@ -1,11 +1,9 @@
-from src.block.schemas import Block
-from src.canvas.schemas import Canvas
+from src.canvas.schemas import Edge
 from src.response.schemas import ImmutableBaseModel
 
-
 class ValidateCanvasRequest(ImmutableBaseModel):
-    canvas: Canvas
+    blocks: list[int]
+    edges: list[Edge]
 
 class ValidateCanvasResponse(ImmutableBaseModel):
     has_cycle: bool
-    cycle_blocks: tuple[Block]

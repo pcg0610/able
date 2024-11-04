@@ -13,11 +13,9 @@ validation_router = router = APIRouter()
     response_model=ResponseModel[ValidateCanvasResponse]
 )
 def check_cycle(request: ValidateCanvasRequest) -> Response:
-    result, cycle_blocks = service.check_cycle(request.canvas)
     return ok(
         data=ValidateCanvasResponse(
-            has_cycle=result,
-            cycle_blocks=cycle_blocks
+            has_cycle=service.check_cycle(request.blocks, request.edges)
         )
     )
 
