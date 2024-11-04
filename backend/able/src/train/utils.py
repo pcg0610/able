@@ -11,8 +11,9 @@ from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
-from src.block.schemas import Block, Edge
+from src.block.schemas import Block
 from src.block.utils import convert_block_to_module
+from src.canvas.schemas import Edge
 
 from src.file.utils import create_file, create_directory
 from src.file.path_manager import PathManager
@@ -362,7 +363,7 @@ def filter_blocks_connected_to_data(
     is_connected = set()
 
     for edge in edges:
-        adj_blocks[edge.source.block_id].append(edge.target.block_id)
+        adj_blocks[edge.source].append(edge.target)
 
     q = deque([data_block.block_id])
     is_connected.add(data_block.block_id)

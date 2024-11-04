@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from src.block.enums import BlockType
 from src.block.exceptions import BlockNotFoundException
