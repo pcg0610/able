@@ -1,31 +1,34 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { resolve } from "path";
-import tsconfigPaths from "vite-tsconfig-paths";
-import svgr from "vite-plugin-svgr";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { dirname, resolve } from 'path';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { fileURLToPath } from 'url';
+import svgr from 'vite-plugin-svgr';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
   resolve: {
     alias: [
-      { find: "@", replacement: resolve(__dirname, "src") },
-      { find: "@pages", replacement: resolve(__dirname, "src/pages") },
+      { find: '@', replacement: resolve(__dirname, 'src') },
+      { find: '@pages', replacement: resolve(__dirname, 'src/pages') },
       {
-        find: "@components",
-        replacement: resolve(__dirname, "src/components"),
+        find: '@components',
+        replacement: resolve(__dirname, 'src/components'),
       },
       {
-        find: "@widgets",
-        replacement: resolve(__dirname, "src/widgets"),
+        find: '@widgets',
+        replacement: resolve(__dirname, 'src/widgets'),
       },
-      { find: "@shared", replacement: resolve(__dirname, "src/shared") },
+      { find: '@shared', replacement: resolve(__dirname, 'src/shared') },
       {
-        find: "@icons",
-        replacement: resolve(__dirname, "src/assets/icons"),
+        find: '@icons',
+        replacement: resolve(__dirname, 'src/assets/icons'),
       },
       {
-        find: "@images",
-        replacement: resolve(__dirname, "src/assets/images"),
+        find: '@images',
+        replacement: resolve(__dirname, 'src/assets/images'),
       },
     ],
   },

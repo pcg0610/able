@@ -12,6 +12,7 @@ export const Container = styled.div<{ isDragging: boolean }>`
   border-radius: 0.3125rem;
   background-color: ${Common.colors.white};
   opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
+  cursor: grab;
 
   &::before {
     content: '';
@@ -27,6 +28,7 @@ export const Container = styled.div<{ isDragging: boolean }>`
 `;
 
 export const Content = styled.div`
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -34,6 +36,7 @@ export const Content = styled.div`
 `;
 
 export const LabelWrapper = styled.div`
+  width: 85%;
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -41,5 +44,9 @@ export const LabelWrapper = styled.div`
 `;
 
 export const LabelText = styled.span`
+  width: 100%;
   font-size: ${Common.fontSizes.sm};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

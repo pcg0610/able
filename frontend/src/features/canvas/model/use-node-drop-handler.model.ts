@@ -1,10 +1,11 @@
 import { useDrop } from 'react-dnd';
 import { Node } from '@xyflow/react';
 
-import { useAddCenteredNode } from '@features/canvas/model/useAddCenteredNode.model';
+import { useAddCenteredNode } from '@/features/canvas/model/use-add-centered-node.model';
+import { Dispatch, SetStateAction } from 'react';
 
 interface DropHandlerParams {
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
+  setNodes: Dispatch<SetStateAction<Node[]>>;
   screenToFlowPosition: (position: { x: number; y: number }) => {
     x: number;
     y: number;

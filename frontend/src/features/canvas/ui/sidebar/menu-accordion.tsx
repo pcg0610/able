@@ -1,11 +1,11 @@
 import { ComponentType, useEffect, useRef, useState } from 'react';
 
-import { useBlocks } from '@features/canvas/api/use-blocks.query';
 import * as S from '@features/canvas/ui/sidebar/menu-accordion.style';
-
-import ArrowButton from '@/shared/ui/button/arrow-button';
-import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
+import { useBlocks } from '@features/canvas/api/use-blocks.query';
 import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
+
+import ArrowButton from '@shared/ui/button/arrow-button';
+import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
 
 interface MenuAccordionProps {
   label: string;
@@ -17,18 +17,19 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
   const [contentHeight, setContentHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { data: blocks } = useBlocks(label);
-  console.log(blocks);
+  const { data, isFetching } = useBlocks(label, isOpen);
+  const blocks = data?.data.blocks || [];
 
   useEffect(() => {
     if (contentRef.current) {
       setContentHeight(contentRef.current.scrollHeight);
     }
-  }, [isOpen]);
+  }, [isOpen, data]);
 
   const handleToggleOpen = () => {
     setIsOpen(!isOpen);
   };
+
   return (
     <S.Accordion>
       <S.Menu onClick={handleToggleOpen}>
@@ -43,9 +44,15 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
         contentHeight={contentHeight}
         ref={contentRef}
       >
-        <MenuBlock label={label} Icon={Icon} />
-        <MenuBlock label={label} Icon={Icon} />
-        <MenuBlock label={label} Icon={Icon} />
+        {isFetching ? (
+          <div>Loading...</div>
+        ) : blocks.length > 0 ? (
+          blocks.map((block) => (
+            <MenuBlock key={block.name} label={block.name} Icon={Icon} />
+          ))
+        ) : (
+          <div>No blocks available</div>
+        )}
       </S.MenuBlockWrapper>
     </S.Accordion>
   );

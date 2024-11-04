@@ -11,7 +11,8 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useNodeDropHandler } from '@features/canvas/model/useNodeDropHandler.model';
+import { Canvas } from '@features/canvas/ui/canvas-editor.style';
+import { useNodeDropHandler } from '@/features/canvas/model/use-node-drop-handler.model';
 import { initialNodes, initialEdges } from '@features/canvas/model/initialData';
 
 import BlockNode from '@/entities/block-node/block-node';
@@ -27,7 +28,7 @@ const CanvasEditor = () => {
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
 
   return (
-    <div ref={dropRef} style={{ width: '100%', height: '100%' }}>
+    <Canvas ref={dropRef}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -39,7 +40,7 @@ const CanvasEditor = () => {
         <Controls position='bottom-center' orientation='horizontal' />
         <Background variant={BackgroundVariant.Dots} />
       </ReactFlow>
-    </div>
+    </Canvas>
   );
 };
 

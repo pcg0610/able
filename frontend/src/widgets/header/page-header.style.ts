@@ -9,6 +9,7 @@ export const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 
   background-color: ${Common.colors.primary};
   color: ${Common.colors.white};
