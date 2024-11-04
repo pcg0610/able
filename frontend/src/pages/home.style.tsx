@@ -8,4 +8,7 @@ export const PageLayout = styled.div`
 export const ContentContainer = styled.div`
   flex: 1;
   padding: 1.25rem; 
+  overflow-y: auto; 
+  height: calc(100% - 2.5rem);
+  box-sizing: border-box;
 `;
