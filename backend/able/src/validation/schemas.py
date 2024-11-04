@@ -7,3 +7,4 @@ class ValidateCanvasRequest(ImmutableBaseModel):
 
 class ValidateCanvasResponse(ImmutableBaseModel):
     has_cycle: bool
+    cycle_blocks: list[int] | None

@@ -1,8 +1,9 @@
 from collections import defaultdict, deque
+from typing import Tuple
 from src.canvas.schemas import Edge
 
 
-def check_cycle(blocks: list[int], edges: list[Edge]) -> bool:
+def check_cycle(blocks: list[int], edges: list[Edge]) -> Tuple[bool, list[int]]:
     """
     Canvas 객체 내의 방향 그래프에서 사이클이 존재하는지 위상 정렬을 통해 판별하고,
     사이클에 포함된 블록들을 반환
@@ -30,6 +31,7 @@ def check_cycle(blocks: list[int], edges: list[Edge]) -> bool:
                 queue.append(adj_block)
 
     if visited_count != len(blocks):
-        return True
+        cycle_blocks = [block for block in blocks if in_degree[block] > 0]
+        return True, cycle_blocks
 
-    return False
+    return False, []
