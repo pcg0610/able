@@ -76,7 +76,7 @@ class Trainer:
     def __init__(self, model: nn.Module, dataset: ImageFolder, criterion: nn.Module, optimizer: optim.Optimizer, batch_size, logger: TrainLogger, checkpoint_interval: int = 10, device: str = 'cpu'):
         self.model = model.to(device)
         self.dataset = dataset
-        self.train_data_loader, self.valid_data_loader, self.test_data_loader = split_dataset(dataset)
+        self.train_data_loader, self.valid_data_loader, self.test_data_loader = [create_data_loader(dataset_split, batch_size) for dataset_split in split_dataset(dataset)]
         self.criterion = criterion
         self.optimizer = optimizer
         self.logger = logger
