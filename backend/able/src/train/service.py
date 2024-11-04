@@ -55,6 +55,9 @@ def train(request: TrainRequest):
     # 학습 모델 그래프 저장
     save_result_block_graph(request.project_name, result_name, canvas_blocks, edges)
 
+    # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
+    save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
+
     save_result_model(project_name, result_name, model)
 
     trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name))
