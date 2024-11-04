@@ -3,6 +3,7 @@ from sys import prefix
 import uvicorn
 from fastapi import FastAPI, HTTPException,Request
 from starlette.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.block.router import block_router
 from src.train.router import train_router
@@ -13,6 +14,19 @@ from src.exceptions import BaseCustomException
 
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(train_router, prefix="/trains", tags=["학습"])
 
