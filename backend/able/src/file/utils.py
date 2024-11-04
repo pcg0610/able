@@ -5,7 +5,9 @@ import json
 from pathlib import Path
 from typing import List, Dict, Any
 from PIL import Image
-from src.file.exceptions import FileNotFoundException, FileUnreadableException
+from fastapi import UploadFile
+from src.file.exceptions import FileNotFoundException, FileUnreadableException, ImageSaveFailException
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -101,6 +103,21 @@ def rename_path(path: Path, new_name: str) -> bool:
 
 def validate_file_format(file_path: str, expected: str) -> bool:
     return file_path.endswith(f".{expected.lower()}")
+
+async def save_img(path: Path, file_name: str, file: UploadFile) -> Path:
+    img_path = path / file_name
+    try:
+        # 파일을 original.jpg로 저장
+        with open(img_path, "wb") as image_file:
+            content = await file.read()
+            image_file.write(content)
+
+    except Exception as e:
+        logger.error(f"원본 이미지 저장 실패: {img_path}",exc_info=True)
+        raise ImageSaveFailException("원본 이미지 저장에 실패하였습니다.")
+    
+    return img_path
+
 
 # JSON 파일을 읽고 저장하는 함수 추가
 def load_json_file(file_path: Path) -> Dict[str, Any]:
