@@ -1,8 +1,17 @@
-from src.block.schemas import Block, Edge
+from src.block.schemas import Block
 from src.response.schemas import ImmutableBaseModel
 
+class CanvasBlock(Block):
+    id: str
+    position: str
+
+class Edge(ImmutableBaseModel):
+    id: str
+    source: int
+    target: int
+
 class Canvas(ImmutableBaseModel):
-    blocks: list[Block] = []
+    blocks: list[CanvasBlock] = []
     edges: list[Edge] = []
 
 class GetCanvasResponse(ImmutableBaseModel):

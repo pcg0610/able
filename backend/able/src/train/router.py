@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Response, BackgroundTasks
-from . import TrainRequestDto, TrainResponseDto
-from .service import train as train_service
+from fastapi import APIRouter, BackgroundTasks
+from starlette.responses import Response
+
+from . import TrainRequest
+from .service import train as train_service, load_train_result
 from src.train.schemas import TrainResultResponse
+from ..response.utils import accepted
 
 train_router = router = APIRouter()
 
 @router.get("/result", response_model=TrainResultResponse)
 def get_train_result(project_name: str, train_result_name: str) -> TrainResultResponse:
-    return TrainResultResponse()
+    return load_train_result(project_name, train_result_name)
 
 
 @router.post("")
-async def train(train_request_dto: TrainRequestDto, background_tasks: BackgroundTasks) -> TrainResponseDto:
-    background_tasks.add_task(train_service(train_request_dto))
-    return Response()
+async def train(request: TrainRequest, background_tasks: BackgroundTasks) -> Response:
+    background_tasks.add_task(train_service(request))
+    return accepted()

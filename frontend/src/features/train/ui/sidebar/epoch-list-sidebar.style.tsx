@@ -22,10 +22,10 @@ export const EpochItem = styled.div<{ isSelected: boolean }>`
   font-size: 0.9375rem;
   cursor: pointer;
   transition-property: background-color;
-  transition-duration: 0.6s;
+  transition-duration: 0.4s;
 
 
   &:hover {
-    background-color: ${Common.colors.gray200};
+    background-color: ${Common.colors.gray100};
   }
 `;

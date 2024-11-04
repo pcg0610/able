@@ -12,11 +12,6 @@ class Block(ImmutableBaseModel):
     type: BlockType
     args: list[Arg]
 
-class Edge(ImmutableBaseModel):
-    edge_id: str
-    source: str
-    target: str
-
 class BlockResponse(ImmutableBaseModel):
     block: Block
 

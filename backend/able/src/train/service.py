@@ -1,37 +1,103 @@
-from .utils import Trainer, validate_file_format, create_dataset, create_data_loader, convert_block_graph_to_model, \
-    convert_criterion_block_to_module, TrainLogger, convert_optimizer_block_to_optimizer, split_dataset, \
-    create_data_preprocessor, filter_blocks_connected_to_data
-from . import TrainRequestDto
+from . import TrainRequest
+from src.train.schemas import TrainResultResponse, PerformanceMetrics, EpochResult, Loss, Accuracy
+from .utils import *
+from src.file.path_manager import PathManager
+from src.file.utils import validate_file_format
+from src.canvas.schemas import SaveCanvasRequest, Canvas
+from src.canvas.service import save_block_graph
+from src.utils import encode_image_to_base64
+from src.file.utils import load_json_file
+from typing import List
 
-def train(train_request_dto: TrainRequestDto):
-    data_path = train_request_dto.data.args.get("data_path")
+path_manager = PathManager()
+
+def train(request: TrainRequest):
+
+    data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks = split_blocks(request.blocks)
+
+    if data_block is None:
+        raise ValueError("Data block is required but was not found.")
+
+    data_path = data_block.args.get("data_path")
 
     if not validate_file_format(data_path, "json"):
         raise Exception()
 
     transform_blocks, loss_blocks, optimizer_blocks, other_blocks = filter_blocks_connected_to_data(
-        train_request_dto.data, train_request_dto.transforms, train_request_dto.loss, train_request_dto.optimizer,
-        train_request_dto.blocks, train_request_dto.edges)
+        data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks, request.edges
+    )
 
-    #TODO: 학습할 모델 그래프 저장 기능 추가
+    save_block_graph(request.project_name, SaveCanvasRequest(canvas=Canvas(blocks=request.blocks, edges=request.edges)))
 
     transforms = create_data_preprocessor(transform_blocks)
-
     dataset = create_dataset(data_path, transforms)
-
-    model = convert_block_graph_to_model(other_blocks, train_request_dto.edges)
+    model = convert_block_graph_to_model(other_blocks, request.edges)
 
     if model is None:
         raise Exception()
 
     criterion = convert_criterion_block_to_module(loss_blocks)
-
     optimizer = convert_optimizer_block_to_optimizer(optimizer_blocks, model.parameters())
 
-    trainer = Trainer(model, dataset, criterion, optimizer, train_request_dto.batch_size, TrainLogger(train_request_dto.project_name))
+    # TrainLogger 초기화 전 디렉터리 생성
+    project_name = request.project_name
+    result_name = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    trainer.train(train_request_dto.epoch)
+    # 결과 및 에포크 디렉터리 생성
+    result_path = path_manager.get_train_result_path(project_name, result_name)
+    epochs_path = result_path / "epochs"
+    create_directory(result_path)
+    create_directory(epochs_path)
 
-    top1_accuracy, top5_accuracy, precision, recall, f1, fig = trainer.test()
+    trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name))
 
-    trainer.logger.save_train_result(top1_accuracy, top5_accuracy, precision, recall, f1, fig)
+    trainer.train(request.epoch)
+    trainer.test()
+
+
+def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
+    # 결과 디렉터리 경로 설정
+    result_path = path_manager.get_train_results_path(project_name) / result_name
+
+    # 혼동 행렬 이미지 로드 및 인코딩
+    confusion_matrix = encode_image_to_base64(result_path / "confusion_matrix.jpg")
+
+    # 성능 지표 로드
+    performance_metrics_data = load_json_file(result_path / "performance_metrics.json")
+    performance_metrics = PerformanceMetrics(**performance_metrics_data["metrics"])
+
+    # F1 스코어 로드
+    f1_score = load_json_file(result_path / "f1_score.json")["f1_score"]
+
+    # 에포크 결과 로드
+    epochs_path = path_manager.get_epochs_path(project_name, result_name)
+    epoch_results: List[EpochResult] = []
+
+    for epoch_dir in epochs_path.iterdir():
+        if epoch_dir.is_dir():
+            epoch_id = epoch_dir.name
+            # 각 에포크에 해당하는 파일 경로 설정
+            training_loss_path = epoch_dir / "training_loss.json"
+            validation_loss_path = epoch_dir / "validation_loss.json"
+            accuracy_path = epoch_dir / "accuracy.json"
+
+            # 각 파일에서 필요한 데이터 로드
+            training_loss = load_json_file(training_loss_path)["loss"]
+            validation_loss = load_json_file(validation_loss_path)["loss"]
+            accuracy = load_json_file(accuracy_path)["accuracy"]
+
+            # 에포크 결과 인스턴스 생성
+            epoch_result = EpochResult(
+                epoch=epoch_id,
+                losses=Loss(training=training_loss, validation=validation_loss),
+                accuracies=Accuracy(accuracy=accuracy)
+            )
+            epoch_results.append(epoch_result)
+
+    # TrainResultResponse 반환
+    return TrainResultResponse(
+        confusion_matrix=confusion_matrix,
+        performance_metrics=performance_metrics,
+        f1_score=f1_score,
+        epoch_result=epoch_results
+    )

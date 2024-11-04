@@ -1,8 +1,7 @@
-import { Link } from 'react-router-dom';
-
 import * as S from '@pages/home.style'
 import HomeHeader from '@features/home/ui/header/home-header'
 import HomeSideBar from '@features/home/ui/sidebar/home-sidebar'
+import HomeContent from '@features/home/ui/content/homeContent'
 
 const HomePage = () => {
   return (
@@ -11,10 +10,7 @@ const HomePage = () => {
       <S.PageLayout>
         <HomeSideBar />
         <S.ContentContainer>
-          <div>홈화면</div>
-          <Link to={'/canvas'}>캔버스</Link>
-          &nbsp;
-          <Link to={'/train'}>학습</Link>
+          <HomeContent />
         </S.ContentContainer>
       </S.PageLayout>
     </>

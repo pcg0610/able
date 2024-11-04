@@ -27,12 +27,8 @@ class PathManager:
         return self.get_projects_path(name) / "block_graph.json"
 
     def get_train_results_path(self, name: str) -> Path:
-        """학습 결과 경로"""
+        """학습 결과 목록 경로"""
         return self.get_projects_path(name) / "train_results"
-
-    def get_train_result_path(self, name: str, result_name: str) -> Path:
-        """학습 결과 경로"""
-        return self.get_train_results_path(name) / result_name
 
     def get_epochs_path(self, name:str, result_name: str):
         """에포크 목록 경로"""
