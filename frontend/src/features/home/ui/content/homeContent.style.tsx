@@ -45,6 +45,7 @@ export const CanvasImage = styled.img`
   height: auto;
   border-radius: 0.5rem;
   object-fit: cover;
+  cursor: pointer;
 `;
 
 export const HistoryWrapper = styled.div`

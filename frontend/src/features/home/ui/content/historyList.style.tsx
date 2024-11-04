@@ -13,6 +13,7 @@ export const HistoryListWrapper = styled.table`
 
 export const HistoryRow = styled.tr`
   border-top: 1px solid ${Common.colors.gray100};
+  cursor: pointer;
 
   &:last-of-type {
     border-bottom: none;

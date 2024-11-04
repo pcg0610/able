@@ -74,6 +74,7 @@ export const Footer = styled.div`
   gap: 0.9375rem;
   min-height: 6.25rem;
   transition-duration: 0.6s;
+  cursor: pointer;
 
   &:hover {
     filter: brightness(0.9) saturate(2);
