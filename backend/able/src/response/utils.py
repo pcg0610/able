@@ -1,7 +1,7 @@
 import logging
 from fastapi import Response
 from typing import TypeVar
-from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_202_ACCEPTED
 from src.response.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -24,13 +24,17 @@ def created() -> Response:
     status_code=HTTP_201_CREATED
 
     return Response(
-        status_code = status_code,
-        media_type="application/json"
+        status_code = status_code
+    )
+
+def accepted() -> Response:
+    status_code=HTTP_202_ACCEPTED
+    return Response(
+        status_code = status_code
     )
 
 def no_content() -> Response:
     status_code = HTTP_204_NO_CONTENT
     return Response(
-        status_code=status_code,
-        media_type="application/json"
+        status_code=status_code
     )

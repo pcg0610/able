@@ -97,3 +97,6 @@ def rename_path(path: Path, new_name: str) -> bool:
 
     logger.warning(f"이름 변경 실패: {path} -> {new_name}")
     return False
+
+def validate_file_format(file_path: str, expected: str) -> bool:
+    return file_path.endswith(f".{expected.lower()}")
