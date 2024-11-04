@@ -11,7 +11,7 @@ from src.canvas.router import canvas_router
 from src.project.router import project_router
 from src.analysis.router import analysis_router
 from src.exceptions import BaseCustomException
-
+from src.validation.router import validation_router
 
 app = FastAPI()
 
@@ -35,6 +35,8 @@ app.include_router(block_router, prefix="/blocks", tags=["블록"])
 app.include_router(project_router, prefix="/projects", tags=["프로젝트"])
 
 app.include_router(canvas_router, prefix="/canvas", tags=["캔버스"])
+
+app.include_router(validation_router, prefix="/validation", tags=["확인"])
 
 app.include_router(analysis_router, prefix="/analyses", tags=["분석"])
 

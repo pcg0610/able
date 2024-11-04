@@ -2,11 +2,11 @@ from src.block.schemas import Block
 from src.response.schemas import ImmutableBaseModel
 
 class CanvasBlock(Block):
-    block_id: str
+    id: str
     position: str
 
 class Edge(ImmutableBaseModel):
-    edge_id: str
+    id: str
     source: str
     target: str
 
