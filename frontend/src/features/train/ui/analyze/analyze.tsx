@@ -15,4 +15,4 @@ const Analyze = () => {
    );
 };
 
-export default Analyze; ``
+export default Analyze; 
