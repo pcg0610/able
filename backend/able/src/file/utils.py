@@ -104,7 +104,7 @@ def rename_path(path: Path, new_name: str) -> bool:
 def validate_file_format(file_path: str, expected: str) -> bool:
     return file_path.endswith(f".{expected.lower()}")
 
-async def save_img(path: Path, file_name: str, file: UploadFile) -> str:
+async def save_img(path: Path, file_name: str, file: UploadFile) -> Path:
     img_path = path / file_name
     try:
         # 파일을 original.jpg로 저장
