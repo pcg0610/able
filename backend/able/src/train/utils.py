@@ -420,4 +420,4 @@ def convert_canvas_blocks(blocks: tuple[Block, ...]) -> tuple[CanvasBlock, ...]:
     return tuple(block for block in blocks)
 
 def save_result_model(project_name: str, result: str, model: nn.Module):
-    torch.save(model, str(pathManager.get_train_result_path(project_name, result)))
+    torch.save(model, str(pathManager.get_train_result_path(project_name, result) / "model.pth"))
