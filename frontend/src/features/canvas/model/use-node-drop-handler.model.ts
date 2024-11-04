@@ -1,8 +1,9 @@
 import { useDrop } from 'react-dnd';
 import { Node } from '@xyflow/react';
-
-import { useAddCenteredNode } from '@/features/canvas/model/use-add-centered-node.model';
 import { Dispatch, SetStateAction } from 'react';
+
+import { BlockItem } from '@features/canvas/types/block.type';
+import { useAddCenteredNode } from '@features/canvas/model/use-add-centered-node.model';
 
 interface DropHandlerParams {
   setNodes: Dispatch<SetStateAction<Node[]>>;
@@ -23,7 +24,7 @@ export const useNodeDropHandler = ({
 
   const [, dropRef] = useDrop(() => ({
     accept: 'BLOCK',
-    drop: (item: { type: string }, monitor) => {
+    drop: (item: BlockItem, monitor) => {
       const clientOffset = monitor.getClientOffset();
       if (clientOffset) {
         addCenteredNode(clientOffset, item);

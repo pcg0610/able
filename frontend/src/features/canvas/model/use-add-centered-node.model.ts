@@ -1,12 +1,14 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { Node } from '@xyflow/react';
 
+import { BlockItem } from '@features/canvas/types/block.type';
+
 interface ClientOffset {
   x: number;
   y: number;
 }
 
-interface AddNodeParams {
+interface AddNodeProps {
   setNodes: Dispatch<SetStateAction<Node[]>>;
   screenToFlowPosition: (position: { x: number; y: number }) => {
     x: number;
@@ -14,10 +16,11 @@ interface AddNodeParams {
   };
 }
 
+// 노드를 마우스 커서 중간에 위치하도록 생성
 export const useAddCenteredNode = ({
   setNodes,
   screenToFlowPosition,
-}: AddNodeParams) => {
+}: AddNodeProps) => {
   // 노드의 중앙 위치 조정 로직을 useCallback으로 작성하여 의존성 문제 해결
   const adjustNodePosition = useCallback(
     (nodeId: string, clientOffset: ClientOffset) => {
@@ -45,7 +48,7 @@ export const useAddCenteredNode = ({
 
   // 노드를 추가하고 adjustNodePosition 호출
   return useCallback(
-    (clientOffset: ClientOffset, item: { type: string }) => {
+    (clientOffset: ClientOffset, item: BlockItem) => {
       const initialPosition = screenToFlowPosition({
         x: clientOffset.x,
         y: clientOffset.y,
@@ -56,12 +59,7 @@ export const useAddCenteredNode = ({
         type: 'custom',
         position: initialPosition,
         data: {
-          type: item.type,
-          fields: [
-            { name: 'in_channels', required: true },
-            { name: 'out_channels', required: true },
-            { name: 'kernel_size', required: true },
-          ],
+          block: item,
         },
       };
 

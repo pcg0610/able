@@ -51,7 +51,8 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
             <MenuBlock
               key={block.name}
               type={label}
-              label={block.name}
+              name={block.name}
+              fields={block.args}
               Icon={Icon}
             />
           ))

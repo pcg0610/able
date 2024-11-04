@@ -2,7 +2,14 @@ import { BLOCK_MENU } from '@features/canvas/costants/block-types.constant';
 
 export type MenuName = (typeof BLOCK_MENU)[number]['name'];
 
-interface BlockField {
+// 블록 노드의 정보를 전달하는 Item
+export interface BlockItem {
+  type: MenuName;
+  name: string;
+  fields: BlockField[];
+}
+
+export interface BlockField {
   name: string;
   value: string;
   isRequired: boolean;
@@ -10,7 +17,7 @@ interface BlockField {
 
 export interface Block {
   name: string;
-  type: string;
+  type: MenuName;
   args: BlockField[];
 }
 
