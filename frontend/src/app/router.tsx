@@ -1,8 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import HomePage from '@/pages/home.page';
-import CanvasPage from '@/pages/canvas/canvas.page';
-import TrainPage from '@/pages/train/train.page';
+import HomePage from '@pages/home.page';
+import CanvasPage from '@pages/canvas/canvas.page';
+import TrainPage from '@pages/train/train.page';
+import DeployPage from '@pages/deploy/deploy.page'
 
 export const router = createBrowserRouter([
   {
@@ -16,5 +17,9 @@ export const router = createBrowserRouter([
   {
     path: '/train',
     element: <TrainPage />,
+  },
+  {
+    path: '/deploy',
+    element: <DeployPage />,
   },
 ]);

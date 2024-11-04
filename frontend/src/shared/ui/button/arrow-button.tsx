@@ -4,7 +4,7 @@ import ArrowIcon from '@assets/icons/arrow.svg?react';
 import Common from '@/shared/styles/common';
 
 interface ArrowButtonProps {
-  direction?: 'up' | 'down' | 'left';
+  direction?: 'up' | 'down' | 'left' | 'right';
   size?: 'md' | 'sm';
   color?: string;
   onClick?: () => void;

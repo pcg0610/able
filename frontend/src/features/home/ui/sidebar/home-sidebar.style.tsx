@@ -5,8 +5,8 @@ import Common from '@shared/styles/common';
 export const SidebarContainer = styled.div`
   width: 15.625rem; 
   height: 100%;
-  background-color: #f8f9fc; // 배경색 설정
-  padding: 1.25rem; // 전체적인 여백
+  background-color: #f8f9fc; 
+  padding: 1.25rem 1rem; 
   border-right: 0.0625rem solid #ddd; 
   display: flex;
   flex-direction: column;
@@ -72,6 +72,23 @@ export const Footer = styled.div`
   padding: 0.625rem;
   margin-top: auto;
   gap: 0.9375rem;
+  min-height: 6.25rem;
+  transition-duration: 0.6s;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.9) saturate(2);
+  }
+`;
+
+export const RocketCircle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #CED0FF;
+  border-radius: 50%; 
+  width: 60px; 
+  height: 60px; 
 `;
 
 export const FooterIcon = styled.span`
@@ -90,4 +107,5 @@ export const FooterText = styled.div`
 export const FooterStatus = styled.div`
   font-size: 0.75rem;
   color: #6c757d;
+  margin-top: 0.25rem;
 `;
