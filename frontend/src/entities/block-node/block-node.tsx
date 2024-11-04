@@ -22,7 +22,7 @@ const BlockNode = ({ data }: BlockNodeProps) => {
     () => S.blockColors[data.type] || '#FFFFFF',
     [data.type]
   );
-  console.log(data.fields[0].required);
+
   return (
     <S.Container blockColor={blockColor}>
       <Handle type='target' position={Position.Top} />
