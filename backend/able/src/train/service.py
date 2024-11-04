@@ -1,9 +1,13 @@
 from . import TrainRequest
+from src.train.schemas import TrainResultResponse, PerformanceMetrics, EpochResult, Loss, Accuracy
 from .utils import *
 from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format
 from src.canvas.schemas import SaveCanvasRequest, Canvas
 from src.canvas.service import save_block_graph
+from src.utils import encode_image_to_base64
+from src.file.utils import load_json_file
+from typing import List
 
 path_manager = PathManager()
 
@@ -49,3 +53,40 @@ def train(request: TrainRequest):
 
     trainer.train(request.epoch)
     trainer.test()
+
+
+def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
+    result_path = path_manager.get_train_result_path(project_name, result_name)
+
+    # 혼동 행렬 이미지 로드 및 인코딩
+    confusion_matrix = encode_image_to_base64(result_path / "confusion_matrix.jpg")
+
+    # 성능 지표 로드
+    performance_metrics_data = load_json_file(result_path / "performance_metrics.json")
+    performance_metrics = PerformanceMetrics(**performance_metrics_data["metrics"])
+
+    # F1 스코어 로드
+    f1_score = load_json_file(result_path / "f1_score.json")["f1_score"]
+
+    # 에포크 결과 로드
+    epochs_path = result_path / "epochs"
+    epoch_results: List[EpochResult] = []
+    for epoch_dir in epochs_path.iterdir():
+        if epoch_dir.is_dir():
+            epoch_id = epoch_dir.name
+            training_loss = load_json_file(epoch_dir / "training_loss.json")["loss"]
+            validation_loss = load_json_file(epoch_dir / "validation_loss.json")["loss"]
+            accuracy = load_json_file(epoch_dir / "accuracy.json")["accuracy"]
+            epoch_result = EpochResult(
+                epoch=epoch_id,
+                losses=Loss(training=training_loss, validation=validation_loss),
+                accuracies=Accuracy(accuracy=accuracy)
+            )
+            epoch_results.append(epoch_result)
+
+    return TrainResultResponse(
+        confusion_matrix=confusion_matrix,
+        performance_metrics=performance_metrics,
+        f1_score=f1_score,
+        epoch_result=epoch_results
+    )
