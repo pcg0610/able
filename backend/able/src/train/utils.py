@@ -174,7 +174,7 @@ class Trainer:
             if best_valid_loss > valid_loss:
                 torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
-    def test(self) -> tuple[float, float, float, float, float, Figure]:
+    def test(self) -> None:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
 
         y_true = []
@@ -213,8 +213,7 @@ class Trainer:
         # 혼동 행렬 계산
         fig = plot_confusion_matrix(y_true, y_pred, self.dataset.classes)
 
-        return top1_correct / total, top5_correct / total, precision, recall, f1, fig
-
+        self.logger.save_train_result(top1_correct / total, top5_correct / total, precision, recall, f1, fig)
 
 def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
     # 혼동 행렬 계산

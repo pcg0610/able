@@ -34,5 +34,4 @@ def train(request: TrainRequest):
     trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name))
 
     trainer.train(request.epoch)
-    top1_accuracy, top5_accuracy, precision, recall, f1, fig = trainer.test()
-    trainer.logger.save_train_result(top1_accuracy, top5_accuracy, precision, recall, f1, fig)
+    trainer.test()
