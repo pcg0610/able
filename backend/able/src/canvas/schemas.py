@@ -7,7 +7,7 @@ class CanvasBlock(Block):
 
 class Canvas(ImmutableBaseModel):
     blocks: list[CanvasBlock] = []
-    edges: list[CanvasBlock] = []
+    edges: list[Edge] = []
 
 class GetCanvasResponse(ImmutableBaseModel):
     canvas: Canvas
