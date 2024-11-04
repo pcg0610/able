@@ -21,4 +21,22 @@ export const globalStyle = css`
     font-family: 'Pretendard', sans-serif;
     color: ${Common.colors.black};
   }
+
+  /* 스크롤바 기본 스타일 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* 스크롤바 트랙 스타일 */
+  ::-webkit-scrollbar-track {
+    background-color: ${Common.colors.gray200}; /* 트랙 배경색 */
+    border-radius: 10px;
+  }
+
+  /* 스크롤바 핸들(움직이는 부분) 스타일 */
+  ::-webkit-scrollbar-thumb {
+    background-color: ${Common.colors.secondary}; /* 핸들 색상 */
+    border-radius: 10px;
+  }
 `;
