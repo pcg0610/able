@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback } from 'react';
 import { Node } from '@xyflow/react';
 
 interface ClientOffset {
@@ -7,7 +7,7 @@ interface ClientOffset {
 }
 
 interface AddNodeParams {
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
+  setNodes: Dispatch<SetStateAction<Node[]>>;
   screenToFlowPosition: (position: { x: number; y: number }) => {
     x: number;
     y: number;
