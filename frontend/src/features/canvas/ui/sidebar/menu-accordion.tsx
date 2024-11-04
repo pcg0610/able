@@ -1,11 +1,11 @@
 import { ComponentType, useEffect, useRef, useState } from 'react';
 
-import { useBlocks } from '@features/canvas/api/use-blocks.query';
 import * as S from '@features/canvas/ui/sidebar/menu-accordion.style';
-
-import ArrowButton from '@/shared/ui/button/arrow-button';
-import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
+import { useBlocks } from '@features/canvas/api/use-blocks.query';
 import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
+
+import ArrowButton from '@shared/ui/button/arrow-button';
+import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
 
 interface MenuAccordionProps {
   label: string;

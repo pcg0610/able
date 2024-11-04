@@ -1,6 +1,7 @@
 import * as S from '@/features/canvas/ui/sidebar/canvas-sidebar.style';
 import { BLOCK_MENU } from '@features/canvas/costants/block-types.constant';
-import MenuAccordion from './menu-accordion';
+
+import MenuAccordion from '@features/canvas/ui/sidebar/menu-accordion';
 
 const CanvasSidebar = () => {
   return (
