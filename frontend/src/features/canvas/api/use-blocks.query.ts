@@ -1,5 +1,7 @@
-import axiosInstance from '@shared/api/axios-instance';
 import { useQuery } from '@tanstack/react-query';
+
+import axiosInstance from '@shared/api/axios-instance';
+import canvasKey from '@features/canvas/api/canvas-key';
 
 // get-fetch, post-create, put-update, delete-delete
 const fetchBlocks = async (type: string) => {
@@ -14,10 +16,8 @@ const fetchBlocks = async (type: string) => {
 
 export const useBlocks = (type: string, isOpen: boolean) => {
   return useQuery({
-    queryKey: ['blocks', type],
-    queryFn: () => {
-      return fetchBlocks(type);
-    },
+    queryKey: canvasKey.blocks(type),
+    queryFn: () => fetchBlocks(type),
     enabled: isOpen,
   });
 };
