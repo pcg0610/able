@@ -1,4 +1,4 @@
-from .dto import TrainRequestDto, TrainResponseDto
+from .dto import TrainRequest, TrainResponse
 from .service import train
 
-__all__ = ["TrainRequestDto", "TrainResponseDto", "train"]
+__all__ = ["TrainRequest", "TrainResponse", "train"]

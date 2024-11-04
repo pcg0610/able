@@ -1,20 +1,13 @@
-from pydantic import BaseModel
-from src.block.schemas import Block, Edge
+from src.canvas.schemas import CanvasBlock, Edge
+from src.response.schemas import ImmutableBaseModel
 
-class TrainRequestDto(BaseModel):
+
+class TrainRequest(ImmutableBaseModel):
     project_name: str
     epoch: int
     batch_size: int
-    data: Block
-    interpreter: Block
-    loss: tuple[Block]
-    optimizer: tuple[Block]
-    transforms: tuple[Block]
-    blocks: tuple[Block]
+    block: tuple[CanvasBlock]
     edges: tuple[Edge]
 
-    class Config:
-        frozen = True
-
-class TrainResponseDto(BaseModel):
+class TrainResponse(ImmutableBaseModel):
     pass

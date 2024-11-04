@@ -5,14 +5,17 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
-from typing import Iterator, Any
+from typing import Iterator, Any, Tuple
 
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
-from src.block.schemas import Block, Edge
+from src.block.schemas import Block
 from src.block.utils import convert_block_to_module
+from src.canvas.schemas import Edge
+
+from src.train.schemas import TrainResultMetrics, TrainResultConfig
 
 from src.file.utils import create_file, create_directory
 from src.file.path_manager import PathManager
@@ -38,6 +41,9 @@ class TrainLogger:
         self.project_name = project_name
         self.result_name = result_name
 
+        # 기존 경로 생성 로직 제거, 결과 및 에포크 디렉터리는 서비스에서 생성
+        self.result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
+
     def create_epoch_log(self, epoch_id: int, accuracy: float, validation_loss: float, training_loss: float):
         epoch_path = pathManager.get_epoch_path(self.project_name, self.result_name, epoch_id)
 
@@ -45,29 +51,39 @@ class TrainLogger:
         create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss': validation_loss}))
         create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss': training_loss}))
 
-    def save_train_result(self, top1_accuracy: float, top5_accuracy: float, precision: float, recall: float, f1: float, fig: Figure):
-        # 학습 결과 경로 설정
-        result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
-        create_directory(result_path)
-
+    def save_train_result(self, metrics: TrainResultMetrics, config: TrainResultConfig):
         # 성능 지표 저장 (performance_metrics.json)
         performance_metrics_data = {
             "metrics": {
-                "accuracy": top1_accuracy,
-                "top5_accuracy": top5_accuracy,
-                "precision": precision,
-                "recall": recall
+                "accuracy": metrics.top1_accuracy,
+                "top5_accuracy": metrics.top5_accuracy,
+                "precision": metrics.precision,
+                "recall": metrics.recall
             }
         }
-        create_file(result_path / "performance_metrics.json", json_to_str(performance_metrics_data))
+        create_file(self.result_path / "performance_metrics.json", json_to_str(performance_metrics_data))
 
         # F1 스코어 저장 (f1_score.json)
-        f1_score_data = {"f1_score": f1}
-        create_file(result_path / "f1_score.json", json_to_str(f1_score_data))
+        f1_score_data = {"f1_score": metrics.f1}
+        create_file(self.result_path / "f1_score.json", json_to_str(f1_score_data))
 
         # 혼동 행렬 저장 (confusion_matrix.jpg)
-        confusion_matrix_path = result_path / "confusion_matrix.jpg"
-        fig.savefig(confusion_matrix_path, format="jpg")
+        confusion_matrix_path = self.result_path / "confusion_matrix.jpg"
+        metrics.confusion_matrix.savefig(confusion_matrix_path, format="jpg")
+
+        # 데이터 정보 저장 (metadata.json)
+        metadata_info = {
+            "data_path": config.data_path,
+            "input_shape": config.input_shape,
+            "classes": config.classes
+        }
+        create_file(self.result_path / "metadata.json", json_to_str(metadata_info))
+
+        # 하이퍼 파라미터 정보 저장 (hyper_parameter.json)
+        create_file(self.result_path / "hyper_parameter.json", json_to_str(config.hyper_params))
+
+        # 블록 그래프 정보 저장 (block_graph.json)
+        create_file(self.result_path / "block_graph.json", json_to_str(config.block_graph_info))
 
 class Trainer:
     """모델의 학습을 책임지는 클래스
@@ -75,7 +91,7 @@ class Trainer:
     def __init__(self, model: nn.Module, dataset: ImageFolder, criterion: nn.Module, optimizer: optim.Optimizer, batch_size, logger: TrainLogger, checkpoint_interval: int = 10, device: str = 'cpu'):
         self.model = model.to(device)
         self.dataset = dataset
-        self.train_data_loader, self.valid_data_loader, self.test_data_loader = split_dataset(dataset)
+        self.train_data_loader, self.valid_data_loader, self.test_data_loader = [create_data_loader(dataset_split, batch_size) for dataset_split in split_dataset(dataset)]
         self.criterion = criterion
         self.optimizer = optimizer
         self.logger = logger
@@ -173,7 +189,7 @@ class Trainer:
             if best_valid_loss > valid_loss:
                 torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
 
-    def test(self) -> tuple[float, float, float, float, float, Figure]:
+    def test(self) -> None:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
 
         y_true = []
@@ -212,8 +228,7 @@ class Trainer:
         # 혼동 행렬 계산
         fig = plot_confusion_matrix(y_true, y_pred, self.dataset.classes)
 
-        return top1_correct / total, top5_correct / total, precision, recall, f1, fig
-
+        self.logger.save_train_result(top1_correct / total, top5_correct / total, precision, recall, f1, fig)
 
 def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
     # 혼동 행렬 계산
@@ -233,9 +248,6 @@ def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
 
     return fig
 
-def validate_file_format(file_path: str, expected: str) -> bool:
-    return file_path.endswith(f".{expected.lower()}")
-
 def create_dataset(data_path: str, train_transform:Compose) -> ImageFolder:
     return ImageFolder(data_path, transform=train_transform)
 
@@ -245,7 +257,7 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def topological_sort(blocks: tuple[Block], edges: tuple[Edge]) -> tuple[Block]:
+def topological_sort(blocks: tuple[Block, ...], edges: tuple[Edge]) -> tuple[Block, ...]:
     graph = defaultdict(list)
     in_degree = {block.id: 0 for block in blocks}
 
@@ -278,7 +290,7 @@ class UserModel(nn.Module):
     def forward(self, x):
         return self.forward(x)
 
-def create_data_preprocessor(transform_blocks: tuple[Block]) -> Compose:
+def create_data_preprocessor(transform_blocks: tuple[Block, ...]) -> Compose:
     return Compose([convert_block_to_module(transform_block) for transform_block in transform_blocks])
 
 def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
@@ -309,7 +321,7 @@ def convert_operation_block_to_module(operation_block: Block) -> nn.Module | Non
 
     return convert_block_to_module(operation_block)
 
-def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn.Module | None:
+def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge]) -> nn.Module | None:
     sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
@@ -326,36 +338,63 @@ def convert_block_graph_to_model(blocks: tuple[Block], edges: tuple[Edge]) -> nn
 
     return model
 
-def filter_blocks_connected_to_data(data_block: Block, transform_blocks: tuple[Block], loss_blocks: tuple[Block], optimizer_blocks: tuple[Block], others: tuple[Block], edges: tuple[Edge]) -> tuple[tuple[Block], tuple[Block], tuple[Block], tuple[Block]]:
+def split_blocks(blocks: list[Block]) -> Tuple[
+    Block | None, Tuple[Block, ...], Tuple[Block, ...], Tuple[Block, ...], Tuple[Block, ...]
+]:
+    data_block = None
+    transform_blocks, loss_blocks, optimizer_blocks, others = [], [], [], []
+
+    for block in blocks:
+        match block.type:
+            case BlockType.DATA:
+                if data_block is None:
+                    data_block = block
+                else:
+                    raise ValueError("Multiple data blocks found. Expected only one.")
+            case BlockType.TRANSFORM:
+                transform_blocks.append(block)
+            case BlockType.LOSS:
+                loss_blocks.append(block)
+            case BlockType.OPTIMIZER:
+                optimizer_blocks.append(block)
+            case _:
+                others.append(block)
+
+    return data_block, tuple(transform_blocks), tuple(loss_blocks), tuple(optimizer_blocks), tuple(others)
+
+def filter_blocks_connected_to_data(
+        data_block: Block | None,
+        transform_blocks: Tuple[Block, ...],
+        loss_blocks: Tuple[Block, ...],
+        optimizer_blocks: Tuple[Block, ...],
+        others: Tuple[Block, ...],
+        edges: Tuple[Edge, ...]
+) -> tuple[tuple[Block, ...], tuple[Block, ...], tuple[Block, ...], tuple[Block, ...]]:
     """
     그래프의 루트인 데이터 블록과 연결된 블록들만 반환하는 함수
     """
     adj_blocks = defaultdict(list)
+    is_connected = set()
 
     for edge in edges:
-        adj_blocks[edge.source.block_id].append(edge.target.block_id)
-
-    visited = defaultdict(bool)
+        adj_blocks[edge.source].append(edge.target)
 
     q = deque([data_block.block_id])
+    is_connected.add(data_block.block_id)
 
     while q:
         block_id = q.popleft()
+        for adj_block_id in adj_blocks.get(block_id, []):
+            if adj_block_id not in is_connected:
+                is_connected.add(adj_block_id)
+                q.append(adj_block_id)
 
-        if visited[block_id]:
-            continue
+    def filter_connected(blocks: tuple[Block, ...]) -> tuple[Block, ...]:
+        return tuple(block for block in blocks if block.block_id in is_connected)
 
-        visited[block_id] = True
-
-        for adj_block in adj_blocks[block_id]:
-            q.append(adj_block)
-
-    conn_transform_blocks = tuple(transform_block for transform_block in transform_blocks if visited[transform_block.block_id])
-
-    conn_loss_blocks = tuple(loss_block for loss_block in loss_blocks if visited[loss_block.block_id])
-
-    conn_optimizer_blocks = tuple(optimizer_block for optimizer_block in optimizer_blocks if visited[optimizer_block.block_id])
-
-    conn_others = tuple(other for other in others if visited[other.block_id])
-
-    return conn_transform_blocks, conn_loss_blocks, conn_optimizer_blocks, conn_others
+    return (
+        filter_connected(transform_blocks),
+        filter_connected(loss_blocks),
+        filter_connected(optimizer_blocks),
+        filter_connected(others)
+    )
