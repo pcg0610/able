@@ -17,7 +17,7 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
   const [contentHeight, setContentHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { data: blocks } = useBlocks(label);
+  const { data: blocks } = useBlocks(label, isOpen);
   console.log(blocks);
 
   useEffect(() => {

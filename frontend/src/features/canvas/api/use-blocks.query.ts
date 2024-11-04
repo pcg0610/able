@@ -12,11 +12,12 @@ const fetchBlocks = async (type: string) => {
   }
 };
 
-export const useBlocks = (type: string) => {
+export const useBlocks = (type: string, isOpen: boolean) => {
   return useQuery({
     queryKey: ['blocks', type],
     queryFn: () => {
       return fetchBlocks(type);
     },
+    enabled: isOpen,
   });
 };
