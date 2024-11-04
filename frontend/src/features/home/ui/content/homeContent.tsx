@@ -66,7 +66,7 @@ const HomeContent = () => {
                <SettingIcon
                   width={24}
                   height={24}
-                  fill={Common.colors.gray500}
+                  color={Common.colors.gray500}
                   onClick={handleSettingClick}
                   style={{ cursor: 'pointer' }}
                />
