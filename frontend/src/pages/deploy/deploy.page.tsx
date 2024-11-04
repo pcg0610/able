@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Container, Content, MainContainer } from '@pages/deploy/deploy.style';
 
-import Sidebar from '@widgets/sidebar/result-sidebar';
+import Sidebar from '@/widgets/sidebar/project-sidebar';
 import ServerComponent from '@features/deploy/ui/server/server';
 import ApiComponent from '@features/deploy/ui/api/api';
 import PageHeader from '@widgets/header/page-header';

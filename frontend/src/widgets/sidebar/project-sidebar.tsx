@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import * as S from '@widgets/sidebar/result-sidebar.style';
+import * as S from '@widgets/sidebar/project-sidebar.style';
 
 import ResultIcon from '@icons/result.svg?react';
 import AnalyzeIcon from '@icons/analyze.svg?react';
