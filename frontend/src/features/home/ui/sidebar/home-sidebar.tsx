@@ -72,7 +72,9 @@ const HomeSideBar = () => {
          </S.FolderSection>
 
          <S.Footer onClick={handleServer}>
-            <RocketIcon width={59} height={59} />
+            <S.RocketCircle>
+               <RocketIcon width={40} height={40} />
+            </S.RocketCircle>
             <div>
                <S.FooterText>서버 확인하기</S.FooterText>
                <S.FooterStatus>Running...</S.FooterStatus>

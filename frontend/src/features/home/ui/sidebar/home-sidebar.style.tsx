@@ -80,6 +80,16 @@ export const Footer = styled.div`
   }
 `;
 
+export const RocketCircle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #CED0FF;
+  border-radius: 50%; 
+  width: 60px; 
+  height: 60px; 
+`;
+
 export const FooterIcon = styled.span`
   margin-right: 0.5rem;
   display: flex;
@@ -96,4 +106,5 @@ export const FooterText = styled.div`
 export const FooterStatus = styled.div`
   font-size: 0.75rem;
   color: #6c757d;
+  margin-top: 0.25rem;
 `;
