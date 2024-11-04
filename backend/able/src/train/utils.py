@@ -3,6 +3,7 @@ from collections import defaultdict, deque
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from parso.python.tree import Module
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
 from typing import Iterator, Any, Tuple
@@ -13,7 +14,8 @@ from torchvision.transforms import Compose
 
 from src.block.schemas import Block
 from src.block.utils import convert_block_to_module
-from src.canvas.schemas import Edge
+from src.canvas.schemas import Edge, CanvasBlock, Canvas, SaveCanvasRequest
+from src.canvas.service import block_graph
 
 from src.train.schemas import TrainResultMetrics, TrainResultConfig
 
@@ -257,7 +259,7 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def topological_sort(blocks: tuple[Block, ...], edges: tuple[Edge]) -> tuple[Block, ...]:
+def topological_sort(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> tuple[Block, ...]:
     graph = defaultdict(list)
     in_degree = {block.id: 0 for block in blocks}
 
@@ -321,7 +323,7 @@ def convert_operation_block_to_module(operation_block: Block) -> nn.Module | Non
 
     return convert_block_to_module(operation_block)
 
-def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge]) -> nn.Module | None:
+def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> nn.Module | None:
     sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
@@ -398,3 +400,24 @@ def filter_blocks_connected_to_data(
         filter_connected(optimizer_blocks),
         filter_connected(others)
     )
+
+def filter_edges_from_block_connected_data(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> tuple[Edge, ...]:
+    block_id = set(block.block_id for block in blocks)
+
+    return tuple(edge for edge in edges if edge.source in block_id)
+
+def save_result_block_graph(project_name: str, result: str, blocks: tuple[CanvasBlock, ...], edges: tuple[Edge, ...]):
+
+    project_path = pathManager.get_projects_path(project_name)
+    block_graph_path = project_path / result / block_graph
+
+    if create_file(block_graph_path, json_to_str(SaveCanvasRequest(canvas=Canvas(blocks=blocks, edges=edges)))):
+        return True
+
+    raise
+
+def convert_canvas_blocks(blocks: tuple[Block, ...]) -> tuple[CanvasBlock, ...]:
+    return tuple(block for block in blocks)
+
+def save_result_model(project_name: str, result: str, model: nn.Module):
+    torch.save(model, str(pathManager.get_train_result_path(project_name, result)))

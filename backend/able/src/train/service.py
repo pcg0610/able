@@ -27,11 +27,14 @@ def train(request: TrainRequest):
         data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks, request.edges
     )
 
-    save_block_graph(request.project_name, SaveCanvasRequest(canvas=Canvas(blocks=request.blocks, edges=request.edges)))
+    # 학습에서 사용하는 간선 추출
+    blocks_connected_to_data: tuple[Block, ...] = (data_block, *transform_blocks, *loss_blocks, *optimizer_blocks, *other_blocks)
+    canvas_blocks = convert_canvas_blocks(blocks_connected_to_data)
+    edges = filter_edges_from_block_connected_data(blocks_connected_to_data, request.edges)
 
     transforms = create_data_preprocessor(transform_blocks)
     dataset = create_dataset(data_path, transforms)
-    model = convert_block_graph_to_model(other_blocks, request.edges)
+    model = convert_block_graph_to_model(other_blocks, edges)
 
     if model is None:
         raise Exception()
@@ -48,6 +51,11 @@ def train(request: TrainRequest):
     epochs_path = result_path / "epochs"
     create_directory(result_path)
     create_directory(epochs_path)
+
+    # 학습 모델 그래프 저장
+    save_result_block_graph(request.project_name, result_name, canvas_blocks, edges)
+
+    save_result_model(project_name, result_name, model)
 
     trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name))
 
