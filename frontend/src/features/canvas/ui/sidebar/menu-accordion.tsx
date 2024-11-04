@@ -48,7 +48,12 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
           <div>Loading...</div>
         ) : blocks.length > 0 ? (
           blocks.map((block) => (
-            <MenuBlock key={block.name} label={block.name} Icon={Icon} />
+            <MenuBlock
+              key={block.name}
+              type={label}
+              label={block.name}
+              Icon={Icon}
+            />
           ))
         ) : (
           <div>No blocks available</div>
