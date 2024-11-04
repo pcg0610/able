@@ -12,15 +12,15 @@ interface MenuBlockProps {
 
 const MenuBlock = ({ label, Icon }: MenuBlockProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'BLOCK', // 드래그 타입을 지정
-    item: { label }, // 드래그 시 전달할 데이터
+    type: 'BLOCK',
+    item: { label },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
   }));
 
   return (
-    <S.Container ref={drag} isDragging={isDragging}>
+    <S.Container ref={drag} isDragging={isDragging} title={label}>
       <S.Content>
         <S.LabelWrapper>
           {Icon && <Icon />}
