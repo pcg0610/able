@@ -18,7 +18,7 @@ const TrainPage = () => {
     <MainContainer>
       <PageHeader title='프로젝트' date='2024.08.12' />
       <Container>
-        <Sidebar onSelectionChange={handleSidebarSelection} />
+        <Sidebar onSelectionChange={handleSidebarSelection} type='train' />
         <Content>
           {selectedComponent === 'analyze' && <AnalyzeComponent />}
           {selectedComponent === 'result' && <ResultComponent />}
