@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 
 import * as S from '@entities/block-node/block-node.style';
 import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
+import { blockColors } from '@shared/constants/block';
 
 interface BlockField {
   name: string;
@@ -19,7 +20,7 @@ interface BlockNodeProps {
 
 const BlockNode = ({ data }: BlockNodeProps) => {
   const blockColor = useMemo(
-    () => S.blockColors[data.type] || '#FFFFFF',
+    () => blockColors[data.type] || '#FFFFFF',
     [data.type]
   );
 
