@@ -1,13 +1,19 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import * as S from '@features/home/ui/sidebar/home-sidebar.style';
 import Common from '@shared/styles/common';
 
+import ProjectModal from '@shared/ui/modal/project-modal';
 import BasicButton from '@shared/ui/button/basic-button'
 import FileIcon from '@icons/file.svg?react';
 import RocketIcon from '@icons/rocket.svg?react';
 
 const HomeSideBar = () => {
+   const [isModalOpen, setIsModalOpen] = useState(false);
+   const [isClosing, setIsClosing] = useState(false);
+   const navigate = useNavigate();
+
    const [selectedProject, setSelectedProject] = useState("홍박사팀");
 
    const projects = [
@@ -21,7 +27,23 @@ const HomeSideBar = () => {
    };
 
    const handleServer = () => {
-      console.log("router server");
+      navigate('/deploy');
+   };
+
+   const handleCreateProjectClick = () => {
+      setIsModalOpen(true);
+      setIsClosing(false);
+   };
+
+   const closeModal = () => {
+      setIsModalOpen(false);  // 임시로 그냥 바로 닫히게 설정
+   };
+
+   const handleAnimationEnd = () => {
+      if (isClosing) {
+         setIsModalOpen(false);
+         setIsClosing(false);
+      }
    };
 
    return (
@@ -34,7 +56,7 @@ const HomeSideBar = () => {
             text="프로젝트 만들기"
             width='100%'
             onClick={() => {
-               console.log('모델 실행 버튼 클릭됨');
+               handleCreateProjectClick();
             }}
          />
 
@@ -56,6 +78,13 @@ const HomeSideBar = () => {
                <S.FooterStatus>Running...</S.FooterStatus>
             </div>
          </S.Footer>
+         {isModalOpen && (
+            <ProjectModal
+               onClose={closeModal}
+               isClosing={isClosing}
+               onAnimationEnd={handleAnimationEnd}
+               type={'create'} />
+         )}
       </S.SidebarContainer>
    );
 };
