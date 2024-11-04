@@ -34,7 +34,7 @@ app.include_router(block_router, prefix="/blocks", tags=["블록"])
 
 app.include_router(project_router, prefix="/projects", tags=["프로젝트"])
 
-app.include_router(canvas_router, prefix="/projects/canvas", tags=["캔버스"])
+app.include_router(canvas_router, prefix="/canvas", tags=["캔버스"])
 
 app.include_router(analysis_router, prefix="/analyses", tags=["분석"])
 
