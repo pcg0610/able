@@ -5,8 +5,8 @@ import Common from '@shared/styles/common';
 export const SidebarContainer = styled.div`
   width: 15.625rem; 
   height: 100%;
-  background-color: #f8f9fc; // 배경색 설정
-  padding: 1.25rem; // 전체적인 여백
+  background-color: #f8f9fc; 
+  padding: 1.25rem 1rem; 
   border-right: 0.0625rem solid #ddd; 
   display: flex;
   flex-direction: column;
@@ -72,6 +72,12 @@ export const Footer = styled.div`
   padding: 0.625rem;
   margin-top: auto;
   gap: 0.9375rem;
+  min-height: 6.25rem;
+  transition-duration: 0.6s;
+
+  &:hover {
+    filter: brightness(0.9) saturate(2);
+  }
 `;
 
 export const FooterIcon = styled.span`

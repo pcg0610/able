@@ -20,6 +20,10 @@ const HomeSideBar = () => {
       setSelectedProject(project);
    };
 
+   const handleServer = () => {
+      console.log("router server");
+   };
+
    return (
       <S.SidebarContainer>
          <S.Title>내 프로젝트</S.Title>
@@ -45,7 +49,7 @@ const HomeSideBar = () => {
             ))}
          </S.FolderSection>
 
-         <S.Footer>
+         <S.Footer onClick={handleServer}>
             <RocketIcon width={59} height={59} />
             <div>
                <S.FooterText>서버 확인하기</S.FooterText>
