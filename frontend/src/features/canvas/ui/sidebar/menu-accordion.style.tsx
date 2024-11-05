@@ -39,6 +39,7 @@ export const SummaryWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-top: 0.625rem;
 `;
 
 export const Text = styled.p`
