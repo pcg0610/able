@@ -3,8 +3,6 @@ from src.train.schemas import TrainResultResponse, PerformanceMetrics, EpochResu
 from .utils import *
 from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format
-from src.canvas.schemas import SaveCanvasRequest, Canvas
-from src.canvas.service import save_block_graph
 from src.utils import encode_image_to_base64
 from src.file.utils import load_json_file
 from typing import List
