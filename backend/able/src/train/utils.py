@@ -64,10 +64,6 @@ class TrainLogger:
         confusion_matrix_path = self.result_path / "confusion_matrix.jpg"
         metrics.confusion_matrix.savefig(confusion_matrix_path, format="jpg")
 
-        # 데이터셋 메타데이터 저장 (metadata.json)
-        # metadata_info = metadata.model_dump(exclude={"hyper_params"})
-        # create_file(self.result_path / "metadata.json", json_to_str(metadata_info))
-
 class Trainer:
     """모델의 학습을 책임지는 클래스
     """
@@ -425,7 +421,6 @@ def save_result_model(project_name: str, result: str, model: nn.Module):
 
 def save_result_hyper_parameter(project_name: str, result: str, batch_size: int, epoch: int):
 
-    project_path = pathManager.get_projects_path(project_name)
     hyper_parameter_path = pathManager.get_train_results_path(project_name) / result / "hyper_parameter.json"
 
     if create_file(hyper_parameter_path, json_to_str(SaveHyperParameter(hyper_parameter=HyperParameter(batch_size=batch_size, epoch=epoch)))):
