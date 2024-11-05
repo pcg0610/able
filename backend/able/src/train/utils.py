@@ -13,9 +13,10 @@ from torchvision.transforms import Compose
 
 from src.block.schemas import Block
 from src.block.utils import convert_block_to_module
-from src.canvas.schemas import Edge
+from src.canvas.schemas import Edge, CanvasBlock, Canvas, SaveCanvasRequest
+from src.canvas.service import block_graph
 
-from src.train.schemas import TrainResultMetrics, TrainResultConfig
+from src.train.schemas import TrainResultMetrics, PerformanceMetrics, HyperParameter, SaveHyperParameter
 
 from src.file.utils import create_file, create_directory
 from src.file.path_manager import PathManager
@@ -51,39 +52,21 @@ class TrainLogger:
         create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss': validation_loss}))
         create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss': training_loss}))
 
-    def save_train_result(self, metrics: TrainResultMetrics, config: TrainResultConfig):
+    def save_train_result(self, metrics: TrainResultMetrics):
         # 성능 지표 저장 (performance_metrics.json)
-        performance_metrics_data = {
-            "metrics": {
-                "accuracy": metrics.top1_accuracy,
-                "top5_accuracy": metrics.top5_accuracy,
-                "precision": metrics.precision,
-                "recall": metrics.recall
-            }
-        }
-        create_file(self.result_path / "performance_metrics.json", json_to_str(performance_metrics_data))
+        performance_metrics_data = metrics.performance_metrics.model_dump()
+        create_file(self.result_path / "performance_metrics.json", json_to_str({"metrics": performance_metrics_data}))
 
         # F1 스코어 저장 (f1_score.json)
-        f1_score_data = {"f1_score": metrics.f1}
-        create_file(self.result_path / "f1_score.json", json_to_str(f1_score_data))
+        create_file(self.result_path / "f1_score.json", json_to_str({"f1_score": metrics.f1}))
 
         # 혼동 행렬 저장 (confusion_matrix.jpg)
         confusion_matrix_path = self.result_path / "confusion_matrix.jpg"
         metrics.confusion_matrix.savefig(confusion_matrix_path, format="jpg")
 
-        # 데이터 정보 저장 (metadata.json)
-        metadata_info = {
-            "data_path": config.data_path,
-            "input_shape": config.input_shape,
-            "classes": config.classes
-        }
-        create_file(self.result_path / "metadata.json", json_to_str(metadata_info))
-
-        # 하이퍼 파라미터 정보 저장 (hyper_parameter.json)
-        create_file(self.result_path / "hyper_parameter.json", json_to_str(config.hyper_params))
-
-        # 블록 그래프 정보 저장 (block_graph.json)
-        create_file(self.result_path / "block_graph.json", json_to_str(config.block_graph_info))
+        # 데이터셋 메타데이터 저장 (metadata.json)
+        # metadata_info = metadata.model_dump(exclude={"hyper_params"})
+        # create_file(self.result_path / "metadata.json", json_to_str(metadata_info))
 
 class Trainer:
     """모델의 학습을 책임지는 클래스
@@ -228,7 +211,27 @@ class Trainer:
         # 혼동 행렬 계산
         fig = plot_confusion_matrix(y_true, y_pred, self.dataset.classes)
 
-        self.logger.save_train_result(top1_correct / total, top5_correct / total, precision, recall, f1, fig)
+        # Top-1 및 Top-5 정확도 계산
+        top1_accuracy = top1_correct / total
+        top5_accuracy = top5_correct / total
+
+        # 성능 지표 객체 생성
+        performance_metrics = PerformanceMetrics(
+            accuracy=top1_accuracy,
+            top5_accuracy=top5_accuracy,
+            precision=precision,
+            recall=recall
+        )
+
+        # TrainResultMetrics 객체 생성
+        metrics = TrainResultMetrics(
+            performance_metrics=performance_metrics,
+            f1=f1,
+            confusion_matrix=fig  # confusion_matrix에 Figure 객체 전달
+        )
+
+        # 성능 결과 저장
+        self.logger.save_train_result(metrics)
 
 def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
     # 혼동 행렬 계산
@@ -257,7 +260,7 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def topological_sort(blocks: tuple[Block, ...], edges: tuple[Edge]) -> tuple[Block, ...]:
+def topological_sort(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> tuple[Block, ...]:
     graph = defaultdict(list)
     in_degree = {block.id: 0 for block in blocks}
 
@@ -321,7 +324,7 @@ def convert_operation_block_to_module(operation_block: Block) -> nn.Module | Non
 
     return convert_block_to_module(operation_block)
 
-def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge]) -> nn.Module | None:
+def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> nn.Module | None:
     sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
@@ -398,3 +401,34 @@ def filter_blocks_connected_to_data(
         filter_connected(optimizer_blocks),
         filter_connected(others)
     )
+
+def filter_edges_from_block_connected_data(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> tuple[Edge, ...]:
+    block_id = set(block.block_id for block in blocks)
+
+    return tuple(edge for edge in edges if edge.source in block_id)
+
+def save_result_block_graph(project_name: str, result: str, blocks: tuple[CanvasBlock, ...], edges: tuple[Edge, ...]):
+
+    project_path = pathManager.get_projects_path(project_name)
+    block_graph_path = project_path / result / block_graph
+
+    if create_file(block_graph_path, json_to_str(SaveCanvasRequest(canvas=Canvas(blocks=blocks, edges=edges)))):
+        return True
+
+    raise
+
+def convert_canvas_blocks(blocks: tuple[Block, ...]) -> tuple[CanvasBlock, ...]:
+    return tuple(block for block in blocks)
+
+def save_result_model(project_name: str, result: str, model: nn.Module):
+    torch.save(model, str(pathManager.get_train_result_path(project_name, result) / "model.pth"))
+
+def save_result_hyper_parameter(project_name: str, result: str, batch_size: int, epoch: int):
+
+    project_path = pathManager.get_projects_path(project_name)
+    hyper_parameter_path = project_path / result / "hyper_parameter.json"
+
+    if create_file(hyper_parameter_path, json_to_str(SaveHyperParameter(hyper_parameter=HyperParameter(batch_size=batch_size, epoch=epoch)))):
+        return True
+
+    raise
