@@ -3,7 +3,6 @@ from collections import defaultdict, deque
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from parso.python.tree import Module
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
 from typing import Iterator, Any, Tuple
@@ -17,7 +16,7 @@ from src.block.utils import convert_block_to_module
 from src.canvas.schemas import Edge, CanvasBlock, Canvas, SaveCanvasRequest
 from src.canvas.service import block_graph
 
-from src.train.schemas import TrainResultMetrics, TrainResultMetadata, HyperParameter, SaveHyperParameter
+from src.train.schemas import TrainResultMetrics, PerformanceMetrics, HyperParameter, SaveHyperParameter
 
 from src.file.utils import create_file, create_directory
 from src.file.path_manager import PathManager
@@ -53,7 +52,7 @@ class TrainLogger:
         create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss': validation_loss}))
         create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss': training_loss}))
 
-    def save_train_result(self, metrics: TrainResultMetrics, metadata: TrainResultMetadata):
+    def save_train_result(self, metrics: TrainResultMetrics):
         # 성능 지표 저장 (performance_metrics.json)
         performance_metrics_data = metrics.performance_metrics.model_dump()
         create_file(self.result_path / "performance_metrics.json", json_to_str({"metrics": performance_metrics_data}))
@@ -66,8 +65,8 @@ class TrainLogger:
         metrics.confusion_matrix.savefig(confusion_matrix_path, format="jpg")
 
         # 데이터셋 메타데이터 저장 (metadata.json)
-        metadata_info = metadata.model_dump(exclude={"hyper_params"})
-        create_file(self.result_path / "metadata.json", json_to_str(metadata_info))
+        # metadata_info = metadata.model_dump(exclude={"hyper_params"})
+        # create_file(self.result_path / "metadata.json", json_to_str(metadata_info))
 
 class Trainer:
     """모델의 학습을 책임지는 클래스
@@ -212,7 +211,27 @@ class Trainer:
         # 혼동 행렬 계산
         fig = plot_confusion_matrix(y_true, y_pred, self.dataset.classes)
 
-        self.logger.save_train_result(top1_correct / total, top5_correct / total, precision, recall, f1, fig)
+        # Top-1 및 Top-5 정확도 계산
+        top1_accuracy = top1_correct / total
+        top5_accuracy = top5_correct / total
+
+        # 성능 지표 객체 생성
+        performance_metrics = PerformanceMetrics(
+            accuracy=top1_accuracy,
+            top5_accuracy=top5_accuracy,
+            precision=precision,
+            recall=recall
+        )
+
+        # TrainResultMetrics 객체 생성
+        metrics = TrainResultMetrics(
+            performance_metrics=performance_metrics,
+            f1=f1,
+            confusion_matrix=fig  # confusion_matrix에 Figure 객체 전달
+        )
+
+        # 성능 결과 저장
+        self.logger.save_train_result(metrics)
 
 def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
     # 혼동 행렬 계산
