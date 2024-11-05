@@ -1,5 +1,8 @@
-// ProjectModal.tsx
+import { useState } from 'react';
+
 import * as S from '@shared/ui/modal/project-modal.style';
+
+import DropDown from '@shared/ui/dropdown/dropdown';
 
 interface ProjectModalProps {
    onClose: () => void;
@@ -10,6 +13,20 @@ interface ProjectModalProps {
 
 const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModalProps) => {
    const isReadOnly = type === 'modify';
+   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+   const options = [
+      { value: 'option1', label: 'Option 1' },
+      { value: 'option2', label: 'Option 2' },
+      { value: 'option3', label: 'Option 3' },
+      { value: 'option4', label: 'Option 4' },
+      { value: 'option5', label: 'Option 5' },
+   ];
+
+   const handleSelect = (option: Option) => {
+      setSelectedOption(option.label); // 선택된 옵션을 저장
+      console.log('선택된 옵션:', option);
+   };
 
    return (
       <S.ModalOverlay
@@ -45,12 +62,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
                </S.InputWrapper>
                <S.InputWrapper>
                   <S.Label>쿠다 버전</S.Label>
-                  <S.Select>
-                     <option>버전을 선택해주세요.</option>
-                     <option>버전 1</option>
-                     <option>버전 2</option>
-                     <option>버전 3</option>
-                  </S.Select>
+                  <DropDown options={options} onSelect={handleSelect} />
                </S.InputWrapper>
             </S.ModalBody>
             <S.ModalFooter>
