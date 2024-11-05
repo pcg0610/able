@@ -1,0 +1,8 @@
+services:
+  able-server:
+    image: able-server
+    container-name: able-server
+    volumes:
+      - /usr/local/able:/app/data
+    ports: 
+      -"8000:8000"
