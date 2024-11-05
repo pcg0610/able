@@ -25,8 +25,6 @@ def create_project(project: Project) -> bool:
     if create_directory(project_path):
         create_file(block_graph_path, json_to_str(Canvas()))
         return create_file(metadata_path, json_to_str(project))
-    
-    # TODO: 파이썬 커널에 requirements.txt
 
     logger.error(f"동일한 디렉터리 이름 존재: {project.title}")
     raise ProjectNameAlreadyExistsException()
