@@ -6,3 +6,10 @@ services:
       - /usr/local/able:/app/data
     ports: 
       - "8000:8000"
+    networks:
+    - able-network
+
+
+networks:
+  able-network:
+    driver: bridge
