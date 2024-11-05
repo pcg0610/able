@@ -23,7 +23,7 @@ def create_project(project: Project) -> bool:
     block_graph_path = project_path / BLOCK_GRAPH
     
     if create_directory(project_path):
-        create_file(block_graph_path, json_to_str(Canvas))
+        create_file(block_graph_path, json_to_str(Canvas()))
         return create_file(metadata_path, json_to_str(project))
     
     # TODO: 파이썬 커널에 requirements.txt
