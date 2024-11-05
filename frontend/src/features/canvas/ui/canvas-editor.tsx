@@ -8,6 +8,7 @@ import {
   useEdgesState,
   useReactFlow,
   type OnConnect,
+  MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -23,7 +24,16 @@ const CanvasEditor = () => {
   const { screenToFlowPosition } = useReactFlow();
 
   const onConnect: OnConnect = (connection) =>
-    setEdges((eds) => addEdge(connection, eds));
+    setEdges((eds) =>
+      addEdge(
+        {
+          ...connection,
+          type: 'smoothstep',
+          markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
+        },
+        eds
+      )
+    );
 
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
 
