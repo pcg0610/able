@@ -6,6 +6,7 @@ import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
 
 import ArrowButton from '@shared/ui/button/arrow-button';
 import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
+import LoadingSpinner from '@assets/icons/horizontal-loading.svg?react';
 
 interface MenuAccordionProps {
   label: string;
@@ -45,13 +46,23 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
         ref={contentRef}
       >
         {isFetching ? (
-          <div>Loading...</div>
+          <S.SummaryWrapper>
+            <LoadingSpinner />
+          </S.SummaryWrapper>
         ) : blocks.length > 0 ? (
           blocks.map((block) => (
-            <MenuBlock key={block.name} label={block.name} Icon={Icon} />
+            <MenuBlock
+              key={block.name}
+              type={label}
+              name={block.name}
+              fields={block.args}
+              Icon={Icon}
+            />
           ))
         ) : (
-          <div>No blocks available</div>
+          <S.SummaryWrapper>
+            <S.Text>블록이 없어요</S.Text>
+          </S.SummaryWrapper>
         )}
       </S.MenuBlockWrapper>
     </S.Accordion>

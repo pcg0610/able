@@ -1,16 +1,6 @@
 import styled from '@emotion/styled';
 import Common from '@/shared/styles/common';
 
-export const blockColors: Record<string, string> = {
-  transform: '#FF6347',
-  layer: '#FFD700',
-  activation: '#34D399',
-  loss: '#5393c8',
-  operation: '#FF8C00',
-  optimizer: '#6A5ACD',
-  model: '#8A2BE2',
-};
-
 export const Container = styled.div<{ blockColor: string }>`
   width: 15.625rem;
   border-radius: 0.25rem;
