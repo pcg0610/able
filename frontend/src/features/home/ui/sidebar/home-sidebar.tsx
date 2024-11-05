@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as S from '@features/home/ui/sidebar/home-sidebar.style';
 import Common from '@shared/styles/common';
+import { useProjects } from '@features/home/api/use-home.query';
+import { useProjectStateStore } from '@entities/project/model/project.model';
 
 import ProjectModal from '@shared/ui/modal/project-modal';
 import BasicButton from '@shared/ui/button/basic-button'
@@ -14,16 +16,17 @@ const HomeSideBar = () => {
    const [isClosing, setIsClosing] = useState(false);
    const navigate = useNavigate();
 
-   const [selectedProject, setSelectedProject] = useState("홍박사팀");
+   const { projectName, setProjectName } = useProjectStateStore();
+   const { data: projects, isLoading, error } = useProjects();
 
-   const projects = [
-      "컴퓨터 비전 프로젝트",
-      "홍박사팀",
-      "박찬규 연구실",
-   ];
+   useEffect(() => {
+      if (projects && projects.length > 0 && !projectName) {
+         setProjectName(projects[0]);
+      }
+   }, [projects, projectName, setProjectName]);
 
    const handleClick = (project: string) => {
-      setSelectedProject(project);
+      setProjectName(project);
    };
 
    const handleServer = () => {
@@ -46,6 +49,9 @@ const HomeSideBar = () => {
       }
    };
 
+   if (isLoading) return <div>Loading...</div>;
+   if (error) return <div>Error loading projects</div>;
+
    return (
       <S.SidebarContainer>
          <S.Title>내 프로젝트</S.Title>
@@ -61,10 +67,10 @@ const HomeSideBar = () => {
          />
 
          <S.FolderSection>
-            {projects.map((project, index) => (
+            {projects?.map((project, index) => (
                <S.Folder
                   key={index}
-                  isSelected={selectedProject === project}
+                  isSelected={projectName === project}
                   onClick={() => handleClick(project)}>
                   <FileIcon width={20} height={20} /> {project}
                </S.Folder>
