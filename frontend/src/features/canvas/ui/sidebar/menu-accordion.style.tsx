@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 
+import Common from '@/shared/styles/common';
+
 export const Accordion = styled.div`
   display: flex;
   flex-direction: column;
@@ -29,4 +31,17 @@ export const MenuBlockWrapper = styled.div<{
   height: ${({ isOpen, contentHeight }) =>
     isOpen ? `${contentHeight}px` : '0'};
   transition: height 0.3s ease;
+`;
+
+export const SummaryWrapper = styled.div`
+  width: 100%;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const Text = styled.p`
+  font-size: ${Common.fontSizes.xs};
+  color: ${Common.colors.gray300};
 `;
