@@ -12,4 +12,5 @@ services:
 
 networks:
   able-network:
+    external: true
     driver: bridge
