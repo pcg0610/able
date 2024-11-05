@@ -1,5 +1,6 @@
 export const blockColors: Record<string, string> = {
-  transform: '#FF6347',
+  data: '#FF6347',
+  transform: '#FF5680',
   layer: '#FFA436',
   activation: '#FFD700',
   loss: '#34D399',
