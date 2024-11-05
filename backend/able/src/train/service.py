@@ -46,7 +46,7 @@ def train(request: TrainRequest):
     result_name = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # 결과 및 에포크 디렉터리 생성
-    result_path = path_manager.get_train_results_path(project_name) / "train_results" / result_name
+    result_path = path_manager.get_train_results_path(project_name) / result_name
     epochs_path = result_path / "epochs"
     create_directory(result_path)
     create_directory(epochs_path)
@@ -70,7 +70,7 @@ def train(request: TrainRequest):
 
 def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
     # 결과 디렉터리 경로 설정
-    result_path = path_manager.get_train_results_path(project_name) / "train_results" / result_name
+    result_path = path_manager.get_train_results_path(project_name) / result_name
 
     # 혼동 행렬 이미지 로드 및 인코딩
     image_bytes = read_image_file(result_path / "confusion_matrix.jpg")  # 파일 경로에서 bytes 읽기
