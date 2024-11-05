@@ -1,5 +1,5 @@
 from . import TrainRequest
-from src.train.schemas import TrainResultResponse, PerformanceMetrics, EpochResult, Loss, Accuracy
+from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
 from .utils import *
 from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format
