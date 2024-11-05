@@ -421,12 +421,12 @@ def convert_canvas_blocks(blocks: tuple[Block, ...]) -> tuple[CanvasBlock, ...]:
     return tuple(block for block in blocks)
 
 def save_result_model(project_name: str, result: str, model: nn.Module):
-    torch.save(model, str(pathManager.get_train_results_path(project_name) / "train_results" / result / "model.pth"))
+    torch.save(model, str(pathManager.get_train_results_path(project_name) / result / "model.pth"))
 
 def save_result_hyper_parameter(project_name: str, result: str, batch_size: int, epoch: int):
 
     project_path = pathManager.get_projects_path(project_name)
-    hyper_parameter_path = project_path / "train_results" / result / "hyper_parameter.json"
+    hyper_parameter_path = pathManager.get_train_results_path(project_name) / result / "hyper_parameter.json"
 
     if create_file(hyper_parameter_path, json_to_str(SaveHyperParameter(hyper_parameter=HyperParameter(batch_size=batch_size, epoch=epoch)))):
         return True
@@ -450,6 +450,6 @@ def save_metadata(project_name: str, result_name: str, data_block: Block) -> Non
         classes=classes
     )
 
-    metadata_path = pathManager.get_train_results_path(project_name) / "train_results" / result_name / "metadata.json"
+    metadata_path = pathManager.get_train_results_path(project_name) / result_name / "metadata.json"
 
     create_file(metadata_path, json_to_str(metadata.model_dump()))
