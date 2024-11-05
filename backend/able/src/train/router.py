@@ -8,7 +8,12 @@ from ..response.utils import accepted
 
 train_router = router = APIRouter()
 
-@router.get("/result", response_model=TrainResultResponse)
+@router.get(
+    path="/result",
+    response_model=TrainResultResponse,
+    summary="학습 결과 조회",
+    description="프로젝트 이름, 학습 결과 이름에 대하여 조회한다."
+)
 def get_train_result(project_name: str, train_result_name: str) -> TrainResultResponse:
     return load_train_result(project_name, train_result_name)
 
