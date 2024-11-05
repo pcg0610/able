@@ -16,7 +16,7 @@ from src.block.utils import convert_block_to_module
 from src.canvas.schemas import Edge, CanvasBlock, Canvas, SaveCanvasRequest
 from src.canvas.service import block_graph
 
-from src.train.schemas import TrainResultMetrics, PerformanceMetrics, HyperParameter, SaveHyperParameter
+from src.train.schemas import TrainResultMetrics, TrainResultMetadata, PerformanceMetrics, HyperParameter, SaveHyperParameter
 
 from src.file.utils import create_file, create_directory
 from src.file.path_manager import PathManager
@@ -421,14 +421,35 @@ def convert_canvas_blocks(blocks: tuple[Block, ...]) -> tuple[CanvasBlock, ...]:
     return tuple(block for block in blocks)
 
 def save_result_model(project_name: str, result: str, model: nn.Module):
-    torch.save(model, str(pathManager.get_train_result_path(project_name, result) / "model.pth"))
+    torch.save(model, str(pathManager.get_train_results_path(project_name) / "train_results" / result / "model.pth"))
 
 def save_result_hyper_parameter(project_name: str, result: str, batch_size: int, epoch: int):
 
     project_path = pathManager.get_projects_path(project_name)
-    hyper_parameter_path = project_path / result / "hyper_parameter.json"
+    hyper_parameter_path = project_path / "train_results" / result / "hyper_parameter.json"
 
     if create_file(hyper_parameter_path, json_to_str(SaveHyperParameter(hyper_parameter=HyperParameter(batch_size=batch_size, epoch=epoch)))):
         return True
 
     raise
+
+def save_metadata(project_name: str, result_name: str, data_block: Block) -> None:
+    # 메타데이터 정보 추출
+    data_path = data_block.args.get("data_path")
+    input_shape = data_block.args.get("input_shape")
+    classes = data_block.args.get("classes")
+
+    # 데이터 검증
+    if not all([data_path, input_shape, classes]):
+        raise ValueError("메타데이터 정보가 올바르지 않습니다.")
+
+    # 메타데이터 저장
+    metadata = TrainResultMetadata(
+        data_path=data_path,
+        input_shape=input_shape,
+        classes=classes
+    )
+
+    metadata_path = pathManager.get_train_results_path(project_name) / "train_results" / result_name / "metadata.json"
+
+    create_file(metadata_path, json_to_str(metadata.model_dump()))
