@@ -12,6 +12,7 @@ class PathManager:
     def __init__(self):
         self.blocks_path = self.BASE_PATH / "blocks"
         self.data_path = self.BASE_PATH / "data"
+        self.deploy_path = self.data_path / "deploy"
         self.projects_path = self.data_path / "projects"
 
     def get_block_path(self, block_type: BlockType) -> Path:

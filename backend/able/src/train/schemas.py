@@ -1,6 +1,9 @@
 from typing import List, Dict, Any
 from pydantic import Field
+from pydantic.v1 import ConfigDict
+
 from src.response.schemas import ImmutableBaseModel
+from matplotlib.figure import Figure
 
 class PerformanceMetrics(ImmutableBaseModel):
     accuracy: float
@@ -20,6 +23,16 @@ class EpochResult(ImmutableBaseModel):
     losses: Loss
     accuracies: Accuracy
 
+class HyperParameter(ImmutableBaseModel):
+    batch_size: int
+    epoch: int
+
+class GetHyperParameter(ImmutableBaseModel):
+    hyper_parameter: HyperParameter
+
+class SaveHyperParameter(ImmutableBaseModel):
+    hyper_parameter: HyperParameter
+
 class TrainResultResponse(ImmutableBaseModel):
     confusion_matrix: str
     performance_metrics: PerformanceMetrics
@@ -27,16 +40,13 @@ class TrainResultResponse(ImmutableBaseModel):
     epoch_result: List[EpochResult]
 
 class TrainResultMetrics(ImmutableBaseModel):
-    top1_accuracy: float
-    top5_accuracy: float
-    precision: float
-    recall: float
+    performance_metrics: PerformanceMetrics
     f1: float
-    confusion_matrix: str  # 혼동 행렬 이미지 경로 또는 Base64 인코딩
+    confusion_matrix: Figure
 
-class TrainResultConfig(ImmutableBaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+class TrainResultMetadata(ImmutableBaseModel):
     data_path: str = Field(..., description="데이터셋의 경로")
     input_shape: List[int] = Field(..., description="입력 데이터 형상")
     classes: List[str] = Field(..., description="클래스 목록")
-    hyper_params: Dict[str, Any] = Field(..., description="하이퍼 파라미터 정보")
-    block_graph_info: Dict[str, Any] = Field(..., description="모델 구성 요소 정보")

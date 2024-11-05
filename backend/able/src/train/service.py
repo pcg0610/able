@@ -1,12 +1,11 @@
+import json
 from . import TrainRequest
-from src.train.schemas import TrainResultResponse, PerformanceMetrics, EpochResult, Loss, Accuracy
+from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
 from .utils import *
 from src.file.path_manager import PathManager
-from src.file.utils import validate_file_format
-from src.canvas.schemas import SaveCanvasRequest, Canvas
-from src.canvas.service import save_block_graph
+from src.file.utils import validate_file_format, get_file
 from src.utils import encode_image_to_base64
-from src.file.utils import load_json_file
+from src.file.utils import read_image_file
 from typing import List
 
 path_manager = PathManager()
@@ -27,11 +26,14 @@ def train(request: TrainRequest):
         data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks, request.edges
     )
 
-    save_block_graph(request.project_name, SaveCanvasRequest(canvas=Canvas(blocks=request.blocks, edges=request.edges)))
+    # 학습에서 사용하는 간선 추출
+    blocks_connected_to_data: tuple[Block, ...] = (data_block, *transform_blocks, *loss_blocks, *optimizer_blocks, *other_blocks)
+    canvas_blocks = convert_canvas_blocks(blocks_connected_to_data)
+    edges = filter_edges_from_block_connected_data(blocks_connected_to_data, request.edges)
 
     transforms = create_data_preprocessor(transform_blocks)
     dataset = create_dataset(data_path, transforms)
-    model = convert_block_graph_to_model(other_blocks, request.edges)
+    model = convert_block_graph_to_model(other_blocks, edges)
 
     if model is None:
         raise Exception()
@@ -44,10 +46,21 @@ def train(request: TrainRequest):
     result_name = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # 결과 및 에포크 디렉터리 생성
-    result_path = path_manager.get_train_result_path(project_name, result_name)
+    result_path = path_manager.get_train_results_path(project_name) / result_name
     epochs_path = result_path / "epochs"
     create_directory(result_path)
     create_directory(epochs_path)
+
+    # 데이터셋 메타데이터 저장
+    save_metadata(project_name, result_name, data_block)
+
+    # 학습 모델 그래프 저장
+    save_result_block_graph(request.project_name, result_name, canvas_blocks, edges)
+
+    # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
+    save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
+
+    save_result_model(project_name, result_name, model)
 
     trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name))
 
@@ -60,14 +73,15 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     result_path = path_manager.get_train_results_path(project_name) / result_name
 
     # 혼동 행렬 이미지 로드 및 인코딩
-    confusion_matrix = encode_image_to_base64(result_path / "confusion_matrix.jpg")
+    image_bytes = read_image_file(result_path / "confusion_matrix.jpg")  # 파일 경로에서 bytes 읽기
+    confusion_matrix = encode_image_to_base64(image_bytes)
 
     # 성능 지표 로드
-    performance_metrics_data = load_json_file(result_path / "performance_metrics.json")
-    performance_metrics = PerformanceMetrics(**performance_metrics_data["metrics"])
+    performance_metrics_data = json.loads(get_file(result_path / "performance_metrics.json"))
+    performance_metrics = PerformanceMetrics.model_validate(performance_metrics_data["metrics"])
 
     # F1 스코어 로드
-    f1_score = load_json_file(result_path / "f1_score.json")["f1_score"]
+    f1_score = json.loads(get_file(result_path / "f1_score.json"))["f1_score"]
 
     # 에포크 결과 로드
     epochs_path = path_manager.get_epochs_path(project_name, result_name)
@@ -76,21 +90,20 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     for epoch_dir in epochs_path.iterdir():
         if epoch_dir.is_dir():
             epoch_id = epoch_dir.name
-            # 각 에포크에 해당하는 파일 경로 설정
-            training_loss_path = epoch_dir / "training_loss.json"
-            validation_loss_path = epoch_dir / "validation_loss.json"
-            accuracy_path = epoch_dir / "accuracy.json"
+            training_loss_data = json.loads(get_file(epoch_dir / "training_loss.json"))
+            validation_loss_data = json.loads(get_file(epoch_dir / "validation_loss.json"))
+            accuracy_data = json.loads(get_file(epoch_dir / "accuracy.json"))
 
-            # 각 파일에서 필요한 데이터 로드
-            training_loss = load_json_file(training_loss_path)["loss"]
-            validation_loss = load_json_file(validation_loss_path)["loss"]
-            accuracy = load_json_file(accuracy_path)["accuracy"]
+            # 각 파일을 로드하여 모델 인스턴스로 변환
+            training_loss = Loss.model_validate(training_loss_data)
+            validation_loss = Loss.model_validate(validation_loss_data)
+            accuracy = Accuracy.model_validate(accuracy_data)
 
             # 에포크 결과 인스턴스 생성
             epoch_result = EpochResult(
                 epoch=epoch_id,
-                losses=Loss(training=training_loss, validation=validation_loss),
-                accuracies=Accuracy(accuracy=accuracy)
+                losses=Loss(training=training_loss.training, validation=validation_loss.validation),
+                accuracies=Accuracy(accuracy=accuracy.accuracy)
             )
             epoch_results.append(epoch_result)
 

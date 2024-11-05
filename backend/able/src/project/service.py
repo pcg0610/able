@@ -7,6 +7,7 @@ from src.file.path_manager import PathManager
 from src.utils import str_to_json, json_to_str, encode_image_to_base64
 from src.project.exceptions import ProjectNameAlreadyExistsException
 from src.file.exceptions import FileNotFoundException
+from src.canvas.schemas import Canvas
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,13 +15,18 @@ logger = logging.getLogger(__name__)
 path_manager = PathManager()
 METADATA = "metadata.json"
 THUMBNAIL = "thumbnail.jpg"
+BLOCK_GRAPH = "block_graph.json"
 
 def create_project(project: Project) -> bool:
     project_path = path_manager.get_projects_path(project.title)
     metadata_path = project_path / METADATA
+    block_graph_path = project_path / BLOCK_GRAPH
     
     if create_directory(project_path):
+        create_file(block_graph_path, json_to_str(Canvas()))
         return create_file(metadata_path, json_to_str(project))
+    
+    # TODO: 파이썬 커널에 requirements.txt
 
     logger.error(f"동일한 디렉터리 이름 존재: {project.title}")
     raise ProjectNameAlreadyExistsException()

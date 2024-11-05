@@ -2,13 +2,16 @@ import styled from '@emotion/styled';
 
 import Common from '@/shared/styles/common';
 
-export const Container = styled.div<{ isDragging: boolean }>`
+export const Container = styled.div<{
+  isDragging: boolean;
+  blockColor: string;
+}>`
   width: 100%;
   position: relative;
   padding: 0.25rem 0;
   margin-top: 0.625rem;
 
-  border: 0.1rem solid #34d399;
+  border: 0.1rem solid ${({ blockColor }) => blockColor};
   border-radius: 0.3125rem;
   background-color: ${Common.colors.white};
   opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
@@ -21,7 +24,7 @@ export const Container = styled.div<{ isDragging: boolean }>`
     top: 0;
     bottom: 0;
     width: 0.5rem;
-    background-color: #34d399;
+    background-color: ${({ blockColor }) => blockColor};
     border-top-left-radius: 0.15rem;
     border-bottom-left-radius: 0.15rem;
   }

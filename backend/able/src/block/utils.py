@@ -27,7 +27,9 @@ def dynamic_class_loader(module_path: str, class_name: str):
     """ 동적으로 모듈에서 클래스를 로드합니다. """
     try:
         module = importlib.import_module(module_path)
-        return getattr(module, class_name)
+        for name in dir(module):
+            if name.lower() == class_name.lower():
+                return getattr(module, class_name)
     except ImportError as e:
         logger.error(f"Failed to import module {module_path}. Error: {e}")
         raise ImportError(f"Module '{module_path}' could not be imported: {e}")

@@ -2,42 +2,37 @@ import { Handle, Position } from '@xyflow/react';
 import { useMemo } from 'react';
 
 import * as S from '@entities/block-node/block-node.style';
+import Common from '@shared/styles/common';
+import { blockColors } from '@shared/constants/block';
 import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
-
-interface BlockField {
-  name: string;
-  required: boolean;
-}
+import { BlockItem } from '@/features/canvas/types/block.type';
 
 interface BlockNodeProps {
   data: {
-    type: string;
-    fields: BlockField[];
+    block: BlockItem;
     onFieldChange: (fieldName: string, value: string) => void;
   };
 }
 
 const BlockNode = ({ data }: BlockNodeProps) => {
   const blockColor = useMemo(
-    () => S.blockColors[data.type] || '#FFFFFF',
-    [data.type]
+    () =>
+      data?.block?.type ? blockColors[data.block.type] : Common.colors.gray200,
+    [data?.block?.type]
   );
 
   return (
     <S.Container blockColor={blockColor}>
       <Handle type='target' position={Position.Top} />
-      <S.Label>{capitalizeFirstLetter(data.type)}</S.Label>
+      <S.Label>{capitalizeFirstLetter(data?.block?.name || 'Unknown')}</S.Label>
       <S.FieldWrapper>
-        {data.fields.map((field) => (
+        {data?.block?.fields?.map((field) => (
           <S.InputWrapper key={field.name} blockColor={blockColor}>
-            <S.Name>
-              {field.name}
-              {field.required}
-            </S.Name>
+            <S.Name>{field.name}</S.Name>
             <S.Input
               type='text'
-              placeholder={field.required ? 'required' : ''}
-              required={field.required}
+              placeholder={field.isRequired ? 'required' : ''}
+              required={field.isRequired}
               onChange={(e) => data.onFieldChange(field.name, e.target.value)}
             />
           </S.InputWrapper>
