@@ -1,10 +1,10 @@
-import TransformIcon from '@assets/icons/transform.svg?react';
-import LayerIcon from '@assets/icons/layer.svg?react';
-import ActivationIcon from '@assets/icons/activation.svg?react';
-import LossIcon from '@assets/icons/loss.svg?react';
-import OperationIcon from '@assets/icons/operation.svg?react';
-import OptimizerIcon from '@assets/icons/optimizer.svg?react';
-import ModuleIcon from '@assets/icons/module.svg?react';
+import TransformIcon from '@icons/transform.svg?react';
+import LayerIcon from '@icons/layer.svg?react';
+import ActivationIcon from '@icons/activation.svg?react';
+import LossIcon from '@icons/loss.svg?react';
+import OperationIcon from '@icons/operation.svg?react';
+import OptimizerIcon from '@icons/optimizer.svg?react';
+import ModuleIcon from '@icons/module.svg?react';
 
 export const BLOCK_MENU = [
   {

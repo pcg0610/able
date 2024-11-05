@@ -6,7 +6,7 @@ import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
 
 import ArrowButton from '@shared/ui/button/arrow-button';
 import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
-import LoadingSpinner from '@assets/icons/horizontal-loading.svg?react';
+import LoadingSpinner from '@icons/horizontal-loading.svg?react';
 
 interface MenuAccordionProps {
   label: string;
