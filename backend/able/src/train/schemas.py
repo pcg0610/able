@@ -1,5 +1,7 @@
 from typing import List, Dict, Any
 from pydantic import Field
+from pydantic.v1 import ConfigDict
+
 from src.response.schemas import ImmutableBaseModel
 from matplotlib.figure import Figure
 
@@ -41,6 +43,8 @@ class TrainResultMetrics(ImmutableBaseModel):
     performance_metrics: PerformanceMetrics
     f1: float
     confusion_matrix: Figure
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 class TrainResultMetadata(ImmutableBaseModel):
     data_path: str = Field(..., description="데이터셋의 경로")
