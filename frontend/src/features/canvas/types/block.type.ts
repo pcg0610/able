@@ -1,3 +1,4 @@
+import { Response } from '@shared/types/response.type';
 import { BLOCK_MENU } from '@features/canvas/costants/block-types.constant';
 
 export type BlockType = (typeof BLOCK_MENU)[number]['name'] | 'data';
@@ -21,9 +22,6 @@ export interface Block {
   args: BlockField[];
 }
 
-export interface BlocksResponse {
-  status_code: number;
-  timeStamp: string;
-  trackingId: string;
+export interface BlocksResponse extends Response {
   data: { blocks: Block[] };
 }
