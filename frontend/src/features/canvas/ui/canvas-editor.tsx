@@ -15,7 +15,7 @@ import '@xyflow/react/dist/style.css';
 import { Canvas } from '@features/canvas/ui/canvas-editor.style';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
 import { initialNodes, initialEdges } from '@features/canvas/model/initialData';
-import { useCanvas } from '@features/canvas/api/use-canvas';
+import { useCanvas } from '@/features/canvas/api/use-canvas.query';
 
 import BlockNode from '@entities/block-node/block-node';
 
