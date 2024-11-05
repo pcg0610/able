@@ -45,10 +45,13 @@ def train(request: TrainRequest):
     result_name = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # 결과 및 에포크 디렉터리 생성
-    result_path = path_manager.get_train_results_path(project_name) / result_name
+    result_path = path_manager.get_train_results_path(project_name) / "train_results" / result_name
     epochs_path = result_path / "epochs"
     create_directory(result_path)
     create_directory(epochs_path)
+
+    # 데이터셋 메타데이터 저장
+    save_metadata(project_name, result_name, data_block)
 
     # 학습 모델 그래프 저장
     save_result_block_graph(request.project_name, result_name, canvas_blocks, edges)
