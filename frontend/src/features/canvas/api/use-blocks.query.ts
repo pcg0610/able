@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import axiosInstance from '@shared/api/axios-instance';
 import canvasKey from '@features/canvas/api/canvas-key';
-import { BlocksResponse } from '@features/canvas/types/block.type';
+import type { BlocksResponse } from '@features/canvas/types/block.type';
 
 const fetchBlocks = async (type: string) => {
   try {

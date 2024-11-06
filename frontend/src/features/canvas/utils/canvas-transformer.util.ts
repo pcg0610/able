@@ -4,11 +4,12 @@ import {
   MarkerType,
 } from '@xyflow/react';
 
-import {
+import type {
   BlockSchema,
   CanvasResponse,
   EdgeSchema,
 } from '@features/canvas/types/canvas.type';
+import type { BlockItem } from '@features/canvas/types/block.type';
 
 export const transformCanvasResponse = (response: CanvasResponse) => {
   const transformedNodes: XYFlowNode[] = response.data.canvas.blocks.map(
@@ -21,7 +22,7 @@ export const transformCanvasResponse = (response: CanvasResponse) => {
           type: block.type,
           name: block.name,
           fields: block.args,
-        },
+        } as BlockItem,
       },
     })
   );
@@ -29,8 +30,8 @@ export const transformCanvasResponse = (response: CanvasResponse) => {
   const transformedEdges: XYFlowEdge[] = response.data.canvas.edges.map(
     (edge) => ({
       id: edge.id,
-      source: edge.source.toString(),
-      target: edge.target.toString(),
+      source: edge.source,
+      target: edge.target,
       type: 'smoothstep',
       markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
     })
@@ -39,17 +40,22 @@ export const transformCanvasResponse = (response: CanvasResponse) => {
   return { nodes: transformedNodes, edges: transformedEdges };
 };
 
-export const transformNodesToBlocks = (nodes: XYFlowNode[]): BlockSchema[] => {
-  return nodes.map((node) => ({
-    id: node.id,
-    name: (node.data as any).block.name,
-    type: (node.data as any).block.type,
-    args: (node.data as any).block.fields,
-    position: JSON.stringify(node.position),
-  }));
+export const transformNodesToBlockSchema = (
+  nodes: XYFlowNode[]
+): BlockSchema[] => {
+  return nodes.map((node) => {
+    const data = node.data as { block: BlockItem };
+    return {
+      id: node.id,
+      position: JSON.stringify(node.position),
+      name: data.block.name,
+      type: data.block.type,
+      args: data.block.fields,
+    };
+  });
 };
 
-export const transformEdgesToEdgeResponse = (
+export const transformEdgesToEdgeSchema = (
   edges: XYFlowEdge[]
 ): EdgeSchema[] => {
   return edges.map((edge) => ({

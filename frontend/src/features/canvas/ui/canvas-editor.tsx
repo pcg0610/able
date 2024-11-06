@@ -24,8 +24,8 @@ import { useFetchCanvas } from '@/features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import {
-  transformEdgesToEdgeResponse,
-  transformNodesToBlocks,
+  transformEdgesToEdgeSchema,
+  transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
 
 import BlockNode from '@entities/block-node/block-node';
@@ -58,21 +58,6 @@ const CanvasEditor = () => {
       )
     );
 
-  const handleTrainButtonClick = () => {
-    console.log('실행');
-  };
-
-  const handleSavaButtonClick = () => {
-    console.log('저장');
-    const transformedBlocks = transformNodesToBlocks(nodes);
-    const transformedEdges = transformEdgesToEdgeResponse(edges);
-
-    saveCanvas({
-      projectName: '춘식이',
-      canvas: { blocks: transformedBlocks, edges: transformedEdges },
-    });
-  };
-
   const handleFieldChange = useCallback(
     (nodeId: string, fieldName: string, value: string) => {
       setNodes((nds) =>
@@ -96,6 +81,20 @@ const CanvasEditor = () => {
     },
     [setNodes]
   );
+
+  const handleTrainButtonClick = () => {
+    console.log('실행');
+  };
+
+  const handleSavaButtonClick = () => {
+    const transformedBlocks = transformNodesToBlockSchema(nodes);
+    const transformedEdges = transformEdgesToEdgeSchema(edges);
+
+    saveCanvas({
+      projectName: '춘식이',
+      canvas: { blocks: transformedBlocks, edges: transformedEdges },
+    });
+  };
 
   return (
     <S.Canvas ref={dropRef}>

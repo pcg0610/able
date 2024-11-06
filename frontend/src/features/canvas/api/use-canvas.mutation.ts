@@ -1,7 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 
 import axiosInstance from '@/shared/api/axios-instance';
-import { BlockSchema, EdgeSchema } from '@features/canvas/types/canvas.type';
+import type {
+  BlockSchema,
+  EdgeSchema,
+} from '@features/canvas/types/canvas.type';
 
 interface SaveCanvasProps {
   projectName: string;

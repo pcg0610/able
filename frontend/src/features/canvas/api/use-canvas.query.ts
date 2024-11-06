@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import axiosInstance from '@shared/api/axios-instance';
 import canvasKey from '@features/canvas/api/canvas-key';
-import { TransformedCanvas } from '@features/canvas/types/canvas.type';
+import type { TransformedCanvas } from '@features/canvas/types/canvas.type';
 import { transformCanvasResponse } from '@features/canvas/utils/canvas-transformer.util';
 
 const fetchCanvas = async (projectName: string) => {

@@ -8,6 +8,7 @@ export interface BlockItem {
   type: BlockType;
   name: string;
   fields: BlockField[];
+  [key: string]: unknown;
 }
 
 export interface BlockField {
