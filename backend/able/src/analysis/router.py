@@ -3,6 +3,7 @@ from fastapi import APIRouter, UploadFile, File
 from src.response.schemas import ResponseModel
 from src.analysis.schemas import EpochsResponse, ImageResponse
 import src.analysis.service as service
+from src.canvas.schemas import GetCanvasResponse
 from src.response.utils import ok, bad_request
 
 analysis_router = router = APIRouter()
@@ -26,3 +27,9 @@ async def analysis(project_name: str, result_name: str, epoch_name:str, file: Up
         return bad_request()
     image = service.analysis(project_name, result_name, epoch_name, file)
     return ok(data=ImageResponse(image=image))
+
+@router.post("/model",
+             summary="특정 학습 결과의 모델(캔버스) 불러오기", description="분석 페이지 접근 시 보여지는 블록 그래프")
+async def get_model(project_name:str, result_name:str):
+    canvas = service.get_model(project_name, result_name)
+    return ok(data=GetCanvasResponse(canvas=canvas))
