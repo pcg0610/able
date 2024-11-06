@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
    ReactFlow,
    MarkerType,
@@ -6,10 +6,9 @@ import {
    useNodesState,
    useEdgesState,
    ReactFlowProvider,
-   addEdge,
-   ConnectionLineType,
    Background,
    BackgroundVariant,
+   MiniMap,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -134,7 +133,7 @@ const initialNodes = [
    {
       id: 'horizontal-8',
       type: 'custom',
-      position: { x: 750, y: 300 },
+      position: { x: 0, y: 0 },
       data: {
          block: {
             type: 'data',
@@ -195,7 +194,7 @@ const proOptions = {
 const defaultEdgeOptions = {
    type: 'smoothstep',
    markerEnd: { type: MarkerType.ArrowClosed },
-   pathOptions: { offset: 5 },
+   pathOptions: { offset: 15 },
    animated: true,
 };
 
@@ -204,17 +203,11 @@ const CanvasResult = () => {
    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
    const [direction, setDirection] = useState<LayoutOptions['direction']>('TB');
 
-   const onConnect = useCallback(
-      (params) => setEdges((els) => addEdge(params, els)),
-      [],
-   );
-
    const { fitView } = useReactFlow();
 
    useAutoLayout({ direction });
 
    useEffect(() => {
-      console.log('Direction changed:', direction);
       fitView();
    }, [nodes, fitView, direction]);
 
@@ -224,17 +217,17 @@ const CanvasResult = () => {
          edges={edges}
          onNodesChange={onNodesChange}
          onEdgesChange={onEdgesChange}
-         onConnect={onConnect}
          nodesDraggable={false}
+         nodesConnectable={false}
          fitView
          attributionPosition="bottom-left"
          defaultEdgeOptions={defaultEdgeOptions}
          nodeTypes={{ custom: BlockNode }}
-         connectionLineType={ConnectionLineType.SmoothStep}
          proOptions={proOptions}
          zoomOnDoubleClick={false}
       >
          <Background variant={BackgroundVariant.Dots} />
+         <MiniMap />
          <PositionedButton>
             <BasicButton
                text="추론하기"
@@ -247,8 +240,6 @@ const CanvasResult = () => {
          <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
             <button onClick={() => setDirection('TB')}>Down (TB)</button>
             <button onClick={() => setDirection('LR')}>Right (LR)</button>
-            <button onClick={() => setDirection('BT')}>Up (BT)</button>
-            <button onClick={() => setDirection('RL')}>Left (RL)</button>
          </div>
       </ReactFlow>
    );
