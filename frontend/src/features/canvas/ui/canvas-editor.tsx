@@ -100,7 +100,6 @@ const CanvasEditor = () => {
       setNodes((nds) => {
         const filteredChanges = changes.filter((change) => {
           if (change.type === 'remove' && 'id' in change) {
-            // id 속성을 가진 경우에만 접근
             const node = nds.find((node) => node.id === change.id);
             const data = node?.data as { block: BlockItem };
             return data?.block?.type !== 'data';
@@ -111,7 +110,7 @@ const CanvasEditor = () => {
         return applyNodeChanges(filteredChanges, nds);
       });
 
-      // 노드가 변경될 때마다 선택된 노드를 업데이트
+      // 노드가 변경될 때마다 선택된 노드 업데이트
       const selectedChange = changes.find(
         (change) =>
           change.type === 'select' && 'id' in change && change.selected
@@ -125,13 +124,12 @@ const CanvasEditor = () => {
     [setNodes, nodes]
   );
 
-  // 엣지 삭제 제어
   const handleEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       setEdges((eds) => {
         const filteredChanges = changes.filter((change) => {
           if (change.type === 'remove' && selectedNode) {
-            // 현재 선택된 노드가 data 타입일 경우 해당 노드와 연결된 엣지는 삭제하지 않음
+            // 현재 선택된 노드가 data 타입일 경우 해당 노드와 연결된 엣지는 삭제 불가
             const sourceNode = nodes.find(
               (node) => node.id === selectedNode.id
             );
@@ -192,7 +190,7 @@ const CanvasEditor = () => {
         onNodesChange={handleNodesChange}
         onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
-        onNodeClick={(_, node) => setSelectedNode(node)} // 노드를 클릭할 때 선택된 노드 업데이트
+        onNodeClick={(_, node) => setSelectedNode(node)}
         nodeTypes={{ custom: BlockNode }}
       >
         <Controls position='bottom-center' orientation='horizontal' />
