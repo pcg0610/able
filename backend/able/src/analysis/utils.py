@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
-from PIL import Image
 import numpy as np
 import cv2
-from typing import Dict, List
-from pathlib import Path
 import logging
+from PIL import Image
+from typing import List
+from pathlib import Path
 
-from src.train.utils import create_data_preprocessor
+from src.train.utils import create_data_preprocessor, UserModel
 from src.canvas.schemas import CanvasBlock, Canvas
 from src.file.utils import get_file
 from src.utils import str_to_json
@@ -33,8 +33,12 @@ class FeatureMapExtractor:
     def analyze(self):
         self.build_model()
         self.model.eval()
-        with torch.no_grad():
-            self.output = self.model(preprocess_image(self.img_path, self.transform_blocks, self.device))
+
+        input_img = preprocess_image(self.img_path, self.transform_blocks, self.device)
+        input_img.requires_grad = True
+
+        self.output = self.model(input_img)
+        self.save_heatmap()
 
     # 훅 적용
     def build_model(self):
@@ -58,14 +62,14 @@ class FeatureMapExtractor:
     # 피쳐맵 생성 훅
     def get_hook_fn(self, layer_name: str) -> callable:
         def hook_fn(module: nn.Module, input: torch.Tensor, output: torch.Tensor) -> None:
-            self.save_feature_map(output, layer_name)
+            self.save_feature_map(output.detach(), layer_name)
         return hook_fn
     
     # 히트맵 생성 훅
     def get_final_layer_hook(self):
         def hook_fn(module, input, output):
-            self.final_feature_map = output.detach()
-            self.save_heatmap()
+            self.final_feature_map = output
+            self.final_feature_map.retain_grad()
         return hook_fn
 
     def save_feature_map(self, fmap: torch.Tensor, layer_name: str) -> None:
@@ -73,7 +77,12 @@ class FeatureMapExtractor:
         fmap = (fmap - fmap.min()) / (fmap.max() - fmap.min())
         fmap = np.uint8(255 * fmap)
         fmap = cv2.applyColorMap(fmap, cv2.COLORMAP_JET)
-        cv2.imwrite(str(self.feature_maps_path / f"{layer_name}.jpg"), fmap)
+
+         # 원본 이미지 크기로 확대하되, 도트 모양을 유지
+        original_image = cv2.imread(str(self.img_path))
+        fmap_resized = cv2.resize(fmap, (original_image.shape[1], original_image.shape[0]), interpolation=cv2.INTER_NEAREST)
+
+        cv2.imwrite(str(self.feature_maps_path / f"{layer_name}.jpg"), fmap_resized)
 
     def save_heatmap(self) -> None:
         if self.final_feature_map is None:
@@ -92,7 +101,7 @@ class FeatureMapExtractor:
 
         # 가중치를 곱하고 모든 채널을 합산하여 히트맵 생성
         weighted_sum = torch.sum(self.final_feature_map[0] * weights.view(-1, 1, 1), dim=0)
-        heatmap = weighted_sum.cpu().numpy()
+        heatmap = weighted_sum.detach().cpu().numpy()
         heatmap = (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min())
         heatmap = np.uint8(255 * heatmap)
         heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
@@ -114,7 +123,6 @@ def preprocess_image(img_path: str, transform_blocks: List[CanvasBlock], device:
     preprocess = create_data_preprocessor(transform_blocks)
     return preprocess(img).unsqueeze(0).to(device)
 
-
 # 모델 로드
 def load_model(path: Path, device: str = 'cpu') -> nn.Module :
     try:
@@ -127,7 +135,8 @@ def load_model(path: Path, device: str = 'cpu') -> nn.Module :
 # 파라미터 로드
 def load_parameter(model: nn.Module, path: str, device: str = 'cpu') :
     try:
-        model.load_state_dict(torch.load(path, map_location=device))
+        model.load_state_dict(torch.load(path, map_location=device), strict= False)
     except Exception as e:
         logger.error(f"파라미터 적용 실패: {e}")
         raise ModelLoadException("파라미터 적용에 실패하였습니다.")
+

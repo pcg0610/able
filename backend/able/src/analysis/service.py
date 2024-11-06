@@ -7,7 +7,7 @@ from fastapi import UploadFile
 from src.file.path_manager import PathManager
 from src.file.utils import get_directory, read_image_file, save_img, create_directory, get_file
 from src.utils import encode_image_to_base64, get_epoch_id, str_to_json
-from src.analysis.utils import FeatureMapExtractor, read_blocks, preprocess_image, load_model, load_parameter
+from src.analysis.utils import FeatureMapExtractor, read_blocks, load_model, load_parameter
 from src.train.utils import split_blocks
 from src.canvas.schemas import Canvas
 
@@ -30,17 +30,16 @@ def get_result(project_name: str, result_name: str, epoch_name:str, block_id: st
 
     return feature_map_image
 
-async def analysis(project_name: str, result_name: str, epoch_name:str, file: UploadFile) -> str:
+async def analyze(project_name: str, result_name: str, epoch_name:str, file: UploadFile) -> str:
     epoch_path = pathManager.get_epoch_path(project_name, result_name, get_epoch_id(epoch_name))
     feature_maps_path = pathManager.get_feature_maps_path(project_name, result_name, get_epoch_id(epoch_name))
 
     #block_graph.json 파일에서 블록 읽어오기
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
     block_graph = read_blocks(block_graph_path)
-    blocks = block_graph.blocks 
 
     # 블록 카테고리 별로 나누기
-    _, transform_blocks, _, _, _ = split_blocks(blocks)
+    _, transform_blocks, _, _, _ = split_blocks(block_graph.blocks)
 
     # 피쳐맵을 저장할 디렉터리 생성 및 원본 이미지 저장
     create_directory(feature_maps_path)
@@ -49,7 +48,7 @@ async def analysis(project_name: str, result_name: str, epoch_name:str, file: Up
     # 모델 로드
     model_path = pathManager.get_train_result_path(project_name, result_name) / "model.pth"
     model = load_model(model_path)
-    
+
     # 파라미터 적용
     parameter_path = str(epoch_path / "parameter.pth")
     load_parameter(model, parameter_path)
