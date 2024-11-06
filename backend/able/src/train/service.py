@@ -4,7 +4,7 @@ from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
 from .dto import TrainResultRequest
 from .utils import *
 from src.file.path_manager import PathManager
-from src.file.utils import validate_file_format, get_file
+from src.file.utils import validate_file_format, get_file, create_directory
 from src.utils import encode_image_to_base64
 from src.file.utils import read_image_file
 from typing import List
