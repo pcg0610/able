@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { Node } from '@xyflow/react';
+import { Node as XYFlowNode } from '@xyflow/react';
 
 import { BlockItem } from '@features/canvas/types/block.type';
 
@@ -9,25 +9,31 @@ interface ClientOffset {
 }
 
 interface AddNodeProps {
-  setNodes: Dispatch<SetStateAction<Node[]>>;
+  setNodes: Dispatch<SetStateAction<XYFlowNode[]>>;
   screenToFlowPosition: (position: { x: number; y: number }) => {
     x: number;
     y: number;
   };
 }
 
-// 노드를 마우스 커서 중간에 위치하도록 생성
+// 노드가 마우스 커서 중앙에 위치하도록 새 노드 추가
 export const useAddCenteredNode = ({
   setNodes,
   screenToFlowPosition,
 }: AddNodeProps) => {
-  // 노드의 중앙 위치 조정 로직을 useCallback으로 작성하여 의존성 문제 해결
+  // 주어진 노드의 위치를 중앙으로 이동시키는 작업 수행
+  // useCallback으로 캐싱
   const adjustNodePosition = useCallback(
     (nodeId: string, clientOffset: ClientOffset) => {
+      // 비동기적으로 실행
+      // -> 노드가 DOM에 추가된 후에 위치 계산
       setTimeout(() => {
+        // nodeId에 해당하는 DOM 요소 찾기
         const element = document.querySelector(`[data-id="${nodeId}"]`);
         if (element) {
           const { width, height } = element.getBoundingClientRect();
+          // 중앙 위치 계산
+          // screenToFlowPosition: 함수의 중앙 좌표를 XYFlow 좌표계로 변환
           const centeredPosition = screenToFlowPosition({
             x: clientOffset.x - width / 2,
             y: clientOffset.y - height / 2,
@@ -46,15 +52,18 @@ export const useAddCenteredNode = ({
     [screenToFlowPosition, setNodes]
   );
 
-  // 노드를 추가하고 adjustNodePosition 호출
+  // 새로운 노드 추가 및 위치 조정 로직
   return useCallback(
+    // clientOffset: 마우스 커서의 현재 위치
     (clientOffset: ClientOffset, item: BlockItem) => {
+      // 초기 위치 설정
       const initialPosition = screenToFlowPosition({
         x: clientOffset.x,
         y: clientOffset.y,
       });
 
-      const newNode: Node = {
+      // 추가할 새 노드 정의
+      const newNode: XYFlowNode = {
         id: `${Math.random()}`,
         type: 'custom',
         position: initialPosition,
