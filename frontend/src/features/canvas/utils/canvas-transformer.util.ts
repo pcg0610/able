@@ -5,11 +5,10 @@ import {
 } from '@xyflow/react';
 
 import {
-  BlockResponse,
+  BlockSchema,
   CanvasResponse,
-  EdgeResponse,
+  EdgeSchema,
 } from '@features/canvas/types/canvas.type';
-import { BlockItem } from '../types/block.type';
 
 export const transformCanvasResponse = (response: CanvasResponse) => {
   const transformedNodes: XYFlowNode[] = response.data.canvas.blocks.map(
@@ -40,9 +39,7 @@ export const transformCanvasResponse = (response: CanvasResponse) => {
   return { nodes: transformedNodes, edges: transformedEdges };
 };
 
-export const transformNodesToBlocks = (
-  nodes: XYFlowNode[]
-): BlockResponse[] => {
+export const transformNodesToBlocks = (nodes: XYFlowNode[]): BlockSchema[] => {
   return nodes.map((node) => ({
     id: node.id,
     name: (node.data as any).block.name,
@@ -54,7 +51,7 @@ export const transformNodesToBlocks = (
 
 export const transformEdgesToEdgeResponse = (
   edges: XYFlowEdge[]
-): EdgeResponse[] => {
+): EdgeSchema[] => {
   return edges.map((edge) => ({
     id: edge.id,
     source: edge.source,

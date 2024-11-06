@@ -1,6 +1,6 @@
-import { Node, Edge } from '@xyflow/react';
+import { Node as XYFlowNode, Edge as XYFlowEdge } from '@xyflow/react';
 
-export const initialNodes: Node[] = [
+export const initialNodes: XYFlowNode[] = [
   {
     id: '1',
     type: 'custom',
@@ -19,4 +19,4 @@ export const initialNodes: Node[] = [
   },
 ];
 
-export const initialEdges: Edge[] = [];
+export const initialEdges: XYFlowEdge[] = [];

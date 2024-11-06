@@ -1,14 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 
 import axiosInstance from '@/shared/api/axios-instance';
-import {
-  BlockResponse,
-  EdgeResponse,
-} from '@features/canvas/types/canvas.type';
+import { BlockSchema, EdgeSchema } from '@features/canvas/types/canvas.type';
 
 interface SaveCanvasProps {
   projectName: string;
-  canvas: { blocks: BlockResponse[]; edges: EdgeResponse[] };
+  canvas: { blocks: BlockSchema[]; edges: EdgeSchema[] };
 }
 
 const saveCanvas = async ({ projectName, canvas }: SaveCanvasProps) => {
@@ -32,6 +29,9 @@ export const useSaveCanvas = () => {
     mutationFn: saveCanvas,
     onError: () => {
       console.error('캔버스 저장 실패');
+    },
+    onSuccess: () => {
+      console.log('저장 성공');
     },
   });
 };

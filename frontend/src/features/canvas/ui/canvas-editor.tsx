@@ -16,19 +16,22 @@ import { useCallback } from 'react';
 import * as S from '@features/canvas/ui/canvas-editor.style';
 import Common from '@shared/styles/common';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
-import { initialNodes, initialEdges } from '@features/canvas/model/initialData';
+import {
+  initialNodes,
+  initialEdges,
+} from '@/features/canvas/model/initial-data';
 import { useFetchCanvas } from '@/features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import type { BlockItem } from '@features/canvas/types/block.type';
+import {
+  transformEdgesToEdgeResponse,
+  transformNodesToBlocks,
+} from '@features/canvas/utils/canvas-transformer.util';
 
 import BlockNode from '@entities/block-node/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
-import {
-  transformEdgesToEdgeResponse,
-  transformNodesToBlocks,
-} from '../utils/canvas-transformer.util';
 
 const CanvasEditor = () => {
   const { data } = useFetchCanvas('춘식이');
