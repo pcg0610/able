@@ -6,21 +6,21 @@ from src.response.utils import accepted
 deploy_router = router = APIRouter()
 
 @router.get("/run")
-async def run() -> Response:
+def run() -> Response:
     service.run()
     return accepted()
 
 @router.get("/stop")
-async def stop() -> Response:
+def stop() -> Response:
     service.stop()
     return accepted()
 
 @router.post("/routers")
-async def register_router(uri: str) -> Response:
-    service.register_api(uri)
+def register_router(uri: str) -> Response:
+    service.register_router(uri)
     return accepted()
 
 @router.delete("/routers")
-async def remove_router(uri: str) -> Response:
-    service.remove_api(uri)
+def remove_router(uri: str) -> Response:
+    service.remove_router(uri)
     return accepted()
