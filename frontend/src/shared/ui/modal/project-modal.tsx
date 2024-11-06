@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import * as S from '@shared/ui/modal/project-modal.style';
 import { useProjectStore } from '@entities/project/model/project.model';
@@ -20,6 +20,10 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
    const isReadOnly = type === 'modify';
    const { currentProject } = useProjectStore();
    const [selectedOption, setSelectedOption] = useState<string | null>(null);
+   const [projectTitle, setProjectTitle] = useState(currentProject?.title || '');
+   const [projectDescription, setProjectDescription] = useState(currentProject?.description || '');
+   const [pythonKernelPath, setPythonKernelPath] = useState(currentProject?.pythonKernelPath || '');
+
 
    const options = [
       { value: 'string', label: 'string' },
@@ -29,6 +33,17 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
       { value: 'option4', label: 'Option 4' },
       { value: 'option5', label: 'Option 5' },
    ];
+
+   useEffect(() => {
+      if (isReadOnly && currentProject) {
+         setProjectTitle(currentProject.title || '');
+         setProjectDescription(currentProject.description || '');
+      } else {
+         // isReadOnly가 false일 때는 빈 문자열로 초기화
+         setProjectTitle('');
+         setProjectDescription('');
+      }
+   }, [isReadOnly, currentProject]);
 
    const defaultOption = options.find(
       (option) => option.label === currentProject?.cudaVersion
@@ -54,26 +69,29 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
                <S.InputWrapper>
                   <S.Label>프로젝트 이름</S.Label>
                   <S.Input
-                     value={isReadOnly ? currentProject?.title || '' : ''}
+                     value={projectTitle}
                      placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
                      readOnly={isReadOnly}
                      className={isReadOnly ? 'readonly' : ''}
+                     onChange={(e) => setProjectTitle(e.target.value)}
                   />
                </S.InputWrapper>
                <S.InputWrapper>
                   <S.Label>프로젝트 설명 (선택)</S.Label>
                   <S.Input
-                     value={isReadOnly ? currentProject?.description || '' : ''}
+                     value={projectDescription}
                      placeholder={isReadOnly ? '' : '50자 이내로 입력해주세요.'}
                      readOnly={isReadOnly}
                      className={isReadOnly ? 'readonly' : ''}
+                     onChange={(e) => setProjectDescription(e.target.value)}
                   />
                </S.InputWrapper>
                <S.InputWrapper>
                   <S.Label>파이썬 커널 경로</S.Label>
                   <S.Input
-                     defaultValue={currentProject?.pythonKernelPath || ''}
+                     defaultValue={isReadOnly ? currentProject?.pythonKernelPath : ''}
                      placeholder=".exe"
+                     onChange={(e) => setPythonKernelPath(e.target.value)}
                   />
                </S.InputWrapper>
                <S.InputWrapper>
@@ -81,7 +99,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
                   <DropDown
                      options={options}
                      onSelect={handleSelect}
-                     defaultValue={defaultOption}
+                     defaultValue={isReadOnly ? defaultOption : ''}
                   />
                </S.InputWrapper>
             </S.ModalBody>
