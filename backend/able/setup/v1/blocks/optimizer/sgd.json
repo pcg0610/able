@@ -9,27 +9,27 @@
         },
         {
             "name": "lr",
-            "value": "0.01",
+            "value": 0.01,
             "is_required": true
         },
         {
             "name": "momentum",
-            "value": "0",
+            "value": 0,
             "is_required": false
         },
         {
             "name": "dampening",
-            "value": "0",
+            "value": 0,
             "is_required": false
         },
         {
             "name": "weight_decay",
-            "value": "0",
+            "value": 0,
             "is_required": false
         },
         {
             "name": "nesterov",
-            "value": "false",
+            "value": false,
             "is_required": false
         }
     ]

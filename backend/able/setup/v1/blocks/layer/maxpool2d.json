@@ -4,32 +4,32 @@
     "args": [
         {
             "name": "kernel_size",
-            "value": "2",
+            "value": 2,
             "is_required": true
         },
         {
             "name": "stride",
-            "value": "2",
+            "value": 2,
             "is_required": false
         },
         {
             "name": "padding",
-            "value": "0",
+            "value": 0,
             "is_required": false
         },
         {
             "name": "dilation",
-            "value": "1",
+            "value": 1,
             "is_required": false
         },
         {
             "name": "return_indices",
-            "value": "false",
+            "value": false,
             "is_required": false
         },
         {
             "name": "ceil_mode",
-            "value": "false",
+            "value": false,
             "is_required": false
         }
     ]

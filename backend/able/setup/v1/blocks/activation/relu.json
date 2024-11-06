@@ -4,7 +4,7 @@
     "args": [
         {
             "name": "inplace",
-            "value": "false",
+            "value": false,
             "is_required": false
         }
     ]
