@@ -22,7 +22,7 @@ def save_block_graph(project_name: str, data: SaveCanvasRequest) -> bool:
     project_path = path_manager.get_projects_path(project_name)
     block_graph_path =  project_path / block_graph
 
-    if create_file(block_graph_path, json_to_str(data)):
+    if create_file(block_graph_path, json_to_str(data.canvas)):
         return True
 
     raise
