@@ -4,7 +4,7 @@
     "args": [
         {
             "name": "dtype",
-            "value": "null",
+            "value": null,
             "is_required": false
         }
     ]
