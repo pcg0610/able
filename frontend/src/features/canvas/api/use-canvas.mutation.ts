@@ -28,9 +28,6 @@ export const useSaveCanvas = () => {
 
   return useMutation({
     mutationFn: saveCanvas,
-    onError: () => {
-      console.error('캔버스 저장 실패');
-    },
     onSuccess: (_data, variables) => {
       queryClient.setQueryData<CanvasResponse>(
         canvasKey.canvas(variables.projectName),

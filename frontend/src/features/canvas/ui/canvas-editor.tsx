@@ -7,8 +7,10 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
+  applyNodeChanges,
   type OnConnect,
   MarkerType,
+  NodeChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCallback, useEffect } from 'react';
@@ -39,7 +41,7 @@ const CanvasEditor = () => {
   const { data } = useFetchCanvas('춘식이');
   const { mutateAsync: saveCanvas } = useSaveCanvas();
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const { screenToFlowPosition } = useReactFlow();
@@ -89,11 +91,30 @@ const CanvasEditor = () => {
     [setNodes]
   );
 
+  const handleNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      setNodes((nds) => {
+        const filteredChanges = changes.filter((change) => {
+          // block의 type이 data인 블록은 삭제 불가
+          if (change.type === 'remove') {
+            const node = nds.find((node) => node.id === change.id);
+            const data = node?.data as { block: BlockItem };
+            return data.block.type !== 'data';
+          }
+          return true;
+        });
+
+        return applyNodeChanges(filteredChanges, nds);
+      });
+    },
+    [setNodes]
+  );
+
   const handleTrainButtonClick = () => {
     console.log('실행');
   };
 
-  const handleSavaButtonClick = () => {
+  const handleSavaButtonClick = async () => {
     const transformedBlocks = transformNodesToBlockSchema(nodes);
     const transformedEdges = transformEdgesToEdgeSchema(edges);
 
@@ -122,7 +143,7 @@ const CanvasEditor = () => {
           },
         }))}
         edges={edges}
-        onNodesChange={onNodesChange}
+        onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={{ custom: BlockNode }}
