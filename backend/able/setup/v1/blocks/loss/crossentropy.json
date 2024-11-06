@@ -4,7 +4,7 @@
     "args": [
         {
             "name": "weight",
-            "value": "null",
+            "value": null,
             "is_required": false
         },
         {

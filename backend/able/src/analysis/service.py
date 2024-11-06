@@ -5,10 +5,11 @@ from typing import List
 from fastapi import UploadFile
 
 from src.file.path_manager import PathManager
-from src.file.utils import get_directory, read_image_file, save_img, create_directory
-from src.utils import encode_image_to_base64, get_epoch_id
+from src.file.utils import get_directory, read_image_file, save_img, create_directory, get_file
+from src.utils import encode_image_to_base64, get_epoch_id, str_to_json
 from src.analysis.utils import FeatureMapExtractor, read_blocks
 from src.train.utils import split_blocks
+from src.canvas.schemas import Canvas
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ def get_result(project_name: str, result_name: str, epoch_name:str, block_id: st
 
 async def analysis(project_name: str, result_name: str, epoch_name:str, file: UploadFile) -> str:
 
+    # TODO: 모델 파일 직접 불러오기
     #block_graph.json 파일에서 블록, 엣지 정보 읽어오기
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
     block_graph = read_blocks(block_graph_path)
@@ -58,3 +60,8 @@ async def analysis(project_name: str, result_name: str, epoch_name:str, file: Up
 
     heatmap_img = encode_image_to_base64(read_image_file(epoch_path / "heatmap.jpg"))
     return heatmap_img
+
+def get_model(project_name: str, result_name: str) -> Canvas :
+    block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
+    block = Canvas(**str_to_json(get_file(block_graph_path)))
+    return block
