@@ -2,7 +2,7 @@ import { type Node, type Edge } from '@xyflow/react';
 
 import d3Hierarchy from '@features/train/utils/d3-hierarchy.utils';
 
-export type Direction = 'TB' | 'LR' | 'RL' | 'BT';
+export type Direction = 'TB' | 'LR';
 
 export type LayoutAlgorithmOptions = {
   direction: Direction;

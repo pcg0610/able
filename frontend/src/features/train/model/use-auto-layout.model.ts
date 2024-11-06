@@ -10,11 +10,11 @@ import {
 import {
   getSourceHandlePosition,
   getTargetHandlePosition,
-} from '@features/train/utils/auto-layout.utils';
+} from '@/features/train/types/auto-layout.type';
 import layoutAlgorithms from '@features/train/utils/algorithm.utils';
 
 export type LayoutOptions = {
-  direction: 'TB' | 'LR' | 'BT' | 'RL'; // 방향만 선택 가능
+  direction: 'TB' | 'LR'; // 방향만 선택 가능
 };
 
 function useAutoLayout(options: LayoutOptions) {
