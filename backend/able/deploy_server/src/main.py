@@ -6,6 +6,7 @@ app = FastAPI()
 
 pass
 
+
 @app.get("/")
 async def welcome():
     return {"message": "running"}
