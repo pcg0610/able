@@ -29,8 +29,6 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from tqdm import tqdm
-
 MAX_LOSS = 10e8
 
 pathManager = PathManager()
