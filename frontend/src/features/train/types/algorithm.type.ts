@@ -1,6 +1,6 @@
 import { type Node, type Edge } from '@xyflow/react';
 
-import d3Hierarchy from '@features/train/utils/d3-hierarchy.utils';
+import d3Hierarchy from '@features/train/utils/d3-hierarchy.util';
 
 export type Direction = 'TB' | 'LR';
 

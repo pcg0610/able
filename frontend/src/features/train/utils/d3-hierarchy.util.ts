@@ -1,7 +1,7 @@
 import {
   type LayoutAlgorithm,
   type Direction,
-} from '@features/train/utils/algorithm.utils';
+} from '@features/train/types/algorithm.type';
 import { type Node, getIncomers } from '@xyflow/react';
 import { type HierarchyPointNode, stratify, tree } from 'd3-hierarchy';
 
