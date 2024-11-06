@@ -1,10 +1,12 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axiosInstance from '@/shared/api/axios-instance';
 import type {
   BlockSchema,
+  CanvasResponse,
   EdgeSchema,
 } from '@features/canvas/types/canvas.type';
+import canvasKey from '@features/canvas/api/canvas-key';
 
 interface SaveCanvasProps {
   projectName: string;
@@ -12,29 +14,37 @@ interface SaveCanvasProps {
 }
 
 const saveCanvas = async ({ projectName, canvas }: SaveCanvasProps) => {
-  try {
-    const response = await axiosInstance.post(
-      '/canvas',
-      { canvas },
-      {
-        params: { projectName },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  await axiosInstance.post(
+    '/canvas',
+    { canvas },
+    {
+      params: { projectName },
+    }
+  );
 };
 
 export const useSaveCanvas = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: saveCanvas,
     onError: () => {
       console.error('캔버스 저장 실패');
     },
-    onSuccess: () => {
-      console.log('저장 성공');
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData<CanvasResponse>(
+        canvasKey.canvas(variables.projectName),
+        (oldData: any) => ({
+          ...oldData,
+          data: {
+            ...oldData.data,
+            canvas: {
+              blocks: variables.canvas.blocks,
+              edges: variables.canvas.edges,
+            },
+          },
+        })
+      );
     },
   });
 };

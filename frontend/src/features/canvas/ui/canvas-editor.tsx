@@ -11,7 +11,7 @@ import {
   MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import * as S from '@features/canvas/ui/canvas-editor.style';
 import Common from '@shared/styles/common';
@@ -24,6 +24,7 @@ import { useFetchCanvas } from '@/features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import {
+  transformCanvasResponse,
   transformEdgesToEdgeSchema,
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
@@ -37,14 +38,19 @@ const CanvasEditor = () => {
   const { data } = useFetchCanvas('춘식이');
   const { mutate: saveCanvas } = useSaveCanvas();
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(
-    data ? data.nodes : initialNodes
-  );
-  const [edges, setEdges, onEdgesChange] = useEdgesState(
-    data ? data.edges : initialEdges
-  );
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
   const { screenToFlowPosition } = useReactFlow();
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
+
+  useEffect(() => {
+    if (data) {
+      const transformedData = transformCanvasResponse(data);
+      setNodes(transformedData.nodes);
+      setEdges(transformedData.edges);
+    }
+  }, [data, setNodes, setEdges]);
 
   const onConnect: OnConnect = (connection) =>
     setEdges((eds) =>

@@ -2,8 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import axiosInstance from '@shared/api/axios-instance';
 import canvasKey from '@features/canvas/api/canvas-key';
-import type { TransformedCanvas } from '@features/canvas/types/canvas.type';
-import { transformCanvasResponse } from '@features/canvas/utils/canvas-transformer.util';
+import type { CanvasResponse } from '@features/canvas/types/canvas.type';
 
 const fetchCanvas = async (projectName: string) => {
   try {
@@ -23,11 +22,11 @@ const fetchCanvas = async (projectName: string) => {
 };
 
 export const useFetchCanvas = (projectName: string) => {
-  return useQuery<TransformedCanvas>({
+  return useQuery<CanvasResponse>({
     queryKey: canvasKey.canvas(projectName),
     queryFn: async () => {
       const response = await fetchCanvas(projectName);
-      return transformCanvasResponse(response);
+      return response.data;
     },
     enabled: !!projectName,
   });
