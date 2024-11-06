@@ -429,7 +429,7 @@ def save_result_hyper_parameter(project_name: str, result: str, batch_size: int,
     raise
 
 def find_argument(data_block: CanvasBlock, arg_name: str):
-    """data_block의 특정 arg_name에 해당하는 값을 반환."""
+    """CanvasBlock 의 특정 arg_name 값 반환"""
     for arg in data_block.args:
         if arg.name == arg_name:
             return arg.value
