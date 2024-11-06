@@ -2,10 +2,9 @@ from fastapi import APIRouter, BackgroundTasks
 from starlette.responses import Response
 
 from .dto import TrainResultRequest, TrainRequest
-from .service import train as train_service, load_train_result
+from .service import train_in_background, load_train_result
 from src.train.schemas import TrainResultResponse
-from src.response.utils import ok
-from ..response.utils import accepted
+from src.response.utils import ok, accepted
 
 train_router = router = APIRouter()
 
@@ -25,5 +24,5 @@ def get_train_result(request: TrainResultRequest):
 
 @router.post("")
 async def train(request: TrainRequest, background_tasks: BackgroundTasks) -> Response:
-    background_tasks.add_task(train_service(request))
+    background_tasks.add_task(train_in_background, request)
     return accepted()
