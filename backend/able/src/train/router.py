@@ -1,7 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks
 from starlette.responses import Response
 
-from . import TrainRequest
+from .dto import TrainResultRequest, TrainRequest
 from .service import train as train_service, load_train_result
 from src.train.schemas import TrainResultResponse
 from src.response.utils import ok
@@ -15,10 +15,10 @@ train_router = router = APIRouter()
     summary="학습 결과 조회",
     description="프로젝트 이름, 학습 결과 이름에 대하여 조회한다."
 )
-def get_train_result(project_name: str, train_result_name: str):
+def get_train_result(request: TrainResultRequest):
     return ok(
         data=TrainResultResponse(
-            train_result=load_train_result(project_name, train_result_name)
+            train_result=load_train_result(request)
         )
     )
 

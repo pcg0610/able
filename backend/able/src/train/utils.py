@@ -428,11 +428,19 @@ def save_result_hyper_parameter(project_name: str, result: str, batch_size: int,
 
     raise
 
-def save_metadata(project_name: str, result_name: str, data_block: Block) -> None:
+def find_argument(data_block: CanvasBlock, arg_name: str):
+    """data_block의 특정 arg_name에 해당하는 값을 반환."""
+    for arg in data_block.args:
+        if arg.name == arg_name:
+            return arg.value
+    return None
+
+def save_metadata(project_name: str, result_name: str, data_block: CanvasBlock) -> None:
+
     # 메타데이터 정보 추출
-    data_path = data_block.args.get("data_path")
-    input_shape = data_block.args.get("input_shape")
-    classes = data_block.args.get("classes")
+    data_path = find_argument(data_block, "data_path")
+    input_shape = find_argument(data_block, "input_shape")
+    classes = find_argument(data_block, "classes")
 
     # 데이터 검증
     if not all([data_path, input_shape, classes]):

@@ -1,6 +1,7 @@
 import json
 from . import TrainRequest
 from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
+from .dto import TrainResultRequest
 from .utils import *
 from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format, get_file
@@ -68,7 +69,10 @@ def train(request: TrainRequest):
     trainer.test()
 
 
-def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
+def load_train_result(request: TrainResultRequest) -> TrainResultResponse:
+    project_name = request.project_name
+    result_name = request.train_result_name
+
     # 결과 디렉터리 경로 설정
     result_path = path_manager.get_train_results_path(project_name) / result_name
 
