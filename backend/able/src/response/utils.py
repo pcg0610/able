@@ -15,7 +15,7 @@ def ok(data: T) -> Response:
     )
 
     return Response(
-        content=content.model_dump_json(exclude_none=True),
+        content=content.model_dump_json(exclude_none=False),
         status_code=status_code,
         media_type="application/json",
     )
