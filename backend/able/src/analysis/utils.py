@@ -3,7 +3,8 @@ import torch.nn as nn
 import numpy as np
 import cv2
 import logging
-from PIL import Image
+import matplotlib.pyplot as plt
+from PIL import Image, ImageEnhance
 from typing import List
 from pathlib import Path
 
@@ -73,44 +74,52 @@ class FeatureMapExtractor:
         return hook_fn
 
     def save_feature_map(self, fmap: torch.Tensor, layer_name: str) -> None:
-        fmap = fmap[0, 0].cpu().numpy()
+        # 모든 채널을 평균하여 하나의 피처맵 생성
+        fmap = fmap.mean(dim=1).squeeze().cpu().numpy()
+
+        # 정규화
         fmap = (fmap - fmap.min()) / (fmap.max() - fmap.min())
-        fmap = np.uint8(255 * fmap)
-        fmap = cv2.applyColorMap(fmap, cv2.COLORMAP_JET)
 
-         # 원본 이미지 크기로 확대하되, 도트 모양을 유지
-        original_image = cv2.imread(str(self.img_path))
-        fmap_resized = cv2.resize(fmap, (original_image.shape[1], original_image.shape[0]), interpolation=cv2.INTER_NEAREST)
-
-        cv2.imwrite(str(self.feature_maps_path / f"{layer_name}.jpg"), fmap_resized)
+        # 컬러맵 적용 및 저장
+        plt.imshow(fmap, cmap='viridis', interpolation='nearest')
+        plt.axis('off')
+        plt.savefig(str(self.feature_maps_path / f"{layer_name}.jpg"), bbox_inches='tight', pad_inches=0.1)
+        plt.close()
 
     def save_heatmap(self) -> None:
         if self.final_feature_map is None:
             raise ValueError("최종 피쳐 맵이 없습니다. 모델을 통해 이미지를 먼저 예측하세요.")
         if self.output is None:
             raise ValueError("출력값이 없습니다.")
-
-        # 예측 클래스에 대한 그래디언트를 계산
-        target_class = self.output.argmax(dim=1).item()  # 예측한 클래스의 인덱스
+    
+        # 예측된 클래스의 인덱스를 가져와 해당 클래스에 대해 역전파 수행
+        target_class = self.output.argmax(dim=1).item()
         self.model.zero_grad()
-        self.output[0, target_class].backward()  # 특정 클래스에 대한 그래디언트 계산
-
-        # 마지막 Conv 레이어의 피처맵에 대한 그래디언트를 얻고 weights 계산
-        gradients = self.final_feature_map.grad[0]
-        weights = torch.mean(gradients, dim=(1, 2))
-
-        # 가중치를 곱하고 모든 채널을 합산하여 히트맵 생성
+        self.output[0, target_class].backward()
+    
+        # Grad-CAM 방식으로 채널별 중요도 계산
+        gradients = self.final_feature_map.grad[0]  # 마지막 Conv 레이어의 그래디언트
+        weights = torch.mean(gradients, dim=(1, 2))  # 채널별로 평균을 취해 중요도를 계산
+    
+        # 중요도 가중치를 피처 맵에 곱하여 합산
         weighted_sum = torch.sum(self.final_feature_map[0] * weights.view(-1, 1, 1), dim=0)
         heatmap = weighted_sum.detach().cpu().numpy()
-        heatmap = (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min())
-        heatmap = np.uint8(255 * heatmap)
+    
+        # 히트맵 정규화 및 색상 적용
+        heatmap = np.maximum(heatmap, 0)  # 0 이하 값 제거
+        heatmap /= heatmap.max()  # 0~1 사이로 정규화
+        heatmap = np.uint8(255 * heatmap)  # 0~255 값으로 변환
         heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-
-        # 원본 이미지와 히트맵을 결합
+    
+        # 원본 이미지 불러오기 및 히트맵 크기 조정
         original_image = cv2.imread(str(self.img_path))
         heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
-        overlay = cv2.addWeighted(original_image, 0.6, heatmap_resized, 0.4, 0)
+    
+        # 히트맵과 원본 이미지 결합 및 저장
+        overlay = cv2.addWeighted(original_image, 0.4, heatmap_resized, 0.6, 0)
         cv2.imwrite(str(self.epoch_path / "heatmap.jpg"), overlay)
+
+
 
 
 # json 파일을 읽고 블록 리스트를 반환
