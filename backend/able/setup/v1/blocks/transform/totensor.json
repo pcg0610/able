@@ -1,11 +1,5 @@
 {
     "name": "totensor",
     "type": "transform",
-    "args": [
-        {
-            "name": "dtype",
-            "value": null,
-            "is_required": false
-        }
-    ]
+    "args": []
 }
