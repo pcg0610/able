@@ -4,8 +4,8 @@ import { Edge, Node } from '@xyflow/react';
 
 export interface EdgeResponse {
   id: string;
-  source: number;
-  target: number;
+  source: string;
+  target: string;
 }
 
 export interface BlockResponse extends Block {
