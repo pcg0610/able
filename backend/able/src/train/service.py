@@ -13,34 +13,37 @@ path_manager = PathManager()
 
 def train(request: TrainRequest):
 
-    data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks = split_blocks(request.blocks)
+    data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks = split_blocks(request.canvas.blocks)
 
     if data_block is None:
         raise ValueError("Data block is required but was not found.")
 
-    data_path = data_block.args.get("data_path")
+    data_path = find_data_path(data_block)
 
-    if not validate_file_format(data_path, "json"):
-        raise Exception()
+    # if not validate_file_format(data_path, "json"):
+    #     raise Exception()
 
-    transform_blocks, loss_blocks, optimizer_blocks, other_blocks = filter_blocks_connected_to_data(
-        data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks, request.edges
+    transform_blocks_conn, loss_blocks_conn, optimizer_blocks_conn, other_blocks_conn = filter_blocks_connected_to_data(
+        data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks, request.canvas.edges
     )
 
     # 학습에서 사용하는 간선 추출
-    blocks_connected_to_data: tuple[Block, ...] = (data_block, *transform_blocks, *loss_blocks, *optimizer_blocks, *other_blocks)
+    blocks_connected_to_data: list[Block] = (data_block, *transform_blocks_conn, *loss_blocks_conn, *optimizer_blocks_conn, *other_blocks_conn)
     canvas_blocks = convert_canvas_blocks(blocks_connected_to_data)
-    edges = filter_edges_from_block_connected_data(blocks_connected_to_data, request.edges)
+    edges = filter_edges_from_block_connected_data(canvas_blocks, request.canvas.edges)
+
+    edges_model = filter_model_edge(other_blocks_conn, edges)
 
     transforms = create_data_preprocessor(transform_blocks)
+
     dataset = create_dataset(data_path, transforms)
-    model = convert_block_graph_to_model(other_blocks, edges)
+    model = convert_block_graph_to_model([block for block in other_blocks_conn if isinstance(block, CanvasBlock)], edges_model)
 
     if model is None:
         raise Exception()
 
-    criterion = convert_criterion_block_to_module(loss_blocks)
-    optimizer = convert_optimizer_block_to_optimizer(optimizer_blocks, model.parameters())
+    criterion = convert_criterion_block_to_module(loss_blocks[0])
+    optimizer = convert_optimizer_block_to_optimizer(optimizer_blocks[0], model.parameters())
 
     # TrainLogger 초기화 전 디렉터리 생성
     project_name = request.project_name
@@ -56,7 +59,8 @@ def train(request: TrainRequest):
     save_metadata(project_name, result_name, data_block)
 
     # 학습 모델 그래프 저장
-    save_result_block_graph(request.project_name, result_name, canvas_blocks, edges)
+    # TODO: SerializableIter 에러 발생
+    # save_result_block_graph(request.project_name, result_name, canvas_blocks, edges_model)
 
     # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
     save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
