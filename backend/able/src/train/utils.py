@@ -5,20 +5,20 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
-from typing import Iterator, Any, Tuple
+from typing import Iterator, Any
 
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
-from src.block.schemas import Block
+from src.block.schemas import Block, Arg
 from src.block.utils import convert_block_to_module
 from src.canvas.schemas import Edge, CanvasBlock, Canvas, SaveCanvasRequest
 from src.canvas.service import block_graph
 
 from src.train.schemas import TrainResultMetrics, TrainResultMetadata, PerformanceMetrics, HyperParameter, SaveHyperParameter
 
-from src.file.utils import create_file, create_directory
+from src.file.utils import create_file
 from src.file.path_manager import PathManager
 from src.utils import json_to_str
 from datetime import datetime
@@ -43,7 +43,7 @@ class TrainLogger:
         self.result_name = result_name
 
         # 기존 경로 생성 로직 제거, 결과 및 에포크 디렉터리는 서비스에서 생성
-        self.result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
+        self.result_path = pathManager.get_train_results_path(self.project_name) / "results" / result_name
 
     def create_epoch_log(self, epoch_id: int, accuracy: float, validation_loss: float, training_loss: float):
         epoch_path = pathManager.get_epoch_path(self.project_name, self.result_name, epoch_id)
@@ -53,6 +53,7 @@ class TrainLogger:
         create_file(epoch_path / TRAINING_LOSS, json_to_str({'loss': training_loss}))
 
     def save_train_result(self, metrics: TrainResultMetrics):
+        # 성능 지표 저장 (performance_metrics.json)
         # 성능 지표 저장 (performance_metrics.json)
         performance_metrics_data = metrics.performance_metrics.model_dump()
         create_file(self.result_path / "performance_metrics.json", json_to_str({"metrics": performance_metrics_data}))
@@ -260,40 +261,7 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def topological_sort(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> tuple[Block, ...]:
-    graph = defaultdict(list)
-    in_degree = {block.id: 0 for block in blocks}
-
-    for edge in edges:
-        graph[edge.source_id].append(edge.target_id)
-        in_degree[edge.target_id] += 1
-
-    queue = deque([block for block in blocks if in_degree[block.id] == 0])
-    sorted_blocks = []
-
-    while queue:
-        block = queue.popleft()
-        sorted_blocks.append(block)
-
-        for neighbor in graph[block.id]:
-            in_degree[neighbor] -= 1
-            if in_degree[neighbor] == 0:
-                queue.append(next(b for b in blocks if b.id == neighbor))
-
-    if len(sorted_blocks) != len(blocks):
-        raise ValueError("Cycle detected in the graph; topological sort not possible.")
-
-    return tuple(sorted_blocks)
-
-class UserModel(nn.Module):
-    def __init__(self):
-        super(UserModel, self).__init__()
-        self.layers = nn.Sequential()
-
-    def forward(self, x):
-        return self.forward(x)
-
-def create_data_preprocessor(transform_blocks: tuple[Block, ...]) -> Compose:
+def create_data_preprocessor(transform_blocks: list[Block]) -> Compose:
     return Compose([convert_block_to_module(transform_block) for transform_block in transform_blocks])
 
 def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
@@ -315,7 +283,9 @@ def convert_optimizer_block_to_optimizer(optimizer_block: Block, parameters: Ite
     if optimizer_block.type != BlockType.OPTIMIZER:
         return None
 
-    return convert_block_to_module(optimizer_block, parameters)
+    optimizer_block.args.append(Arg(name="params", value=parameters, is_required=True))
+
+    return convert_block_to_module(optimizer_block)
 
 def convert_operation_block_to_module(operation_block: Block) -> nn.Module | None:
 
@@ -324,12 +294,45 @@ def convert_operation_block_to_module(operation_block: Block) -> nn.Module | Non
 
     return convert_block_to_module(operation_block)
 
-def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> nn.Module | None:
-    sorted_blocks = topological_sort(blocks, edges)
+def topological_sort(blocks: list[CanvasBlock], edges: list[Edge]) -> list[CanvasBlock]:
+    graph = defaultdict(list)
+    in_degree = {block.id: 0 for block in blocks}
+
+    for edge in edges:
+        graph[edge.source].append(edge.target)
+        in_degree[edge.target] += 1
+
+    queue = deque([block for block in blocks if in_degree[block.id] == 0])
+    sorted_blocks = []
+
+    while queue:
+        block = queue.popleft()
+        sorted_blocks.append(block)
+
+        for neighbor in graph[block.id]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(next(b for b in blocks if b.id == neighbor))
+
+    if len(sorted_blocks) != len(blocks):
+        raise ValueError("Cycle detected in the graph; topological sort not possible.")
+
+    return list(sorted_blocks)
+
+class UserModel(nn.Module):
+    def __init__(self):
+        super(UserModel, self).__init__()
+        self.layers = nn.Sequential()
+
+    def forward(self, x):
+        return self.layers(x)
+
+def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -> nn.Module | None:
+    # sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
 
-    for block in sorted_blocks:
+    for block in blocks:
         if block.type == BlockType.LAYER:
             module = convert_layer_block_to_module(block)
         elif block.type == BlockType.OPERATION:
@@ -337,12 +340,12 @@ def convert_block_graph_to_model(blocks: tuple[Block, ...], edges: tuple[Edge, .
         else:
             return None
 
-        model.layers.add_module(block.name, module)
+        model.layers.add_module(block.id, module)
 
     return model
 
-def split_blocks(blocks: list[Block]) -> Tuple[
-    Block | None, Tuple[Block, ...], Tuple[Block, ...], Tuple[Block, ...], Tuple[Block, ...]
+def split_blocks(blocks: list[Block]) -> list[
+    Block | None, list[Block], list[Block], list[Block], list[Block]
 ]:
     data_block = None
     transform_blocks, loss_blocks, optimizer_blocks, others = [], [], [], []
@@ -363,16 +366,16 @@ def split_blocks(blocks: list[Block]) -> Tuple[
             case _:
                 others.append(block)
 
-    return data_block, tuple(transform_blocks), tuple(loss_blocks), tuple(optimizer_blocks), tuple(others)
+    return data_block, transform_blocks, loss_blocks, optimizer_blocks, others
 
 def filter_blocks_connected_to_data(
         data_block: Block | None,
-        transform_blocks: Tuple[Block, ...],
-        loss_blocks: Tuple[Block, ...],
-        optimizer_blocks: Tuple[Block, ...],
-        others: Tuple[Block, ...],
-        edges: Tuple[Edge, ...]
-) -> tuple[tuple[Block, ...], tuple[Block, ...], tuple[Block, ...], tuple[Block, ...]]:
+        transform_blocks: list[Block],
+        loss_blocks: list[Block],
+        optimizer_blocks: list[Block],
+        others: list[Block],
+        edges: list[Edge]
+) -> tuple[list[Block], list[Block], list[Block], list[Block]]:
     """
     그래프의 루트인 데이터 블록과 연결된 블록들만 반환하는 함수
     """
@@ -382,8 +385,8 @@ def filter_blocks_connected_to_data(
     for edge in edges:
         adj_blocks[edge.source].append(edge.target)
 
-    q = deque([data_block.block_id])
-    is_connected.add(data_block.block_id)
+    q = deque([data_block.id])
+    is_connected.add(data_block.id)
 
     while q:
         block_id = q.popleft()
@@ -392,8 +395,8 @@ def filter_blocks_connected_to_data(
                 is_connected.add(adj_block_id)
                 q.append(adj_block_id)
 
-    def filter_connected(blocks: tuple[Block, ...]) -> tuple[Block, ...]:
-        return tuple(block for block in blocks if block.block_id in is_connected)
+    def filter_connected(blocks: list[Block]) -> list[Block]:
+        return [block for block in blocks if block.id in is_connected]
 
     return (
         filter_connected(transform_blocks),
@@ -402,12 +405,12 @@ def filter_blocks_connected_to_data(
         filter_connected(others)
     )
 
-def filter_edges_from_block_connected_data(blocks: tuple[Block, ...], edges: tuple[Edge, ...]) -> tuple[Edge, ...]:
-    block_id = set(block.block_id for block in blocks)
+def filter_edges_from_block_connected_data(blocks: list[Block], edges: list[Edge]) -> list[Edge]:
+    block_id = set(block.id for block in blocks)
 
-    return tuple(edge for edge in edges if edge.source in block_id)
+    return [edge for edge in edges if edge.source in block_id]
 
-def save_result_block_graph(project_name: str, result: str, blocks: tuple[CanvasBlock, ...], edges: tuple[Edge, ...]):
+def save_result_block_graph(project_name: str, result: str, blocks: list[CanvasBlock], edges: list[Edge]):
 
     project_path = pathManager.get_projects_path(project_name)
     block_graph_path = project_path / result / block_graph
@@ -417,8 +420,8 @@ def save_result_block_graph(project_name: str, result: str, blocks: tuple[Canvas
 
     raise
 
-def convert_canvas_blocks(blocks: tuple[Block, ...]) -> tuple[CanvasBlock, ...]:
-    return tuple(block for block in blocks)
+def convert_canvas_blocks(blocks: list[Block]) -> list[CanvasBlock]:
+    return [block for block in blocks if isinstance(block, CanvasBlock)]
 
 def save_result_model(project_name: str, result: str, model: nn.Module):
     torch.save(model, str(pathManager.get_train_results_path(project_name) / result / "model.pth"))
@@ -453,3 +456,14 @@ def save_metadata(project_name: str, result_name: str, data_block: Block) -> Non
     metadata_path = pathManager.get_train_results_path(project_name) / result_name / "metadata.json"
 
     create_file(metadata_path, json_to_str(metadata.model_dump()))
+
+def find_data_path(data_block: CanvasBlock):
+    for arg in data_block.args:
+        if arg.name == "data_path":
+            return arg.value
+    return None
+
+def filter_model_edge(blocks: list[Block], edges: list[Edge]) -> list[Edge]:
+    model_block_set = set(block.id for block in blocks if block.type == BlockType.LAYER or block.type == BlockType.OPERATION)
+
+    return [edge for edge in edges if edge.source in model_block_set and edge.target in model_block_set]
