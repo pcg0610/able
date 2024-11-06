@@ -33,10 +33,11 @@ import BlockNode from '@entities/block-node/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
+import toast from 'react-hot-toast';
 
 const CanvasEditor = () => {
   const { data } = useFetchCanvas('춘식이');
-  const { mutate: saveCanvas } = useSaveCanvas();
+  const { mutateAsync: saveCanvas } = useSaveCanvas();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -96,10 +97,17 @@ const CanvasEditor = () => {
     const transformedBlocks = transformNodesToBlockSchema(nodes);
     const transformedEdges = transformEdgesToEdgeSchema(edges);
 
-    saveCanvas({
-      projectName: '춘식이',
-      canvas: { blocks: transformedBlocks, edges: transformedEdges },
-    });
+    toast.promise(
+      saveCanvas({
+        projectName: '춘식이',
+        canvas: { blocks: transformedBlocks, edges: transformedEdges },
+      }),
+      {
+        loading: '저장 중...',
+        success: '저장 완료',
+        error: '저장 실패',
+      }
+    );
   };
 
   return (
