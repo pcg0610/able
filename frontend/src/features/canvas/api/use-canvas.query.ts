@@ -22,7 +22,7 @@ const fetchCanvas = async (projectName: string) => {
   }
 };
 
-export const useCanvas = (projectName: string) => {
+export const useFetchCanvas = (projectName: string) => {
   return useQuery<TransformedCanvas>({
     queryKey: canvasKey.canvas(projectName),
     queryFn: async () => {

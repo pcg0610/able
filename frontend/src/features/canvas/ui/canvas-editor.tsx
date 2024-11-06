@@ -11,20 +11,28 @@ import {
   MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useCallback } from 'react';
 
 import * as S from '@features/canvas/ui/canvas-editor.style';
 import Common from '@shared/styles/common';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
 import { initialNodes, initialEdges } from '@features/canvas/model/initialData';
-import { useCanvas } from '@/features/canvas/api/use-canvas.query';
+import { useFetchCanvas } from '@/features/canvas/api/use-canvas.query';
+import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
+import type { BlockItem } from '@features/canvas/types/block.type';
 
 import BlockNode from '@entities/block-node/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
+import {
+  transformEdgesToEdgeResponse,
+  transformNodesToBlocks,
+} from '../utils/canvas-transformer.util';
 
 const CanvasEditor = () => {
-  const { data } = useCanvas('춘식이');
+  const { data } = useFetchCanvas('춘식이');
+  const { mutate: saveCanvas } = useSaveCanvas();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(
     data ? data.nodes : initialNodes
@@ -33,6 +41,7 @@ const CanvasEditor = () => {
     data ? data.edges : initialEdges
   );
   const { screenToFlowPosition } = useReactFlow();
+  const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
 
   const onConnect: OnConnect = (connection) =>
     setEdges((eds) =>
@@ -46,22 +55,56 @@ const CanvasEditor = () => {
       )
     );
 
-  const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
-
   const handleTrainButtonClick = () => {
     console.log('실행');
   };
 
   const handleSavaButtonClick = () => {
     console.log('저장');
-    console.log(nodes);
-    console.log(edges);
+    const transformedBlocks = transformNodesToBlocks(nodes);
+    const transformedEdges = transformEdgesToEdgeResponse(edges);
+
+    saveCanvas({
+      projectName: '춘식이',
+      canvas: { blocks: transformedBlocks, edges: transformedEdges },
+    });
   };
+
+  const handleFieldChange = useCallback(
+    (nodeId: string, fieldName: string, value: string) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  block: {
+                    ...(node.data.block as BlockItem),
+                    fields: (node.data.block as BlockItem).fields.map((field) =>
+                      field.name === fieldName ? { ...field, value } : field
+                    ),
+                  },
+                },
+              }
+            : node
+        )
+      );
+    },
+    [setNodes]
+  );
 
   return (
     <S.Canvas ref={dropRef}>
       <ReactFlow
-        nodes={nodes}
+        nodes={nodes.map((node) => ({
+          ...node,
+          data: {
+            ...node.data,
+            onFieldChange: (fieldName: string, value: string) =>
+              handleFieldChange(node.id, fieldName, value),
+          },
+        }))}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

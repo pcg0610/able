@@ -4,7 +4,12 @@ import {
   MarkerType,
 } from '@xyflow/react';
 
-import { CanvasResponse } from '@features/canvas/types/canvas.type';
+import {
+  BlockResponse,
+  CanvasResponse,
+  EdgeResponse,
+} from '@features/canvas/types/canvas.type';
+import { BlockItem } from '../types/block.type';
 
 export const transformCanvasResponse = (response: CanvasResponse) => {
   const transformedNodes: XYFlowNode[] = response.data.canvas.blocks.map(
@@ -33,4 +38,26 @@ export const transformCanvasResponse = (response: CanvasResponse) => {
   );
 
   return { nodes: transformedNodes, edges: transformedEdges };
+};
+
+export const transformNodesToBlocks = (
+  nodes: XYFlowNode[]
+): BlockResponse[] => {
+  return nodes.map((node) => ({
+    id: node.id,
+    name: (node.data as any).block.name,
+    type: (node.data as any).block.type,
+    args: (node.data as any).block.fields,
+    position: JSON.stringify(node.position),
+  }));
+};
+
+export const transformEdgesToEdgeResponse = (
+  edges: XYFlowEdge[]
+): EdgeResponse[] => {
+  return edges.map((edge) => ({
+    id: edge.id,
+    source: edge.source,
+    target: edge.target,
+  }));
 };

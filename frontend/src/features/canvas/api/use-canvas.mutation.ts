@@ -1,12 +1,25 @@
-import axiosInstance from '@/shared/api/axios-instance';
 import { useMutation } from '@tanstack/react-query';
 
-const saveCanvas = async (projectName: string) => {
+import axiosInstance from '@/shared/api/axios-instance';
+import {
+  BlockResponse,
+  EdgeResponse,
+} from '@features/canvas/types/canvas.type';
+
+interface SaveCanvasProps {
+  projectName: string;
+  canvas: { blocks: BlockResponse[]; edges: EdgeResponse[] };
+}
+
+const saveCanvas = async ({ projectName, canvas }: SaveCanvasProps) => {
   try {
-    const response = await axiosInstance.post('/canvas', {
-      params: { projectName },
-      data: {},
-    });
+    const response = await axiosInstance.post(
+      '/canvas',
+      { canvas },
+      {
+        params: { projectName },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error(error);
@@ -14,9 +27,9 @@ const saveCanvas = async (projectName: string) => {
   }
 };
 
-export const useCanvas = (projectName: string) => {
+export const useSaveCanvas = () => {
   return useMutation({
-    mutationFn: () => saveCanvas(projectName),
+    mutationFn: saveCanvas,
     onError: () => {
       console.error('캔버스 저장 실패');
     },
