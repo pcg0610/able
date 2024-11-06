@@ -116,7 +116,7 @@ class FeatureMapExtractor:
         heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
     
         # 히트맵과 원본 이미지 결합 및 저장
-        overlay = cv2.addWeighted(original_image, 0.4, heatmap_resized, 0.6, 0)
+        overlay = heatmap_resized * 0.4 + original_image
         cv2.imwrite(str(self.epoch_path / "heatmap.jpg"), overlay)
 
 
