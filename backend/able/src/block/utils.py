@@ -65,10 +65,10 @@ def create_instance(block: Block, cls, valid_args: Dict[str, Any], parameters: I
     """ 블록 타입에 따라 적절한 객체를 생성합니다. """
     try:
         if block.type == BlockType.OPTIMIZER:
-            if parameters is None:
-                raise ValueError("Parameters must be provided for optimizer initialization.")
+            # if parameters is None:
+            #     raise ValueError("Parameters must be provided for optimizer initialization.")
             logger.debug(f"Initializing optimizer {block.name} with args {valid_args}")
-            return cls(parameters, **valid_args)
+            return cls(**valid_args)
 
         elif block.type in {BlockType.LAYER, BlockType.ACTIVATION, BlockType.LOSS, BlockType.MODULE}:
             logger.debug(f"Initializing module {block.name} with args {valid_args}")
