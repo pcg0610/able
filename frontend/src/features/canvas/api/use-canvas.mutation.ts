@@ -7,6 +7,7 @@ import type {
   EdgeSchema,
 } from '@features/canvas/types/canvas.type';
 import canvasKey from '@features/canvas/api/canvas-key';
+import toast from 'react-hot-toast';
 
 interface SaveCanvasProps {
   projectName: string;
@@ -42,6 +43,8 @@ export const useSaveCanvas = () => {
           },
         })
       );
+
+      toast.success('캔버스 저장 완료');
     },
   });
 };
