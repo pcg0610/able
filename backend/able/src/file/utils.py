@@ -1,9 +1,8 @@
 import shutil
 import logging
 import io
-import json
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List
 from PIL import Image
 from fastapi import UploadFile
 from src.file.exceptions import FileNotFoundException, FileUnreadableException, ImageSaveFailException

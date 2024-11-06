@@ -6,6 +6,7 @@ class TrainRequest(ImmutableBaseModel):
     project_name: str
     epoch: int
     batch_size: int
+    device: str
     canvas: Canvas
 
 class TrainResponse(ImmutableBaseModel):

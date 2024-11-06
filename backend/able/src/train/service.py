@@ -9,7 +9,15 @@ from src.utils import encode_image_to_base64
 from src.file.utils import read_image_file
 from typing import List
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 path_manager = PathManager()
+
+async def train_in_background(request: TrainRequest):
+    train(request)
 
 def train(request: TrainRequest):
 
@@ -65,12 +73,19 @@ def train(request: TrainRequest):
     # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
     save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
 
-    save_result_model(project_name, result_name, model)
+    # save_result_model(project_name, result_name, model)
 
-    trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name))
+    trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name, result_path), device=request.device)
+
+    logger.info("학습 시작")
 
     trainer.train(request.epoch)
+    
+    logger.info("학습 종료")
+    
+    logger.info("테스트 시작")
     trainer.test()
+    logger.info("테스트 종료")
 
 
 def load_train_result(request: TrainResultRequest) -> TrainResultResponse:

@@ -29,6 +29,8 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from tqdm import tqdm
+
 MAX_LOSS = 10e8
 
 pathManager = PathManager()
@@ -43,7 +45,7 @@ class TrainLogger:
         self.result_name = result_name
 
         # 기존 경로 생성 로직 제거, 결과 및 에포크 디렉터리는 서비스에서 생성
-        self.result_path = pathManager.get_train_results_path(self.project_name) / "results" / result_name
+        self.result_path = pathManager.get_train_result_path(self.project_name, result_name)
 
     def create_epoch_log(self, epoch_id: int, accuracy: float, validation_loss: float, training_loss: float):
         epoch_path = pathManager.get_epoch_path(self.project_name, self.result_name, epoch_id)
@@ -65,6 +67,9 @@ class TrainLogger:
         confusion_matrix_path = self.result_path / "confusion_matrix.jpg"
         metrics.confusion_matrix.savefig(confusion_matrix_path, format="jpg")
 
+    def save_model(self, model: nn.Module, file_name: str):
+        torch.save(model, f"{self.result_path}/{file_name}")
+
 class Trainer:
     """모델의 학습을 책임지는 클래스
     """
@@ -72,7 +77,7 @@ class Trainer:
         self.model = model.to(device)
         self.dataset = dataset
         self.train_data_loader, self.valid_data_loader, self.test_data_loader = [create_data_loader(dataset_split, batch_size) for dataset_split in split_dataset(dataset)]
-        self.criterion = criterion
+        self.criterion = criterion.to(device)
         self.optimizer = optimizer
         self.logger = logger
         self.checkpoint_interval = checkpoint_interval
@@ -82,7 +87,7 @@ class Trainer:
         self.model.train()  # 모델을 훈련 모드로 전환
         running_loss = 0.0
 
-        for inputs, targets in self.train_data_loader:
+        for inputs, targets in tqdm(self.train_data_loader, unit="batch"):
             inputs, targets = inputs.to(self.device), targets.to(self.device)
 
             # Gradients 초기화
@@ -157,17 +162,17 @@ class Trainer:
             valid_accuracy, valid_loss = self.validate()
 
             # Logging
-            self.logger.create_epoch_log(epoch, train_accuracy, train_loss, valid_loss)
 
             # Checkpoint (간단히 마지막 모델만 저장)
-            if epoch % self.checkpoint_interval == 0:
-                torch.save(self.model.state_dict(), f"model_checkpoint_epoch_{epoch+1}.pth")
+            if (epoch + 1) % self.checkpoint_interval == 0:
+                self.logger.create_epoch_log(epoch + 1, train_accuracy, train_loss, valid_loss)
+                self.logger.save_model(self.model, f"epochs/epoch_{epoch + 1}/model_checkpoint_epoch_{epoch + 1}.pth")
 
             if best_train_loss > train_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_train_loss.pth")
+                self.logger.save_model(self.model, f"model_checkpoint_best_train_loss.pth")
 
             if best_valid_loss > valid_loss:
-                torch.save(self.model.state_dict(), f"model_checkpoint_best_valid_loss.pth")
+                self.logger.save_model(self.model, f"model_checkpoint_best_valid_loss.pth")
 
     def test(self) -> None:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
@@ -231,20 +236,21 @@ class Trainer:
         self.logger.save_train_result(metrics)
 
 def plot_confusion_matrix(y_true, y_pred, class_names) -> Figure:
+    plt.ioff()
     # 혼동 행렬 계산
     conf_matrix = confusion_matrix(y_true, y_pred)
 
     # 플롯 크기 및 스타일 설정
     fig, ax = plt.subplots()
-    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
+    sns.heatmap(conf_matrix, ax=ax, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
 
     # 제목 및 축 레이블 설정
-    ax.title("Confusion Matrix")
-    ax.xlabel("Predicted Labels")
-    ax.ylabel("True Labels")
+    ax.set_title("Confusion Matrix")
+    ax.set_xlabel("Predicted Labels")
+    ax.set_ylabel("True Labels")
     plt.xticks(rotation=45)
     plt.yticks(rotation=45)
-    plt.tight_layout()
+    fig.tight_layout()
 
     return fig
 
