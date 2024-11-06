@@ -1,11 +1,10 @@
 import subprocess
 import sys
-import os
+import re
 import json
+import time
+import psutil
 from pathlib import Path
-
-import httpx
-
 from src.deploy.enums import DeployStatus
 from src.file.utils import get_file, create_file
 from src.file.path_manager import PathManager
@@ -16,7 +15,8 @@ path_manager = PathManager()
 DEFAULT_METADATA = """{
     "api_version": "0.33.1",
     "port": "8088",
-    "pid": null,
+    "reloader_pid": null,
+    "server_pid": null,
     "status": "stop"
 }"""
 
@@ -34,38 +34,82 @@ def run() -> bool:
 
     process = subprocess.Popen([
         sys.executable, "-m", "uvicorn", "deploy_server.src.main:app",
-        "--host", "0.0.0.0", "--port", "8088", "--reload"
+        "--host", "127.0.0.1", "--port", "8088", "--reload"
     ])
 
-    metadata.update({"pid": process.pid, "status": DeployStatus.RUNNING.value})
-    create_file(metadata_path, json_to_str(metadata))
+    # reloader 프로세스의 PID
+    reloader_pid = process.pid
+    server_pid = None
+
+    # 특정 포트를 사용하는 프로세스 찾기 (최대 10초 동안 재시도)
+    for _ in range(20):
+        time.sleep(0.5)
+        for conn in psutil.net_connections(kind='inet'):
+            if conn.laddr.port == 8088 and conn.status == psutil.CONN_LISTEN:
+                server_pid = conn.pid
+                break
+        if server_pid:
+            break
+
+    if server_pid:
+        print(f"Reloader PID: {reloader_pid}, Server PID: {server_pid}")
+        metadata.update({"reloader_pid": reloader_pid, "server_pid": server_pid, "status": DeployStatus.RUNNING.value})
+        create_file(metadata_path, json_to_str(metadata))
+    else:
+        print("Server process could not be found.")
 
     return True
 
 def stop() -> bool:
-
     metadata_path = path_manager.deploy_path / "metadata.json"
-    metadata = str_to_json(get_file(metadata_path))
+    if not metadata_path.exists():
+        print("No metadata file found. Server may not be running.")
+        return False
 
-    if metadata["status"] == DeployStatus.STOP.value:
-        # 예외 처리 필요
-        pass
+    # metadata 파일 읽기
+    with open(metadata_path, "r") as f:
+        metadata = json.load(f)
 
-    pid = metadata.get("pid")
-    if pid:
-        try:
-            if os.name == 'nt':
-                subprocess.run(["taskkill", "/PID", str(pid), "/F"], check=True)
-            else:
-                subprocess.run(["kill", "-9", str(pid)], check=True)
-        except subprocess.CalledProcessError:
-            raise RuntimeError(f"Failed to stop server with PID {pid}.")
+    # 서버가 실행 중이 아닌 경우
+    if metadata.get("status") != DeployStatus.RUNNING.value:
+        print("Server is not running.")
+        return False
 
-    metadata.update({"status": DeployStatus.STOP.value, "pid": None})
-    create_file(metadata_path, json_to_str(metadata))
+    # reloader_pid와 server_pid 확인
+    reloader_pid = metadata.get("reloader_pid")
+    server_pid = metadata.get("server_pid")
 
-    return True
+    if not reloader_pid or not server_pid:
+        print("Process IDs not found in metadata.")
+        return False
 
+    try:
+        # reloader 프로세스 종료
+        reloader_process = psutil.Process(reloader_pid)
+        for child in reloader_process.children(recursive=True):
+            try:
+                child.terminate()  # 자식 프로세스 종료
+                child.wait(timeout=5)
+                print(f"Terminated server process with PID {child.pid}.")
+            except psutil.NoSuchProcess:
+                print(f"Server process with PID {child.pid} already terminated.")
+        reloader_process.terminate()  # reloader 프로세스 종료
+        reloader_process.wait(timeout=5)
+        print(f"Terminated reloader process with PID {reloader_pid}.")
+
+        # metadata 파일 갱신
+        metadata.update({"status": DeployStatus.STOP.value, "reloader_pid": None, "server_pid": None})
+        with open(metadata_path, "w") as f:
+            json.dump(metadata, f)
+        print("Server stopped successfully and metadata updated.")
+
+        return True
+    except psutil.NoSuchProcess:
+        print("The process does not exist or is already terminated.")
+        return False
+    except Exception as e:
+        print(f"Failed to stop server: {e}")
+        return False
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent / "deploy_server/src"
 ROUTER_DIR = BASE_DIR / "routers"
@@ -106,8 +150,47 @@ async def {path_name}_route():
             with MAIN_FILE_PATH.open("w", encoding="utf-8") as main_file:
                 main_file.write(main_content)
 
-            return True, f"Route '{uri}' has been created and registered in main.py."
+            return True
         else:
-            return False, "Marker 'pass' not found in main.py."
+            return False
     except Exception as e:
-        return False, f"Failed to update main.py: {e}"
+        return False
+
+def remove_api(uri: str) -> bool:
+
+    path_name = uri.strip("/").replace("/", "_")
+    file_path = ROUTER_DIR / f"{path_name}.py"
+
+    # 라우터 파일이 존재하면 삭제
+    if file_path.exists():
+        try:
+            file_path.unlink()
+            print(f"Deleted router file: {file_path}")
+        except Exception as e:
+            return False
+    else:
+        print(f"Router file '{file_path}' does not exist.")
+
+    include_statement = f'from deploy_server.src.routers.{path_name} import router as {path_name}_router\n'
+    include_statement += f'app.include_router({path_name}_router)\n'
+
+    try:
+        # main.py 파일을 읽고 삭제할 코드 부분 찾기
+        with MAIN_FILE_PATH.open("r", encoding="utf-8") as main_file:
+            content = main_file.read()
+
+        # 삭제할 라우터 코드가 main.py에 포함된 경우에만 진행
+        if include_statement in content:
+            content = content.replace(include_statement, "")
+
+            # 수정된 내용을 main.py에 다시 쓰기
+            with MAIN_FILE_PATH.open("w", encoding="utf-8") as main_file:
+                main_file.write(content)
+
+            print(f"Removed route registration for '{uri}' from main.py")
+            return True
+        else:
+            print(f"No matching route registration found in main.py for '{uri}'")
+            return False
+    except Exception as e:
+        return False
