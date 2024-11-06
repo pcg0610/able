@@ -34,14 +34,11 @@ export const useSaveCanvas = () => {
     onSuccess: (_data, variables) => {
       queryClient.setQueryData<CanvasResponse>(
         canvasKey.canvas(variables.projectName),
-        (oldData: any) => ({
+        (oldData) => ({
           ...oldData,
-          data: {
-            ...oldData.data,
-            canvas: {
-              blocks: variables.canvas.blocks,
-              edges: variables.canvas.edges,
-            },
+          canvas: {
+            blocks: variables.canvas.blocks,
+            edges: variables.canvas.edges,
           },
         })
       );

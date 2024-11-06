@@ -1,4 +1,3 @@
-import { Response } from '@/shared/types/response.type';
 import type { Block } from '@features/canvas/types/block.type';
 import { Node as XYFlowNode, Edge as XYFlowEdge } from '@xyflow/react';
 
@@ -13,8 +12,8 @@ export interface BlockSchema extends Block {
   position: string;
 }
 
-export interface CanvasResponse extends Response {
-  data: { canvas: { blocks: BlockSchema[]; edges: EdgeSchema[] } };
+export interface CanvasResponse {
+  canvas: { blocks: BlockSchema[]; edges: EdgeSchema[] };
 }
 
 export interface TransformedCanvas {

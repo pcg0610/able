@@ -12,7 +12,7 @@ import type {
 import type { BlockItem } from '@features/canvas/types/block.type';
 
 export const transformCanvasResponse = (response: CanvasResponse) => {
-  const transformedNodes: XYFlowNode[] = response.data.canvas.blocks.map(
+  const transformedNodes: XYFlowNode[] = response.canvas.blocks.map(
     (block) => ({
       id: block.id,
       type: 'custom',
@@ -27,15 +27,13 @@ export const transformCanvasResponse = (response: CanvasResponse) => {
     })
   );
 
-  const transformedEdges: XYFlowEdge[] = response.data.canvas.edges.map(
-    (edge) => ({
-      id: edge.id,
-      source: edge.source,
-      target: edge.target,
-      type: 'smoothstep',
-      markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
-    })
-  );
+  const transformedEdges: XYFlowEdge[] = response.canvas.edges.map((edge) => ({
+    id: edge.id,
+    source: edge.source,
+    target: edge.target,
+    type: 'smoothstep',
+    markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
+  }));
 
   return { nodes: transformedNodes, edges: transformedEdges };
 };
