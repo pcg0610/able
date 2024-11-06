@@ -8,12 +8,15 @@ import {
   useEdgesState,
   useReactFlow,
   applyNodeChanges,
+  applyEdgeChanges,
   type OnConnect,
   MarkerType,
   NodeChange,
+  EdgeChange,
+  Node,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import * as S from '@features/canvas/ui/canvas-editor.style';
 import Common from '@shared/styles/common';
@@ -42,7 +45,8 @@ const CanvasEditor = () => {
   const { mutateAsync: saveCanvas } = useSaveCanvas();
 
   const [nodes, setNodes] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [edges, setEdges] = useEdgesState(initialEdges);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
   const { screenToFlowPosition } = useReactFlow();
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
@@ -95,19 +99,61 @@ const CanvasEditor = () => {
     (changes: NodeChange[]) => {
       setNodes((nds) => {
         const filteredChanges = changes.filter((change) => {
-          // block의 type이 data인 블록은 삭제 불가
-          if (change.type === 'remove') {
+          if (change.type === 'remove' && 'id' in change) {
+            // id 속성을 가진 경우에만 접근
             const node = nds.find((node) => node.id === change.id);
             const data = node?.data as { block: BlockItem };
-            return data.block.type !== 'data';
+            return data?.block?.type !== 'data';
           }
           return true;
         });
 
         return applyNodeChanges(filteredChanges, nds);
       });
+
+      // 노드가 변경될 때마다 선택된 노드를 업데이트
+      const selectedChange = changes.find(
+        (change) =>
+          change.type === 'select' && 'id' in change && change.selected
+      );
+      if (selectedChange && 'id' in selectedChange) {
+        const selectedNode =
+          nodes.find((node) => node.id === selectedChange.id) || null;
+        setSelectedNode(selectedNode);
+      }
     },
-    [setNodes]
+    [setNodes, nodes]
+  );
+
+  // 엣지 삭제 제어
+  const handleEdgesChange = useCallback(
+    (changes: EdgeChange[]) => {
+      setEdges((eds) => {
+        const filteredChanges = changes.filter((change) => {
+          if (change.type === 'remove' && selectedNode) {
+            // 현재 선택된 노드가 data 타입일 경우 해당 노드와 연결된 엣지는 삭제하지 않음
+            const sourceNode = nodes.find(
+              (node) => node.id === selectedNode.id
+            );
+            const data = sourceNode?.data as { block: BlockItem };
+            if (data?.block?.type === 'data') {
+              const edge = eds.find((edge) => edge.id === change.id);
+              if (
+                edge &&
+                (edge.source === selectedNode.id ||
+                  edge.target === selectedNode.id)
+              ) {
+                return false;
+              }
+            }
+          }
+          return true;
+        });
+
+        return applyEdgeChanges(filteredChanges, eds);
+      });
+    },
+    [setEdges, nodes, selectedNode]
   );
 
   const handleTrainButtonClick = () => {
@@ -144,8 +190,9 @@ const CanvasEditor = () => {
         }))}
         edges={edges}
         onNodesChange={handleNodesChange}
-        onEdgesChange={onEdgesChange}
+        onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
+        onNodeClick={(_, node) => setSelectedNode(node)} // 노드를 클릭할 때 선택된 노드 업데이트
         nodeTypes={{ custom: BlockNode }}
       >
         <Controls position='bottom-center' orientation='horizontal' />
