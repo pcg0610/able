@@ -36,6 +36,11 @@ export const PythonTitle = styled.span`
   color: #a9a9a9;
 `;
 
+export const Description = styled.p`
+  margin-top: 1rem;
+  color: ${Common.colors.gray400};
+`;
+
 export const CanvasWrapper = styled.div`
   display: flex;
   justify-content: center;

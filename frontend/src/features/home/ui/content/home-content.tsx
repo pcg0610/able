@@ -66,18 +66,21 @@ const HomeContent = () => {
   return (
     <>
       <S.HomeContentWrapper>
-        <S.Title>
-          <FolderIcon width={45} height={45} />
-          {currentProject?.title || '프로젝트 이름 없음'}
-          <S.PythonTitle>python 3.9.6</S.PythonTitle>
-          <SettingIcon
-            width={22}
-            height={22}
-            color={Common.colors.gray400}
-            onClick={handleSettingClick}
-            style={{ cursor: 'pointer' }}
-          />
-        </S.Title>
+        <div>
+          <S.Title>
+            <FolderIcon width={45} height={45} />
+            {currentProject?.title || '프로젝트 이름 없음'}
+            <S.PythonTitle>python 3.9.6</S.PythonTitle>
+            <SettingIcon
+              width={22}
+              height={22}
+              color={Common.colors.gray400}
+              onClick={handleSettingClick}
+              style={{ cursor: 'pointer' }}
+            />
+          </S.Title>
+          <S.Description>{currentProject?.description}</S.Description>
+        </div>
         <div>
           <S.SubTitle>
             <WritingIcon width={30} height={30} />
