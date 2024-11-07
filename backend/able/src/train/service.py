@@ -1,7 +1,7 @@
 import json
 from . import TrainRequest
-from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
-from .dto import TrainResultRequest
+from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy, Device
+from .dto import TrainResultRequest, DeviceListResponse
 from .utils import *
 from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format, get_file, create_directory
@@ -23,6 +23,9 @@ def train(request: TrainRequest):
 
     data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks = split_blocks(request.canvas.blocks)
 
+    if isinstance(data_block, CanvasBlock):
+        data_block: CanvasBlock = data_block
+
     if data_block is None:
         raise ValueError("Data block is required but was not found.")
 
@@ -36,7 +39,7 @@ def train(request: TrainRequest):
     )
 
     # 학습에서 사용하는 간선 추출
-    blocks_connected_to_data: list[Block] = (data_block, *transform_blocks_conn, *loss_blocks_conn, *optimizer_blocks_conn, *other_blocks_conn)
+    blocks_connected_to_data: list[Block] = [data_block, *transform_blocks_conn, *loss_blocks_conn, *optimizer_blocks_conn, *other_blocks_conn]
     canvas_blocks = convert_canvas_blocks(blocks_connected_to_data)
     edges = filter_edges_from_block_connected_data(canvas_blocks, request.canvas.edges)
 
@@ -64,21 +67,22 @@ def train(request: TrainRequest):
     create_directory(epochs_path)
 
     # 데이터셋 메타데이터 저장
-    save_metadata(project_name, result_name, data_block)
+    save_metadata(project_name, result_name, data_block, dataset.classes)
 
     # 학습 모델 그래프 저장
-    # TODO: SerializableIter 에러 발생
-    # save_result_block_graph(request.project_name, result_name, canvas_blocks, edges_model)
+    save_result_block_graph(request.project_name, result_name, canvas_blocks, edges_model)
 
     # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
     save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
 
-    save_result_model(project_name, result_name, model)
+    device = 'cpu'
+    if request.device.index != -1:
+        device = f"cuda:{request.device.index}"
 
-    logger = TrainLogger(project_name, result_name)
+    train_logger = TrainLogger(project_name, result_name)
 
     try:
-        trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name, result_path), device=request.device)
+        trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name, result_name), device=device)
 
         logger.info("학습 시작")
         trainer.train(request.epoch)
@@ -87,9 +91,9 @@ def train(request: TrainRequest):
         logger.info("테스트 시작")
         trainer.test()
         logger.info("테스트 종료")
-        logger.update_status(TrainStatus.COMPLETE)
+        train_logger.update_status(TrainStatus.COMPLETE)
     except Exception as e:
-        logger.update_status(TrainStatus.FAIL)
+        train_logger.update_status(TrainStatus.FAIL)
         raise e
 
 def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
@@ -139,3 +143,11 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
         f1_score=f1_score,
         epoch_result=epoch_results
     )
+
+def get_device_list() -> DeviceListResponse:
+    device_list = [Device(index=-1, name='cpu')]
+
+    for index in range(torch.cuda.device_count()):
+        device_list.append(Device(index=index, name=torch.cuda.get_device_name(index)))
+
+    return DeviceListResponse(devices=device_list)

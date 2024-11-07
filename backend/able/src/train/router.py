@@ -2,7 +2,7 @@ from fastapi import APIRouter, BackgroundTasks
 from starlette.responses import Response
 
 from .dto import TrainResultRequest, TrainRequest
-from .service import train as train_service, load_train_result
+from .service import train_in_background, load_train_result, get_device_list
 from src.train.schemas import TrainResultResponse
 from src.response.utils import ok
 from ..response.schemas import ResponseModel
@@ -26,5 +26,11 @@ def get_train_result(project_name: str, train_result_name: str):
 
 @router.post("")
 async def train(request: TrainRequest, background_tasks: BackgroundTasks) -> Response:
-    background_tasks.add_task(train_service(request))
+    background_tasks.add_task(train_in_background, request)
     return accepted()
+
+@router.get("/devices")
+def get_devices():
+    return ok(
+        data=get_device_list()
+    )
