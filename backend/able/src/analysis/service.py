@@ -10,7 +10,7 @@ from src.utils import encode_image_to_base64, str_to_json, handle_pagination, ha
 from src.analysis.utils import FeatureMapExtractor, read_blocks, load_model
 from src.train.utils import split_blocks
 from src.canvas.schemas import Canvas
-from src.analysis.schemas import FeatureMapRequest, FeatureMap, CheckpointResponse
+from src.analysis.schemas import FeatureMapRequest, FeatureMap, CheckpointResponse, AnalyzeResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,7 +47,8 @@ def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
 
     return feature_map_list
 
-async def analyze(project_name: str, result_name: str, checkpoint_name:str, device_index: int, file: UploadFile) -> str:
+async def analyze(project_name: str, result_name: str, checkpoint_name:str, device_index: int, file: UploadFile) -> AnalyzeResponse:
+    result_path = pathManager.get_train_result_path(project_name, result_name)
     checkpoint_path = pathManager.get_checkpoint_path(project_name, result_name, checkpoint_name)
     feature_maps_path = checkpoint_path / "feature_maps"
 
@@ -71,13 +72,13 @@ async def analyze(project_name: str, result_name: str, checkpoint_name:str, devi
     model_path = checkpoint_path / "model.pth"
     model = load_model(model_path, device)
 
-    extractor = FeatureMapExtractor(model, checkpoint_path, feature_maps_path, transform_blocks, img_path, device)
+    extractor = FeatureMapExtractor(model,result_path, checkpoint_path, feature_maps_path, transform_blocks, img_path, device)
 
-    # 피쳐맵 추출 훅 적용 후 실행
-    extractor.analyze()
+    # 피처맵, 히트맵, 상위 3개 클래스 추출
+    scores = extractor.analyze()
 
     heatmap_img = encode_image_to_base64(read_image_file(checkpoint_path / "heatmap.jpg"))
-    return heatmap_img
+    return AnalyzeResponse(image=heatmap_img, class_scores=scores)
 
 def get_block_graph(project_name: str, result_name: str) -> Canvas :
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
