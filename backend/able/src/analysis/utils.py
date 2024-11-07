@@ -144,7 +144,7 @@ class FeatureMapExtractor:
         ]
 
         # 파일 기록
-        # create_file(self.checkpoint_path / "analysis_result.json", json_to_str(ClassScores(class_scores=scores)))
+        create_file(self.checkpoint_path / "analysis_result.json", json_to_str(ClassScores(class_scores=scores)))
 
         return scores
 
