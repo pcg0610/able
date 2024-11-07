@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Container, Content, MainContainer } from '@pages/train/train.style';
+import { useProjectNameStore } from '@entities/project/model/project.model';
 
 import Sidebar from '@/widgets/sidebar/project-sidebar';
 import AnalyzeComponent from '@features/train/ui/analyze/analyze';
@@ -8,6 +9,7 @@ import ResultComponent from '@features/train/ui/result/result';
 import PageHeader from '@widgets/header/page-header';
 
 const TrainPage = () => {
+  const { projectName } = useProjectNameStore();
   const [selectedComponent, setSelectedComponent] = useState('result');
 
   const handleSidebarSelection = (selection: string) => {
@@ -16,7 +18,7 @@ const TrainPage = () => {
 
   return (
     <MainContainer>
-      <PageHeader title="프로젝트" date="2024.08.12" />
+      <PageHeader title={projectName} date="2024.08.12" />
       <Container>
         <Sidebar onSelectionChange={handleSidebarSelection} type="train" />
         <Content>

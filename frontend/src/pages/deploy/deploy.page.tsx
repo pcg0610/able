@@ -16,7 +16,7 @@ const TrainPage = () => {
 
   return (
     <MainContainer>
-      <PageHeader title="프로젝트" date="2024.08.12" />
+      <PageHeader title="서버 관리" />
       <Container>
         <Sidebar onSelectionChange={handleSidebarSelection} type="deploy" />
         <Content>
