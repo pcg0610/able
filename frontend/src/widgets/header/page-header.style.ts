@@ -17,6 +17,7 @@ export const Header = styled.div`
 
 export const Title = styled.span`
   font-weight: ${Common.fontWeights.semiBold};
+  color: ${Common.colors.white};
 `;
 
 export const Date = styled.span`

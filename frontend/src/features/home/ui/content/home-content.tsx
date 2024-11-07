@@ -6,9 +6,9 @@ import Common from '@shared/styles/common';
 import { useProject } from '@features/home/api/use-home.query';
 import { useProjectStore, useProjectNameStore } from '@entities/project/model/project.model';
 
-import HistoryList from '@/features/home/ui/content/history-list';
+import HistoryList from '@features/home/ui/content/history-list';
 import Pagination from '@shared/ui/pagination/pagination';
-import ProjectModal from '@shared/ui/modal/project-modal';
+import ProjectModal from '@features/home/ui/modal/project-modal';
 import WritingIcon from '@icons/writing.svg?react';
 import ClockIcon from '@icons/clock.svg?react';
 import FolderIcon from '@icons/folder.svg?react';

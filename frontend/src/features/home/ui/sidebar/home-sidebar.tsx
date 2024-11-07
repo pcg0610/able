@@ -6,7 +6,7 @@ import Common from '@shared/styles/common';
 import { useProjects } from '@features/home/api/use-home.query';
 import { useProjectNameStore } from '@entities/project/model/project.model';
 
-import ProjectModal from '@shared/ui/modal/project-modal';
+import ProjectModal from '@/features/home/ui/modal/project-modal';
 import BasicButton from '@shared/ui/button/basic-button';
 import FileIcon from '@icons/file.svg?react';
 import RocketIcon from '@icons/rocket.svg?react';

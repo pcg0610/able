@@ -16,7 +16,8 @@ export const globalStyle = css`
     box-sizing: border-box;
   }
 
-  body {
+  body,
+  button {
     font-family: 'Pretendard', sans-serif;
     color: ${Common.colors.black};
   }
