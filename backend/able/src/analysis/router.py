@@ -27,10 +27,10 @@ async def get_feature_map( request: FeatureMapRequest):
 @router.post("", 
              response_model=ResponseModel[ImageResponse],
              summary="분석 실행 및 히트맵 생성", description="특정 학습 결과의 에포크에 대해 샘플 이미지 1장을 받아 실행 후 히트맵을 반환" )
-async def analyze(project_name: str, result_name: str, epoch_name:str, device_name: str, device_index: int, file: UploadFile = File(...)):
+async def analyze(project_name: str, result_name: str, epoch_name:str, device_index: int, file: UploadFile = File(...)):
     # if(file.content_type != "imge/jpeg"):
     #     return bad_request()
-    image = await service.analyze(project_name, result_name, epoch_name, device_name, device_index, file)
+    image = await service.analyze(project_name, result_name, epoch_name, device_index, file)
     return ok(data=ImageResponse(image=image))
 
 @router.get("/model",
