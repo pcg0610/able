@@ -6,7 +6,8 @@ class FeatureMap(ImmutableBaseModel):
     img: Optional[str]
 
 class EpochsResponse(ImmutableBaseModel):
-    epochs : List[str]
+    epochs : Optional[List[str]]
+    has_next: bool
 
 class ImageResponse(ImmutableBaseModel):
     image: str

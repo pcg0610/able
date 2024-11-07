@@ -6,21 +6,28 @@ from fastapi import UploadFile
 
 from src.file.path_manager import PathManager
 from src.file.utils import get_directory, read_image_file, save_img, create_directory, get_file
-from src.utils import encode_image_to_base64, get_epoch_id, str_to_json
+from src.utils import encode_image_to_base64, get_epoch_id, str_to_json, handle_pagination, has_next_page
 from src.analysis.utils import FeatureMapExtractor, read_blocks, load_model, load_parameter
 from src.train.utils import split_blocks
 from src.canvas.schemas import Canvas
-from src.analysis.schemas import FeatureMapRequest, FeatureMap
+from src.analysis.schemas import FeatureMapRequest, FeatureMap, EpochsResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 pathManager = PathManager()
 
-def get_epochs(project_name: str, result_name: str) -> List[str]:
+def get_epochs(project_name: str, result_name: str, index: int, size: int) -> EpochsResponse:
     epochs_path = pathManager.get_epochs_path(project_name, result_name)
     epochs = get_directory(epochs_path)
-    return [epoch.name for epoch in epochs if epoch.is_dir()]
+
+    page_item = handle_pagination(
+        [epoch.name for epoch in epochs if epoch.is_dir()],
+        index,
+        size
+    )
+
+    return EpochsResponse(epochs=page_item, has_next=has_next_page(len(epochs), index, size))
 
 
 def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
