@@ -4,7 +4,7 @@ import * as S from '@shared/ui/input/input.style';
 
 interface InputProps {
   label?: string;
-  value?: string;
+  value?: string | number;
   defaultValue?: string;
   placeholder?: string;
   readOnly?: boolean;
@@ -14,19 +14,17 @@ interface InputProps {
 
 const Input = ({ label, value, defaultValue, placeholder, readOnly = false, className, onChange }: InputProps) => {
   return (
-    <>
-      <S.InputWrapper>
-        {label && <S.Label>{label}</S.Label>}
-        <S.Input
-          value={value}
-          defaultValue={defaultValue}
-          placeholder={placeholder}
-          readOnly={readOnly}
-          className={className}
-          onChange={onChange}
-        />
-      </S.InputWrapper>
-    </>
+    <S.Container>
+      {label && <S.Label>{label}</S.Label>}
+      <S.Input
+        value={value}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        readOnly={readOnly}
+        className={className}
+        onChange={onChange}
+      />
+    </S.Container>
   );
 };
 

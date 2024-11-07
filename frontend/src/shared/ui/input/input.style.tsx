@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 import Common from '@shared/styles/common';
 
-export const InputWrapper = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
 `;
