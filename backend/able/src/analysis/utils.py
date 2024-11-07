@@ -143,8 +143,8 @@ class FeatureMapExtractor:
             for idx, score in zip(top_indices, top_values)
         ]
 
-        #파일 기록
-        create_file(self.checkpoint_path / "analysis_result.json", json_to_str(ClassScores(class_scores=scores)))
+        # 파일 기록
+        # create_file(self.checkpoint_path / "analysis_result.json", json_to_str(ClassScores(class_scores=scores)))
 
         return scores
 
