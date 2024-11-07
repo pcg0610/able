@@ -15,12 +15,13 @@ from src.block.schemas import Block, Arg
 from src.block.utils import convert_block_to_module
 from src.canvas.schemas import Edge, CanvasBlock, Canvas, SaveCanvasRequest
 from src.canvas.service import block_graph
+from src.train.enums import TrainStatus
 
 from src.train.schemas import TrainResultMetrics, TrainResultMetadata, PerformanceMetrics, HyperParameter, SaveHyperParameter
 
-from src.file.utils import create_file
+from src.file.utils import create_file, get_file
 from src.file.path_manager import PathManager
-from src.utils import json_to_str
+from src.utils import json_to_str, str_to_json
 from datetime import datetime
 
 from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix
@@ -43,7 +44,18 @@ class TrainLogger:
         self.result_name = result_name
 
         # 기존 경로 생성 로직 제거, 결과 및 에포크 디렉터리는 서비스에서 생성
-        self.result_path = pathManager.get_train_result_path(self.project_name, result_name)
+        self.result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
+
+        self.metadata_path = self.result_path / "train_status.json"
+
+    def update_status(self, status: TrainStatus) -> None:
+        metadata_content = get_file(self.metadata_path)
+        metadata_dict = str_to_json(metadata_content)
+
+        metadata_dict["status"] = status.value
+
+        new_metadata_content = json_to_str(metadata_dict)
+        create_file(self.metadata_path, new_metadata_content)
 
     def create_epoch_log(self, epoch_id: int, accuracy: float, validation_loss: float, training_loss: float):
         epoch_path = pathManager.get_epoch_path(self.project_name, self.result_name, epoch_id)
@@ -75,7 +87,7 @@ class Trainer:
         self.model = model.to(device)
         self.dataset = dataset
         self.train_data_loader, self.valid_data_loader, self.test_data_loader = [create_data_loader(dataset_split, batch_size) for dataset_split in split_dataset(dataset)]
-        self.criterion = criterion.to(device)
+        self.criterion = criterion
         self.optimizer = optimizer
         self.logger = logger
         self.checkpoint_interval = checkpoint_interval
@@ -85,7 +97,7 @@ class Trainer:
         self.model.train()  # 모델을 훈련 모드로 전환
         running_loss = 0.0
 
-        for inputs, targets in tqdm(self.train_data_loader, unit="batch"):
+        for inputs, targets in self.train_data_loader:
             inputs, targets = inputs.to(self.device), targets.to(self.device)
 
             # Gradients 초기화
@@ -160,6 +172,7 @@ class Trainer:
             valid_accuracy, valid_loss = self.validate()
 
             # Logging
+            self.logger.create_epoch_log(epoch, train_accuracy, train_loss, valid_loss)
 
             # Checkpoint (간단히 마지막 모델만 저장)
             if (epoch + 1) % self.checkpoint_interval == 0:
@@ -412,10 +425,8 @@ def filter_edges_from_block_connected_data(blocks: list[Block], edges: list[Edge
 
 def save_result_block_graph(project_name: str, result: str, blocks: list[CanvasBlock], edges: list[Edge]):
 
-    project_path = pathManager.get_projects_path(project_name)
-    block_graph_path = project_path / result / block_graph
-
-    if create_file(block_graph_path, json_to_str(SaveCanvasRequest(canvas=Canvas(blocks=blocks, edges=edges)))):
+    block_graph_path = pathManager.get_train_result_path(project_name, result) / "block_graph.json"
+    if create_file(block_graph_path, json_to_str(Canvas(blocks=blocks, edges=edges))):
         return True
 
     raise
@@ -457,10 +468,11 @@ def save_metadata(project_name: str, result_name: str, data_block: CanvasBlock) 
     metadata = TrainResultMetadata(
         data_path=data_path,
         input_shape=input_shape,
-        classes=classes
+        classes=classes,
+        status=TrainStatus.RUNNING
     )
 
-    metadata_path = pathManager.get_train_results_path(project_name) / result_name / "metadata.json"
+    metadata_path = pathManager.get_train_result_path(project_name, result_name) / "metadata.json"
 
     create_file(metadata_path, json_to_str(metadata.model_dump()))
 

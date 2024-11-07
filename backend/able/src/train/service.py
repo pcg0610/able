@@ -73,24 +73,26 @@ def train(request: TrainRequest):
     # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
     save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
 
-    # save_result_model(project_name, result_name, model)
+    save_result_model(project_name, result_name, model)
 
-    trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name, result_path), device=request.device)
+    logger = TrainLogger(project_name, result_name)
 
-    logger.info("학습 시작")
+    try:
+        trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name, result_path), device=request.device)
 
-    trainer.train(request.epoch)
-    
-    logger.info("학습 종료")
-    
-    logger.info("테스트 시작")
-    trainer.test()
-    logger.info("테스트 종료")
+        logger.info("학습 시작")
+        trainer.train(request.epoch)
+        logger.info("학습 종료")
 
+        logger.info("테스트 시작")
+        trainer.test()
+        logger.info("테스트 종료")
+        logger.update_status(TrainStatus.COMPLETE)
+    except Exception as e:
+        logger.update_status(TrainStatus.FAIL)
+        raise e
 
-def load_train_result(request: TrainResultRequest) -> TrainResultResponse:
-    project_name = request.project_name
-    result_name = request.train_result_name
+def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
 
     # 결과 디렉터리 경로 설정
     result_path = path_manager.get_train_results_path(project_name) / result_name
