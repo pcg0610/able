@@ -15,7 +15,8 @@ import BlockNodeFeature from '@entities/block-node/block-node-feature';
 import useAutoLayout, { type LayoutOptions } from '@features/train/model/use-auto-layout.model';
 import { useModel } from '@features/train/api/use-analyze.query';
 import { useProjectStateStore } from '@entities/project/model/project.model';
-import { useFetchFeatureMap } from '@features/train/api/use-analyze.mutation';
+import { useImageStore } from '@entities/train/model/train.model';
+import { useFetchFeatureMap, useCreateFeatureMap } from '@features/train/api/use-analyze.mutation';
 import {
    initialNodes,
    initialEdges,
@@ -46,19 +47,40 @@ const CanvasResult = () => {
    const [featureMap, setFeatureMap] = useState<FeatureMapResponse[]>([]);
 
    const { projectName } = useProjectStateStore();
+   const { uploadedImage } = useImageStore();
    const { data: canvas } = useModel(projectName, 'result1');
    const { fitView } = useReactFlow();
+   const { mutate: fetchCreateModel } = useCreateFeatureMap();
    const { mutate: fetchFeatureMap } = useFetchFeatureMap();
+   const [autoFit, setAutoFit] = useState(false);
 
    useAutoLayout({ direction });
 
    const handleNodeClick = useCallback((nodeId: string) => {
+      setAutoFit(false);
       setSelectedBlockIds((prev) =>
          prev.includes(nodeId) ? prev.filter((id) => id !== nodeId) : [...prev, nodeId]
       );
    }, []);
 
-   const handleFetchImages = () => {
+   const handleCreateModel = () => {
+      fetchCreateModel(
+         {
+            projectName,
+            resultName: 'result1',
+            epochName: 'epoch_1',
+            deviceIndex: -1,
+            image: uploadedImage,
+         },
+         {
+            onSuccess: (data) => {
+               console.log("Feature map created successfully:", data);
+            },
+         }
+      );
+   };
+
+   const handleFeaatureImages = () => {
       fetchFeatureMap(
          { projectName, resultName: 'result1', epochName: 'epoch1', blockIds: selectedBlockIds },
          {
@@ -77,6 +99,11 @@ const CanvasResult = () => {
             },
          }
       );
+   };
+
+   const handleLayoutChange = (newDirection) => {
+      setDirection(newDirection);
+      setAutoFit(true); // 정렬 버튼을 클릭할 때 autoFit을 true로 설정하여 fitView 호출 허용
    };
 
    useEffect(() => {
@@ -103,8 +130,10 @@ const CanvasResult = () => {
    }, [canvas, featureMap, setNodes, setEdges]);
 
    useEffect(() => {
-      fitView();
-   }, [fitView, direction]);
+      if (autoFit) {
+         fitView();
+      }
+   }, [fitView, direction, nodes, autoFit]);
 
    return (
       <ReactFlow
@@ -127,12 +156,12 @@ const CanvasResult = () => {
                text="추론하기"
                icon={<PlayIcon width={13} height={15} />}
                width='10rem'
-               onClick={handleFetchImages}
+               onClick={handleCreateModel}
             />
          </PositionedButton>
          <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
-            <button onClick={() => setDirection('TB')}>Down (TB)</button>
-            <button onClick={() => setDirection('LR')}>Right (LR)</button>
+            <button onClick={() => handleLayoutChange('TB')}>Down (TB)</button>
+            <button onClick={() => handleLayoutChange('LR')}>Right (LR)</button>
          </div>
       </ReactFlow>
    );
