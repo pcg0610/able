@@ -54,3 +54,7 @@ class TrainResultMetadata(ImmutableBaseModel):
     input_shape: List[int] = Field(..., description="입력 데이터 형상")
     classes: List[str] = Field(..., description="클래스 목록")
     status: TrainStatus
+
+class Device(ImmutableBaseModel):
+    index: int
+    name: str
