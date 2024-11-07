@@ -6,18 +6,18 @@ from fastapi import UploadFile
 
 from src.file.path_manager import PathManager
 from src.file.utils import get_directory, read_image_file, save_img, create_directory, get_file
-from src.utils import encode_image_to_base64, get_epoch_id, str_to_json, handle_pagination, has_next_page
-from src.analysis.utils import FeatureMapExtractor, read_blocks, load_model, load_parameter
+from src.utils import encode_image_to_base64, str_to_json, handle_pagination, has_next_page
+from src.analysis.utils import FeatureMapExtractor, read_blocks, load_model
 from src.train.utils import split_blocks
 from src.canvas.schemas import Canvas
-from src.analysis.schemas import FeatureMapRequest, FeatureMap, EpochsResponse
+from src.analysis.schemas import FeatureMapRequest, FeatureMap, CheckpointResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 pathManager = PathManager()
 
-def get_checkpoints(project_name: str, result_name: str, index: int, size: int) -> EpochsResponse:
+def get_checkpoints(project_name: str, result_name: str, index: int, size: int) -> CheckpointResponse:
     checkpoints_path = pathManager.get_checkpoints_path(project_name, result_name)
     checkpoints = get_directory(checkpoints_path)
 
@@ -27,7 +27,7 @@ def get_checkpoints(project_name: str, result_name: str, index: int, size: int) 
         size
     )
 
-    return EpochsResponse(epochs=page_item, has_next=has_next_page(len(checkpoints), index, size))
+    return CheckpointResponse(epochs=page_item, has_next=has_next_page(len(checkpoints), index, size))
 
 
 def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
@@ -46,9 +46,9 @@ def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
 
     return feature_map_list
 
-async def analyze(project_name: str, result_name: str, epoch_name:str, device_name: str, device_index: int, file: UploadFile) -> str:
-    epoch_path = get_model_path(project_name, result_name, epoch_name)
-    feature_maps_path = epoch_path / "feature_maps"
+async def analyze(project_name: str, result_name: str, checkpoint_name:str, device_name: str, device_index: int, file: UploadFile) -> str:
+    checkpoint_path = get_model_path(project_name, result_name, checkpoint_name)
+    feature_maps_path = checkpoint_path / "feature_maps"
 
     #block_graph.json 파일에서 블록 읽어오기
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
@@ -67,15 +67,15 @@ async def analyze(project_name: str, result_name: str, epoch_name:str, device_na
         device = f"cuda:{device_index}"
 
     # 모델 로드
-    model_path = epoch_path / "model.pth"
+    model_path = checkpoint_path / "model.pth"
     model = load_model(model_path, device)
 
-    extractor = FeatureMapExtractor(model, epoch_path, feature_maps_path, transform_blocks, img_path, device)
+    extractor = FeatureMapExtractor(model, checkpoint_path, feature_maps_path, transform_blocks, img_path, device)
 
     # 피쳐맵 추출 훅 적용 후 실행
     extractor.analyze()
 
-    heatmap_img = encode_image_to_base64(read_image_file(epoch_path / "heatmap.jpg"))
+    heatmap_img = encode_image_to_base64(read_image_file(checkpoint_path / "heatmap.jpg"))
     return heatmap_img
 
 def get_block_graph(project_name: str, result_name: str) -> Canvas :
@@ -83,12 +83,12 @@ def get_block_graph(project_name: str, result_name: str) -> Canvas :
     block = Canvas(**str_to_json(get_file(block_graph_path)))
     return block
 
-def get_model_path(project_name: str, result_name: str, epoch_name: str) -> Path:
-        if epoch_name == "train":
+def get_model_path(project_name: str, result_name: str, checkpoint_name: str) -> Path:
+        if checkpoint_name == "train":
              return pathManager.get_checkpoints_path(project_name, result_name) / "train_best"
-        if epoch_name == "valid":
+        if checkpoint_name == "valid":
              return pathManager.get_checkpoints_path(project_name, result_name) / "valid_best"
-        if epoch_name == "final":
+        if checkpoint_name == "final":
              return pathManager.get_checkpoints_path(project_name, result_name) / "final"
 
-        return pathManager.get_checkpoint_path(project_name, result_name, epoch_name) 
+        return pathManager.get_checkpoint_path(project_name, result_name, checkpoint_name) 

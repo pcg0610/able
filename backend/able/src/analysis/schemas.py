@@ -5,7 +5,7 @@ class FeatureMap(ImmutableBaseModel):
     block_id: str
     img: Optional[str]
 
-class EpochsResponse(ImmutableBaseModel):
+class CheckpointResponse(ImmutableBaseModel):
     epochs : Optional[List[str]]
     has_next: bool
 
