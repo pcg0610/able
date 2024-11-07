@@ -8,7 +8,7 @@ from src.train_log.schemas import TrainLogResponse
 train_log_router = router = APIRouter()
 
 @router.get(
-    path="/{title}/train/logs",
+    path="/{project_name}/train/logs",
     response_model=ResponseModel[TrainLogResponse],
     summary="프로젝트 학습 기록 조회",
     description="프로젝트 이름으로 학습 기록 조회"
