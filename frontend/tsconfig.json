@@ -10,7 +10,7 @@
       "@pages/*": ["src/pages/*"],
       "@shared/*": ["src/shared/*"],
       "@widgets/*": ["src/widgets/*"],
-      "@icons/*": ["src/icons/*"],
+      "@icons/*": ["src/assets/icons/*"],
       "@images/*": ["src/images/*"]
     },
     "target": "ES2020",

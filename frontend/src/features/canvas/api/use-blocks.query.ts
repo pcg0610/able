@@ -2,9 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import axiosInstance from '@shared/api/axios-instance';
 import canvasKey from '@features/canvas/api/canvas-key';
-import { BlocksResponse } from '@features/canvas/types/block.type';
+import type { BlocksResponse } from '@features/canvas/types/block.type';
 
-// get-fetch, post-create, put-update, delete-delete
 const fetchBlocks = async (type: string) => {
   try {
     const response = await axiosInstance.get('/blocks', { params: { type } });

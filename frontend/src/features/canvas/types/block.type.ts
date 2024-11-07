@@ -1,5 +1,5 @@
 import { Response } from '@shared/types/response.type';
-import { BLOCK_MENU } from '@features/canvas/costants/block-types.constant';
+import { BLOCK_MENU } from '@/features/canvas/costants/block-menu.constant';
 
 export type BlockType = (typeof BLOCK_MENU)[number]['name'] | 'data';
 
@@ -8,6 +8,7 @@ export interface BlockItem {
   type: BlockType;
   name: string;
   fields: BlockField[];
+  [key: string]: unknown;
 }
 
 export interface BlockField {

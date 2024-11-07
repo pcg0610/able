@@ -28,11 +28,14 @@ const BlockNode = ({ data }: BlockNodeProps) => {
       <S.FieldWrapper>
         {data?.block?.fields?.map((field) => (
           <S.InputWrapper key={field.name} blockColor={blockColor}>
-            <S.Name>{field.name}</S.Name>
+            <S.Name>
+              {field.name} {field.isRequired ? '*' : ''}
+            </S.Name>
             <S.Input
               type='text'
               placeholder={field.isRequired ? 'required' : ''}
               required={field.isRequired}
+              value={field.value || ''}
               onChange={(e) => data.onFieldChange(field.name, e.target.value)}
             />
           </S.InputWrapper>

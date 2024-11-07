@@ -6,14 +6,18 @@ import { Global } from '@emotion/react';
 
 import { queryClient } from '@shared/api/query-client';
 import { globalStyle } from '@shared/styles/global.style';
+import ToastManager from '@shared/ui/toast/toast-manager';
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Global styles={globalStyle} />
-      <RouterProvider router={router} />
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <>
+      <ToastManager />
+      <QueryClientProvider client={queryClient}>
+        <Global styles={globalStyle} />
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </>
   );
 };
 
