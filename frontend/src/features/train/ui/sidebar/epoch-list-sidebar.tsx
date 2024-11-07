@@ -1,32 +1,88 @@
-import { useState } from 'react';
-import { SidebarContainer, EpochItem } from "@features/train/ui/sidebar/epoch-list-sidebar.style";
+import { React, useState, useEffect, useCallback } from 'react';
+
+import * as S from "@features/train/ui/sidebar/epoch-list-sidebar.style";
+import { useEpochs } from '@features/train/api/use-analyze.query';
+import { useProjectStateStore } from '@entities/project/model/project.model';
+
+import SearchBox from '@shared/ui/searchbar/searchbar';
 
 const EpochListSidebar = () => {
-   const [selectedEpoch, setSelectedEpoch] = useState("20241222_epoch_10.pth");
+   const [selectedEpoch, setSelectedEpoch] = useState('');
+   const [index, setIndex] = useState(0);
+   const [size] = useState(10);
 
-   const epochs = [
-      "20241222_epoch_10.pth",
-      "20241222_epoch_20.pth",
-      "20241222_epoch_30.pth",
-      "20241222_epoch_40.pth",
+   const bestEpochs = [
+      "best_train_loss",
+      "best_valid_loss",
+      "final",
    ];
+
+   const { projectName } = useProjectStateStore();
+   const { data: epochData, isLoading } = useEpochs(projectName, 'result1', index, size);
+
+   const loadMoreEpochs = useCallback(() => {
+      if (epochData?.hasNext && !isLoading) {
+         setIndex((prevIndex) => prevIndex + 1);
+      }
+   }, [epochData?.hasNext, isLoading, size]);
+
+   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+      const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+      if (scrollHeight - scrollTop === clientHeight) {
+         loadMoreEpochs();
+      }
+   }, [loadMoreEpochs]);
+
 
    const handleClick = (epoch: string) => {
       setSelectedEpoch(epoch);
    };
 
+   const handleSearchChange = (value: string) => {
+      console.log("Search value changed:", value);
+   };
+
+   useEffect(() => {
+      if (epochData?.epochs && epochData.epochs.length > 0 && !selectedEpoch) {
+         setSelectedEpoch(epochData.epochs[0]);
+      }
+   }, [epochData?.epochs]);
+
    return (
-      <SidebarContainer>
-         {epochs.map((epoch, index) => (
-            <EpochItem
-               key={index}
-               isSelected={selectedEpoch === epoch}
-               onClick={() => handleClick(epoch)}
-            >
-               {epoch}
-            </EpochItem>
-         ))}
-      </SidebarContainer>
+      <S.SidebarContainer>
+         <S.BestSection>
+            {bestEpochs.map((epoch, index) => (
+               <S.EpochItem
+                  key={`best-${index}`}
+                  isSelected={selectedEpoch === epoch}
+                  onClick={() => handleClick(epoch)}
+               >
+                  {epoch}
+               </S.EpochItem>
+            ))}
+         </S.BestSection>
+         <S.Divider />
+         <SearchBox
+            placeholder="주문번호, 상품명, 구매자명, 전화번호"
+            onSearchChange={handleSearchChange}
+         />
+         <S.ScrollableSection onScroll={handleScroll}>
+            {epochData?.epochs ? (
+               epochData?.epochs.map((epoch, index) => (
+                  <S.EpochItem
+                     key={index}
+                     isSelected={selectedEpoch === epoch}
+                     onClick={() => handleClick(epoch)}
+                  >
+                     {epoch}
+                  </S.EpochItem>
+               ))
+            ) : (
+               <div>에포크 없음</div>
+            )}
+            {isLoading && <div>로딩 중...</div>}
+         </S.ScrollableSection>
+      </S.SidebarContainer >
    );
 };
 
