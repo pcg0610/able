@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 
 import * as S from '@shared/ui/dropdown/dropdown.style';
 
+import ArrowButton from '@shared/ui/button/arrow-button';
+
 interface Option {
   value: string;
   label: string;
@@ -37,7 +39,7 @@ const Dropdown = ({ label, options, placeholder = '버전을 선택하세요', d
       <S.DropdownWrapper>
         <S.DropdownHeader onClick={() => setIsOpen(!isOpen)} isPlaceholder={!selectedOption}>
           {selectedOption ? selectedOption.label : placeholder}
-          <S.Arrow isOpen={isOpen} />
+          <ArrowButton direction={isOpen ? 'up' : 'down'} />
         </S.DropdownHeader>
         {isOpen && (
           <S.DropdownList>

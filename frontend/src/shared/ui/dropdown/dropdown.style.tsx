@@ -29,15 +29,6 @@ export const DropdownHeader = styled.div<{ isPlaceholder: boolean }>`
   color: ${({ isPlaceholder }) => (isPlaceholder ? Common.colors.gray300 : 'inherit')};
 `;
 
-export const Arrow = styled.span<{ isOpen: boolean }>`
-  border: solid #000;
-  border-width: 0 0.125rem 0.125rem 0;
-  display: inline-block;
-  padding: 0.1875rem;
-  transform: ${({ isOpen }) => (isOpen ? 'rotate(-135deg)' : 'rotate(45deg)')};
-  transition: transform 0.2s;
-`;
-
 export const DropdownList = styled.ul`
   position: absolute;
   width: 100%;
