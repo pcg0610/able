@@ -13,8 +13,7 @@ from torchvision.transforms import Compose
 
 from src.block.schemas import Block, Arg
 from src.block.utils import convert_block_to_module
-from src.canvas.schemas import Edge, CanvasBlock, Canvas, SaveCanvasRequest
-from src.canvas.service import block_graph
+from src.canvas.schemas import Edge, CanvasBlock, Canvas
 from src.train.enums import TrainStatus
 
 from src.train.schemas import TrainResultMetrics, TrainResultMetadata, PerformanceMetrics, HyperParameter, SaveHyperParameter
@@ -46,7 +45,7 @@ class TrainLogger:
         # 기존 경로 생성 로직 제거, 결과 및 에포크 디렉터리는 서비스에서 생성
         self.result_path = pathManager.get_train_result_path(self.project_name, self.result_name)
 
-        self.metadata_path = self.result_path / "train_status.json"
+        self.metadata_path = self.result_path / "metadata.json"
 
     def update_status(self, status: TrainStatus) -> None:
         metadata_content = get_file(self.metadata_path)
@@ -118,7 +117,7 @@ class Trainer:
 
         return epoch_loss
 
-    def validate(self) -> float:
+    def validate(self) -> tuple[float, float]:
         self.model.eval()  # 모델을 평가 모드로 전환
         running_loss = 0.0
 
@@ -171,13 +170,10 @@ class Trainer:
             train_accuracy = self.epoch_accuracy()
             valid_accuracy, valid_loss = self.validate()
 
-            # Logging
-            self.logger.create_epoch_log(epoch, train_accuracy, train_loss, valid_loss)
-
             # Checkpoint (간단히 마지막 모델만 저장)
             if (epoch + 1) % self.checkpoint_interval == 0:
                 self.logger.create_epoch_log(epoch + 1, train_accuracy, train_loss, valid_loss)
-                self.logger.save_model(self.model, f"epochs/epoch_{epoch + 1}/parameter.pth")
+                self.logger.save_model(self.model, f"checkpoints/epoch_{epoch + 1}/parameter.pth")
 
             if best_train_loss > train_loss:
                 self.logger.save_model(self.model, f"model_checkpoint_best_train_loss.pth")
@@ -359,7 +355,7 @@ def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -
 
     return model
 
-def split_blocks(blocks: list[Block]) -> list[
+def split_blocks(blocks: list[Block]) -> tuple[
     Block | None, list[Block], list[Block], list[Block], list[Block]
 ]:
     data_block = None
@@ -455,12 +451,12 @@ def find_argument(data_block: CanvasBlock, arg_name: str):
             return arg.value
     return None
 
-def save_metadata(project_name: str, result_name: str, data_block: CanvasBlock) -> None:
+def save_metadata(project_name: str, result_name: str, data_block: CanvasBlock, classes: list[str]) -> None:
 
     # 메타데이터 정보 추출
     data_path = find_argument(data_block, "data_path")
     input_shape = find_argument(data_block, "input_shape")
-    classes = find_argument(data_block, "classes")
+    # classes = find_argument(data_block, "classes")
 
     # 데이터 검증
     if not all([data_path, input_shape, classes]):

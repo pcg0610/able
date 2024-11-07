@@ -1,11 +1,11 @@
 {
   "project_name": "string",
-  "epoch": 30,
+  "epoch": 10,
   "batch_size": 256,
   "device": {
-    "index": -1,
-    "name": "cpu"
-  },
+        "index": -1,
+        "name": "cpu"
+      },
   "canvas": {
     "blocks": [
       {
@@ -21,11 +21,6 @@
           {
             "name": "input_shape",
             "value": [227, 227],
-            "is_required": true
-          },
-          {
-            "name": "classes",
-            "value": ["butterfly", "cat", "chicken", "cow", "dog", "elephant", "horse", "sheep", "spider", "squirrel"],
             "is_required": true
           }
         ],
