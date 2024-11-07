@@ -7,10 +7,13 @@ import {
 
 // connection이 사이클 발생하는지 확인
 export const isValidConnection = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
-  return (connection: Connection) => {
+  return (connection: Connection): boolean => {
     // 목적 노드(연결하려는 노드)
-    const target = nodes.find((node) => node.id === connection.target);
+    const targetNode = nodes.find((node) => node.id === connection.target);
+    // 목적 노드가 존재하지 않거나 출발 노드와 목적 노드가 동일하다면 사이클 발생 x
+    if (!targetNode || targetNode.id === connection.source) return false;
 
+    // 재귀적으로 자식 노드를 탐색하여 사이클을 감지
     const hasCycle = (
       node: XYFlowNode,
       visited = new Set<string>()
@@ -22,20 +25,15 @@ export const isValidConnection = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
       visited.add(node.id);
 
       // 노드의 자식 노드를 추적하여 사이클 검출
+      // 자식 노드 중 하나가 출발 노드와 동일하다면 사이클 발생
       // getOutgoers: 현재 노드에서 출발하는 모든 자식 노드(outgoers) 반환
-      for (const outgoer of getOutgoers(node, nodes, edges)) {
-        // 자식 노드 중 하나가 출발 노드와 동일하다면 사이클 발생
-        if (outgoer.id === connection.source) return true;
-        if (hasCycle(outgoer, visited)) return true;
-      }
-
-      return false;
+      return getOutgoers(node, nodes, edges).some(
+        (outgoer) =>
+          outgoer.id === connection.source || hasCycle(outgoer, visited)
+      );
     };
 
-    if (target) {
-      // 출발 노드와 목적 노드가 동일한지 확인
-      if (target.id === connection.source) return false;
-      if (!hasCycle(target)) return false;
-    }
+    // 사이클이 존재하지 않으면 true 반환
+    return !hasCycle(targetNode);
   };
 };
