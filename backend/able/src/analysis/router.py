@@ -35,5 +35,5 @@ async def analyze(project_name: str, result_name: str, epoch_name:str, file: Upl
 @router.get("/model",
              summary="특정 학습 결과의 모델(캔버스) 불러오기", description="분석 페이지 접근 시 보여지는 블록 그래프")
 async def get_model(project_name:str, result_name:str):
-    canvas = service.get_model(project_name, result_name)
+    canvas = service.get_block_graph(project_name, result_name)
     return ok(data=GetCanvasResponse(canvas=canvas))

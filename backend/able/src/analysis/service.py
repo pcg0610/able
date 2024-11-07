@@ -31,7 +31,7 @@ def get_epochs(project_name: str, result_name: str, index: int, size: int) -> Ep
 
 
 def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
-    feature_map_path = pathManager.get_feature_maps_path(request.project_name, request.result_name, get_epoch_id(request.epoch_name))
+    feature_map_path = get_model_path(request.project_name, request.result_name, request.epoch_name) / "feature_maps"
     
     feature_map_list = []
 
@@ -47,8 +47,8 @@ def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
     return feature_map_list
 
 async def analyze(project_name: str, result_name: str, epoch_name:str, file: UploadFile) -> str:
-    epoch_path = pathManager.get_checkpoint_path(project_name, result_name, get_epoch_id(epoch_name))
-    feature_maps_path = pathManager.get_feature_maps_path(project_name, result_name, get_epoch_id(epoch_name))
+    epoch_path = get_model_path(project_name, result_name, epoch_name)
+    feature_maps_path = epoch_path / "feature_maps"
 
     #block_graph.json 파일에서 블록 읽어오기
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
@@ -74,7 +74,17 @@ async def analyze(project_name: str, result_name: str, epoch_name:str, file: Upl
     heatmap_img = encode_image_to_base64(read_image_file(epoch_path / "heatmap.jpg"))
     return heatmap_img
 
-def get_model(project_name: str, result_name: str) -> Canvas :
+def get_block_graph(project_name: str, result_name: str) -> Canvas :
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
     block = Canvas(**str_to_json(get_file(block_graph_path)))
     return block
+
+def get_model_path(project_name: str, result_name: str, epoch_name: str) -> Path:
+        if epoch_name == "train":
+             return pathManager.get_epochs_path(project_name, result_name) / "train_best"
+        if epoch_name == "valid":
+             return pathManager.get_epochs_path(project_name, result_name) / "valid_best"
+        if epoch_name == "final":
+             return pathManager.get_epochs_path(project_name, result_name) / "final"
+
+        return pathManager.get_epoch_path(project_name, result_name, get_epoch_id(epoch_name)) 
