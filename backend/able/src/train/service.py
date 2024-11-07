@@ -10,6 +10,8 @@ from typing import List
 
 import logging
 
+from src.train_log.utils import format_float
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -109,7 +111,7 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     performance_metrics = PerformanceMetrics.model_validate(performance_metrics_data["metrics"])
 
     # F1 스코어 로드
-    f1_score = str_to_json(get_file(result_path / "f1_score.json"))["f1_score"]
+    f1_score = format_float(str_to_json(get_file(result_path / "f1_score.json"))["f1_score"])
 
     # 에포크 결과 로드
     epochs_path = path_manager.get_checkpoints_path(project_name, result_name)
