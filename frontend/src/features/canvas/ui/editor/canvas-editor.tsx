@@ -7,9 +7,11 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
+  getOutgoers,
   type OnConnect,
+  type Node as XYFlowNode,
+  type IsValidConnection,
   MarkerType,
-  Node,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCallback, useEffect, useState } from 'react';
@@ -46,7 +48,7 @@ const CanvasEditor = () => {
 
   const [nodes, setNodes] = useNodesState(initialNodes);
   const [edges, setEdges] = useEdgesState(initialEdges);
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [selectedNode, setSelectedNode] = useState<XYFlowNode | null>(null);
 
   const { handleNodesChange } = useNodeChangeHandler({
     nodes,
@@ -61,9 +63,10 @@ const CanvasEditor = () => {
     selectedNode,
   });
 
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
 
+  // 백엔드에서 캔버스 정보를 받아오면 노드와 엣지 상태를 업데이트
   useEffect(() => {
     if (data) {
       const transformedData = transformCanvasResponse(data);
@@ -72,7 +75,45 @@ const CanvasEditor = () => {
     }
   }, [data, setNodes, setEdges]);
 
-  const onConnect: OnConnect = (connection) =>
+  // 사이클 발생하는지 확인
+  const isValidConnection: IsValidConnection = useCallback(
+    (connection) => {
+      const nodes = getNodes();
+      const edges = getEdges();
+      const target = nodes.find((node) => node.id === connection.target); // 연결하려는 노드
+      const hasCycle = (node: XYFlowNode, visited = new Set()) => {
+        // 이미 탐색한 노드이면 탐색 불필요
+        if (visited.has(node.id)) return false;
+
+        // 현재 노드 방문 처리
+        visited.add(node.id);
+
+        // 노드의 자식 노드를 추적하여 사이클 검출
+        // getOutgoers: 현재 노드에서 출발하는 모든 자식 노드(outgoers) 반환
+        for (const outgoer of getOutgoers(node, nodes, edges)) {
+          // 자식 노드 중 하나가 출발 노드와 동일하다면 사이클 발생
+          if (outgoer.id === connection.source) return true;
+          if (hasCycle(outgoer, visited)) return true;
+        }
+
+        return false;
+      };
+
+      // 출발 노드와 목적 노드가 동일한지 확인
+      if (target && target.id === connection.source) return false;
+      return target ? !hasCycle(target) : false;
+    },
+    [getNodes, getEdges]
+  );
+
+  // 노드를 연결할 때 호출
+  const onConnect: OnConnect = (connection) => {
+    if (!isValidConnection(connection)) {
+      toast.error('사이클 발생 위험이 있어요.');
+      return;
+    }
+
+    // 사이클이 발생하지 않으면 엣지 추가
     setEdges((eds) =>
       addEdge(
         {
@@ -83,7 +124,9 @@ const CanvasEditor = () => {
         eds
       )
     );
+  };
 
+  // 특정 노드의 블록 필드 변경
   const handleFieldChange = useCallback(
     (nodeId: string, fieldName: string, value: string) => {
       setNodes((nds) =>
@@ -118,7 +161,7 @@ const CanvasEditor = () => {
 
     toast.promise(
       saveCanvas({
-        projectName: '춘식이',
+        projectName: currentProject?.title || '',
         canvas: { blocks: transformedBlocks, edges: transformedEdges },
       }),
       {
