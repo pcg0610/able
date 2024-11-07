@@ -70,63 +70,30 @@ export const ModalBody = styled.div`
   gap: 1rem;
 `;
 
-export const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-export const Label = styled.label`
-  font-size: ${Common.fontSizes.sm};
-  margin-bottom: 0.25rem;
-`;
-
-export const Input = styled.input`
-  padding: 0.5rem;
-  border: 0.0625rem solid #ddd;
-  border-radius: 0.25rem;
-  font-size: ${Common.fontSizes.sm};
-  &.readonly {
-    background-color: #f0f0f0;
-    color: #888;
-    cursor: not-allowed;
-  }
-  &::placeholder {
-    color: ${Common.colors.gray300};
-  }
-  &:focus {
-    border: 0.125rem solid #85b7d9;
-    outline: none;
-  }
-`;
-
-export const Select = styled.select`
-  padding: 0.5rem;
-  border: 0.0625rem solid #ddd;
-  border-radius: 0.25rem;
-  font-size: ${Common.fontSizes.sm};
-`;
-
 export const ModalFooter = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
+  margin-top: 2rem;
 `;
 
 export const CancelButton = styled.button`
-  background-color: #f5f5f5;
+  background-color: ${Common.colors.gray100};
+  color: ${Common.colors.black};
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   cursor: pointer;
   font-size: ${Common.fontSizes.sm};
+  font-weight: ${Common.fontWeights.medium};
 `;
 
 export const ConfirmButton = styled.button`
   background-color: #007bff;
-  color: white;
+  color: ${Common.colors.white};
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   cursor: pointer;
   font-size: ${Common.fontSizes.sm};
+  font-weight: ${Common.fontWeights.medium};
 `;
