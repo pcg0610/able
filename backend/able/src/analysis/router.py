@@ -20,7 +20,7 @@ async def get_feature_map( request: FeatureMapRequest):
     feature_map_list = service.get_feature_map(request)
     return ok(data=FeatureMapResponse(feature_map=feature_map_list))
 
-@router.get("",
+@router.post("",
              summary="분석 실행 및 히트맵 생성", description="특정 학습 결과의 에포크에 대해 샘플 이미지 1장을 받아 실행 후 히트맵을 반환" )
 async def analyze(project_name: str, result_name: str, epoch_name:str, file: UploadFile = File(...)):
     # if(file.content_type != "imge/jpeg"):
@@ -28,7 +28,7 @@ async def analyze(project_name: str, result_name: str, epoch_name:str, file: Upl
     image = await service.analyze(project_name, result_name, epoch_name, file)
     return ok(data=ImageResponse(image=image))
 
-@router.post("/model",
+@router.get("/model",
              summary="특정 학습 결과의 모델(캔버스) 불러오기", description="분석 페이지 접근 시 보여지는 블록 그래프")
 async def get_model(project_name:str, result_name:str):
     canvas = service.get_model(project_name, result_name)
