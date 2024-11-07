@@ -2,7 +2,7 @@ from math import ceil
 
 from src.file.path_manager import PathManager
 from src.file.utils import get_file
-from src.train_log.utils import parse_train_result_date, format_accuracy
+from src.train_log.utils import parse_train_result_date, format_float
 from src.train_log.schemas import TrainLogResponse, TrainSummary
 from src.utils import str_to_json, handle_pagination
 
@@ -28,12 +28,12 @@ def get_train_logs(title:str, page:int, page_size:int) -> list[TrainSummary] :
 
         performance_data = str_to_json(get_file(performance_metrics_path))
         raw_accuracy = performance_data["metrics"].get("accuracy")
-        accuracy = format_accuracy(raw_accuracy) if raw_accuracy is not None else "0%"
+        accuracy = format_float(raw_accuracy) if raw_accuracy is not None else "0"
 
         train_result = TrainSummary(
             index=index,
             date=formatted_date,
-            accuracy=accuracy,
+            accuracy=accuracy + "%",
             status=metadata["status"]
         )
 
