@@ -191,7 +191,7 @@ class Trainer:
                 best_valid_loss = valid_loss
 
         self.logger.create_epoch_log("final", train_accuracy, train_loss, valid_loss)
-        self.logger.save_model(self.model, "checkpoints/final/model_checkpoint_final.pth")
+        self.logger.save_model(self.model, "checkpoints/final/model.pth")
 
     def test(self) -> None:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
