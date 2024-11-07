@@ -4,11 +4,11 @@ import * as S from '@shared/ui/modal/modal.style';
 interface ModalProps {
   onClose: () => void;
   isClosing?: boolean;
-  onAnimationEnd: () => void;
+  onAnimationEnd?: () => void;
   title: string;
   children: ReactNode;
-  CancelText?: string;
-  ConfirmText?: string;
+  cancelText?: string;
+  confirmText?: string;
 }
 
 const Modal = ({
@@ -17,8 +17,8 @@ const Modal = ({
   onAnimationEnd,
   title,
   children,
-  CancelText = '취소',
-  ConfirmText = '확인',
+  cancelText = '취소',
+  confirmText = '확인',
 }: ModalProps) => (
   <S.ModalOverlay onClick={onClose} onAnimationEnd={onAnimationEnd} className={isClosing ? 'fadeOut' : 'fadeIn'}>
     <S.ModalWrapper onClick={(e) => e.stopPropagation()}>
@@ -28,8 +28,8 @@ const Modal = ({
       </S.ModalHeader>
       <S.ModalBody>{children}</S.ModalBody>
       <S.ModalFooter>
-        <S.CancelButton onClick={onClose}>{CancelText}</S.CancelButton>
-        <S.ConfirmButton>{ConfirmText}</S.ConfirmButton>
+        <S.CancelButton onClick={onClose}>{cancelText}</S.CancelButton>
+        <S.ConfirmButton>{confirmText}</S.ConfirmButton>
       </S.ModalFooter>
     </S.ModalWrapper>
   </S.ModalOverlay>
