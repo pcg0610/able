@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import * as S from '@shared/ui/modal/modal.style';
-import ModalPortal from './modal-portal';
 
 interface ModalProps {
   onClose: () => void;
@@ -21,7 +20,6 @@ const Modal = ({
   CancelText = '취소',
   ConfirmText = '확인',
 }: ModalProps) => (
-  // <ModalPortal>
   <S.ModalOverlay onClick={onClose} onAnimationEnd={onAnimationEnd} className={isClosing ? 'fadeOut' : 'fadeIn'}>
     <S.ModalWrapper onClick={(e) => e.stopPropagation()}>
       <S.ModalHeader>
@@ -35,7 +33,6 @@ const Modal = ({
       </S.ModalFooter>
     </S.ModalWrapper>
   </S.ModalOverlay>
-  // </ModalPortal>
 );
 
 export default Modal;
