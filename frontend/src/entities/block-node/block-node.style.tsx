@@ -55,3 +55,31 @@ export const Input = styled.input<{ required: boolean }>`
     color: ${Common.colors.gray200};
   }
 `;
+
+export const Image = styled.img`
+  width: 100%; 
+  max-height: 9.375rem; 
+  object-fit: contain; 
+`;
+
+export const CustomUploadContainer = styled.div`
+  border: none;
+  padding: 1.5625rem;
+  min-height: 9.375rem;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s ease;
+  color: #666666;
+
+  &:hover {
+    border-color: #666666;
+  }
+`;
+
+export const HiddenInput = styled.input`
+  display: none;
+`;
