@@ -10,6 +10,7 @@ from src.utils import encode_image_to_base64, get_epoch_id, str_to_json
 from src.analysis.utils import FeatureMapExtractor, read_blocks, load_model, load_parameter
 from src.train.utils import split_blocks
 from src.canvas.schemas import Canvas
+from src.analysis.schemas import FeatureMapRequest, FeatureMap
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,13 +23,21 @@ def get_epochs(project_name: str, result_name: str) -> List[str]:
     return [epoch.name for epoch in epochs if epoch.is_dir()]
 
 
-def get_result(project_name: str, result_name: str, epoch_name:str, block_id: str) -> str:
-    feature_map_path = pathManager.get_feature_maps_path(project_name, result_name, get_epoch_id(epoch_name))
+def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
+    feature_map_path = pathManager.get_feature_maps_path(request.project_name, request.result_name, get_epoch_id(request.epoch_name))
     
-    image_name = 'layers.' + block_id + ".jpg"
-    feature_map_image = encode_image_to_base64(read_image_file(feature_map_path / image_name))
+    feature_map_list = []
 
-    return feature_map_image
+    for id in request.block_id :
+        image_name = 'layers.' + id + ".jpg"
+        image_data = None
+        try:
+            image_data = encode_image_to_base64(read_image_file(feature_map_path / image_name))
+        except Exception as e:
+            logger.error(f"feature map이 존재하지 않는 블록: {id}")
+        feature_map_list.append(FeatureMap(block_id=id, img=image_data))
+
+    return feature_map_list
 
 async def analyze(project_name: str, result_name: str, epoch_name:str, file: UploadFile) -> str:
     epoch_path = pathManager.get_epoch_path(project_name, result_name, get_epoch_id(epoch_name))

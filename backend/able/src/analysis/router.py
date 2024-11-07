@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File
 
 from src.response.schemas import ResponseModel
-from src.analysis.schemas import EpochsResponse, ImageResponse
+from src.analysis.schemas import EpochsResponse, ImageResponse, FeatureMapRequest, FeatureMapResponse
 import src.analysis.service as service
 from src.canvas.schemas import GetCanvasResponse
 from src.response.utils import ok, bad_request
@@ -14,13 +14,13 @@ async def get_epochs(project_name: str, result_name: str):
     epochs = service.get_epochs(project_name, result_name)
     return ok(data=EpochsResponse(epochs=epochs))
 
-@router.get("/feature-map", response_model=ResponseModel[ImageResponse],
-            summary="피쳐 맵 조회", description="특정 블록의 피쳐맵 조회")
-async def get_result(project_name: str, result_name: str, epoch_name:str, block_id: str):
-    image = service.get_result(project_name, result_name, epoch_name, block_id)
-    return ok(data=ImageResponse(image=image))
+@router.post("/feature-map", response_model=ResponseModel[ImageResponse],
+            summary="피쳐 맵 조회", description="블록의 피쳐맵 조회, 피쳐맵이 존재하지 않는 블록일 경우 null 반환")
+async def get_feature_map( request: FeatureMapRequest):
+    feature_map_list = service.get_feature_map(request)
+    return ok(data=FeatureMapResponse(feature_map=feature_map_list))
 
-@router.post("",
+@router.get("",
              summary="분석 실행 및 히트맵 생성", description="특정 학습 결과의 에포크에 대해 샘플 이미지 1장을 받아 실행 후 히트맵을 반환" )
 async def analyze(project_name: str, result_name: str, epoch_name:str, file: UploadFile = File(...)):
     # if(file.content_type != "imge/jpeg"):
