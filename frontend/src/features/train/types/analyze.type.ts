@@ -14,3 +14,8 @@ export interface EpochResponse {
   epochs: string[];
   hasNext: boolean;
 }
+
+export interface ImageStore {
+  uploadedImage: string | null;
+  setUploadedImage: (image: string | null) => void;
+}
