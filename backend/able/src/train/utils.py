@@ -177,13 +177,15 @@ class Trainer:
             # Checkpoint (간단히 마지막 모델만 저장)
             if (epoch + 1) % self.checkpoint_interval == 0:
                 self.logger.create_epoch_log(epoch + 1, train_accuracy, train_loss, valid_loss)
-                self.logger.save_model(self.model, f"epochs/epoch_{epoch + 1}/model_checkpoint_epoch_{epoch + 1}.pth")
+                self.logger.save_model(self.model, f"epochs/epoch_{epoch + 1}/parameter.pth")
 
             if best_train_loss > train_loss:
                 self.logger.save_model(self.model, f"model_checkpoint_best_train_loss.pth")
 
             if best_valid_loss > valid_loss:
                 self.logger.save_model(self.model, f"model_checkpoint_best_valid_loss.pth")
+
+        self.logger.save_model(self.model, "model_checkpoint_final.pth")
 
     def test(self) -> None:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
