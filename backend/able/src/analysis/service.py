@@ -62,12 +62,9 @@ async def analyze(project_name: str, result_name: str, epoch_name:str, file: Upl
     img_path = await save_img(feature_maps_path, "original.jpg", file)
 
     # 모델 로드
-    model_path = pathManager.get_train_result_path(project_name, result_name) / "model.pth"
+    model_path = epoch_path / "model.pth"
     model = load_model(model_path)
 
-    # 파라미터 적용
-    parameter_path = str(epoch_path / "parameter.pth")
-    load_parameter(model, parameter_path)
 
     extractor = FeatureMapExtractor(model, epoch_path, feature_maps_path, transform_blocks, img_path, device="cpu")
 
