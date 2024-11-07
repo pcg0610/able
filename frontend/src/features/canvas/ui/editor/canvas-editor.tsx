@@ -37,6 +37,7 @@ import BlockNode from '@entities/block-node/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
+import TrainModal from '@features/canvas/ui/modal/train-modal';
 
 const CanvasEditor = () => {
   const { projectName } = useProjectNameStore();
@@ -46,6 +47,7 @@ const CanvasEditor = () => {
   const [nodes, setNodes] = useNodesState(initialNodes);
   const [edges, setEdges] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<XYFlowNode | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { handleNodesChange } = useNodeChangeHandler({
     nodes,
@@ -118,7 +120,11 @@ const CanvasEditor = () => {
   );
 
   const handleTrainButtonClick = () => {
-    console.log('실행');
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   const handleSavaButtonClick = async () => {
@@ -139,42 +145,45 @@ const CanvasEditor = () => {
   };
 
   return (
-    <S.Canvas ref={dropRef}>
-      <ReactFlow
-        nodes={nodes.map((node) => ({
-          ...node,
-          data: {
-            ...node.data,
-            onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
-          },
-        }))}
-        edges={edges}
-        onNodesChange={handleNodesChange}
-        onEdgesChange={handleEdgesChange}
-        onConnect={onConnect}
-        onNodeClick={(_, node) => setSelectedNode(node)}
-        nodeTypes={{ custom: BlockNode }}
-      >
-        <Controls position="bottom-center" orientation="horizontal" />
-        <Background variant={BackgroundVariant.Dots} />
-      </ReactFlow>
-      <S.OverlayButton>
-        <BasicButton
-          text="실행"
-          icon={<PlayIcon width={13} height={16} />}
-          width="5.5rem"
-          onClick={handleTrainButtonClick}
-        />
-        <BasicButton
-          text="저장"
-          color={Common.colors.primary}
-          backgroundColor={Common.colors.secondary}
-          icon={<SaveIcon />}
-          width="5.5rem"
-          onClick={handleSavaButtonClick}
-        />
-      </S.OverlayButton>
-    </S.Canvas>
+    <>
+      {isModalOpen && <TrainModal onClose={handleCloseModal} />}
+      <S.Canvas ref={dropRef}>
+        <ReactFlow
+          nodes={nodes.map((node) => ({
+            ...node,
+            data: {
+              ...node.data,
+              onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
+            },
+          }))}
+          edges={edges}
+          onNodesChange={handleNodesChange}
+          onEdgesChange={handleEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={(_, node) => setSelectedNode(node)}
+          nodeTypes={{ custom: BlockNode }}
+        >
+          <Controls position="bottom-center" orientation="horizontal" />
+          <Background variant={BackgroundVariant.Dots} />
+        </ReactFlow>
+        <S.OverlayButton>
+          <BasicButton
+            text="실행"
+            icon={<PlayIcon width={13} height={16} />}
+            width="5.5rem"
+            onClick={handleTrainButtonClick}
+          />
+          <BasicButton
+            text="저장"
+            color={Common.colors.primary}
+            backgroundColor={Common.colors.secondary}
+            icon={<SaveIcon />}
+            width="5.5rem"
+            onClick={handleSavaButtonClick}
+          />
+        </S.OverlayButton>
+      </S.Canvas>
+    </>
   );
 };
 
