@@ -13,6 +13,7 @@ from src.canvas.router import canvas_router
 from src.project.router import project_router
 from src.analysis.router import analysis_router
 from src.exceptions import BaseCustomException
+from src.train_log.router import train_log_router
 from src.validation.router import validation_router
 
 app = FastAPI()
@@ -31,6 +32,8 @@ app.add_middleware(
 )
 
 app.include_router(train_router, prefix="/trains", tags=["학습"])
+
+app.include_router(train_log_router, prefix="/projects", tags=["학습 결과"])
 
 app.include_router(block_router, prefix="/blocks", tags=["블록"])
 

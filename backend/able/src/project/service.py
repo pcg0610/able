@@ -1,3 +1,4 @@
+from math import ceil
 from typing import List, Optional
 import logging
 
@@ -35,7 +36,6 @@ def get_project(title: str) -> Optional[SelectedProject]:
     thumbnail_path = path_manager.get_projects_path(title) / THUMBNAIL
 
     data = get_file(metadata_path)
-    
     project = SelectedProject.model_validate(str_to_json(data))
     try :
         project.thumbnail = encode_image_to_base64(read_image_file(thumbnail_path))
@@ -44,7 +44,6 @@ def get_project(title: str) -> Optional[SelectedProject]:
         project.thumbnail = None
 
     return project
-
 
 def get_projects() -> List[str]:
     projects_path = path_manager.projects_path
