@@ -6,6 +6,6 @@ def parse_train_result_date(folder_name: str) -> str:
     dt = datetime.strptime(folder_name, "%Y%m%d_%H%M%S")
     return dt.strftime("%Y.%m.%d %H:%M")
 
-def format_accuracy(accuracy_value: float) -> str:
+def format_float(accuracy_value: float) -> str:
     # accuracy -> percentage
-    return f"{math.floor(accuracy_value * 100)}%"
+    return f"{math.floor(accuracy_value * 100)}"
