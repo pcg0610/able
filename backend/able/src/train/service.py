@@ -1,7 +1,7 @@
 import json
 from . import TrainRequest
-from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
-from .dto import TrainResultRequest
+from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy, Device
+from .dto import TrainResultRequest, DeviceListResponse
 from .utils import *
 from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format, get_file, create_directory
@@ -75,10 +75,14 @@ def train(request: TrainRequest):
 
     save_result_model(project_name, result_name, model)
 
-    logger = TrainLogger(project_name, result_name)
+    device = 'cpu'
+    if request.device.index != -1:
+        device = f"cuda:{request.device.index}"
+
+    train_logger = TrainLogger(project_name, result_name)
 
     try:
-        trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name, result_path), device=request.device)
+        trainer = Trainer(model, dataset, criterion, optimizer, request.batch_size, TrainLogger(request.project_name, result_path), device=device)
 
         logger.info("학습 시작")
         trainer.train(request.epoch)
@@ -87,9 +91,9 @@ def train(request: TrainRequest):
         logger.info("테스트 시작")
         trainer.test()
         logger.info("테스트 종료")
-        logger.update_status(TrainStatus.COMPLETE)
+        train_logger.update_status(TrainStatus.COMPLETE)
     except Exception as e:
-        logger.update_status(TrainStatus.FAIL)
+        train_logger.update_status(TrainStatus.FAIL)
         raise e
 
 def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
@@ -139,3 +143,11 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
         f1_score=f1_score,
         epoch_result=epoch_results
     )
+
+def get_device_list() -> DeviceListResponse:
+    device_list = [Device(index=-1, name='cpu')]
+
+    for index in range(torch.cuda.device_count()):
+        device_list.append(Device(index=index, name=torch.cuda.get_device_name(index)))
+
+    return DeviceListResponse(devices=device_list)
