@@ -4,7 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import * as S from '@/features/home/ui/content/home-content.style';
 import Common from '@shared/styles/common';
 import { useProject } from '@features/home/api/use-home.query';
-import { useProjectStore, useProjectStateStore } from '@entities/project/model/project.model';
+import {
+  useProjectStore,
+  useProjectStateStore,
+} from '@entities/project/model/project.model';
 
 import HistoryList from '@/features/home/ui/content/history-list';
 import Pagination from '@shared/ui/pagination/pagination';
@@ -32,9 +35,7 @@ const HomeContent = () => {
   const { projectName } = useProjectStateStore();
   const { currentProject, setCurrentProject } = useProjectStore();
 
-  const { data: project, isLoading, error } = useProject(projectName, {
-    enabled: !!projectName,
-  });
+  const { data: project, isLoading, error } = useProject(projectName);
 
   const handleCanvasClick = () => {
     navigate('/canvas');

@@ -17,7 +17,6 @@ const fetchProject = async (title: string) => {
   try {
     const response = await axiosInstance.get(`/projects/${title}`);
     const project = response.data?.data?.project;
-    console.log(project);
     return project || null;
   } catch (error) {
     console.error('Failed to fetch projects:', error);
@@ -32,7 +31,7 @@ export const useProjects = () => {
   });
 };
 
-export const useProject = (title: string, p0: { enabled: boolean }) => {
+export const useProject = (title: string) => {
   return useQuery({
     queryKey: homeKey.project(title),
     queryFn: () => fetchProject(title),
