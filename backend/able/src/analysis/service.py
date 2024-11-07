@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 pathManager = PathManager()
 
 def get_epochs(project_name: str, result_name: str, index: int, size: int) -> EpochsResponse:
-    epochs_path = pathManager.get_epochs_path(project_name, result_name)
+    epochs_path = pathManager.get_checkpoints_path(project_name, result_name)
     epochs = get_directory(epochs_path)
 
     page_item = handle_pagination(
@@ -47,7 +47,7 @@ def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
     return feature_map_list
 
 async def analyze(project_name: str, result_name: str, epoch_name:str, file: UploadFile) -> str:
-    epoch_path = pathManager.get_epoch_path(project_name, result_name, get_epoch_id(epoch_name))
+    epoch_path = pathManager.get_checkpoint_path(project_name, result_name, get_epoch_id(epoch_name))
     feature_maps_path = pathManager.get_feature_maps_path(project_name, result_name, get_epoch_id(epoch_name))
 
     #block_graph.json 파일에서 블록 읽어오기

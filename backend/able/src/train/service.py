@@ -62,7 +62,7 @@ def train(request: TrainRequest):
 
     # 결과 및 에포크 디렉터리 생성
     result_path = path_manager.get_train_results_path(project_name) / result_name
-    epochs_path = path_manager.get_epochs_path(project_name, result_name)
+    epochs_path = path_manager.get_checkpoints_path(project_name, result_name)
     create_directory(result_path)
     create_directory(epochs_path)
 
@@ -113,7 +113,7 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     f1_score = json.loads(get_file(result_path / "f1_score.json"))["f1_score"]
 
     # 에포크 결과 로드
-    epochs_path = path_manager.get_epochs_path(project_name, result_name)
+    epochs_path = path_manager.get_checkpoints_path(project_name, result_name)
     epoch_results: List[EpochResult] = []
 
     for epoch_dir in epochs_path.iterdir():

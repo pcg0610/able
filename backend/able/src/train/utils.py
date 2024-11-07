@@ -56,8 +56,8 @@ class TrainLogger:
         new_metadata_content = json_to_str(metadata_dict)
         create_file(self.metadata_path, new_metadata_content)
 
-    def create_epoch_log(self, epoch_id: int, accuracy: float, validation_loss: float, training_loss: float):
-        epoch_path = pathManager.get_epoch_path(self.project_name, self.result_name, epoch_id)
+    def create_epoch_log(self, checkpoint: str, accuracy: float, validation_loss: float, training_loss: float):
+        epoch_path = pathManager.get_checkpoint_path(self.project_name, self.result_name, checkpoint)
 
         create_file(epoch_path / ACCURACY, json_to_str({'accuracy': accuracy}))
         create_file(epoch_path / VALIDATION_LOSS, json_to_str({'loss': validation_loss}))
@@ -162,7 +162,12 @@ class Trainer:
     def train(self, epochs) -> None:
         best_train_loss = MAX_LOSS
         best_valid_loss = MAX_LOSS
-        
+
+        train_loss = 0
+        train_accuracy = 0
+        valid_loss = 0
+        valid_accuracy = 0
+
         for epoch in range(epochs):
 
             # Training and validation
@@ -172,16 +177,21 @@ class Trainer:
 
             # Checkpoint (간단히 마지막 모델만 저장)
             if (epoch + 1) % self.checkpoint_interval == 0:
-                self.logger.create_epoch_log(epoch + 1, train_accuracy, train_loss, valid_loss)
-                self.logger.save_model(self.model, f"checkpoints/epoch_{epoch + 1}/parameter.pth")
+                self.logger.create_epoch_log(f"epoch_{epoch + 1}", train_accuracy, train_loss, valid_loss)
+                self.logger.save_model(self.model, f"checkpoints/epoch_{epoch + 1}/model.pth")
 
             if best_train_loss > train_loss:
-                self.logger.save_model(self.model, f"model_checkpoint_best_train_loss.pth")
+                self.logger.create_epoch_log("train_best", train_accuracy, train_loss, valid_loss)
+                self.logger.save_model(self.model, f"checkpoints/train_best/model.pth")
+                best_train_loss = train_loss
 
             if best_valid_loss > valid_loss:
-                self.logger.save_model(self.model, f"model_checkpoint_best_valid_loss.pth")
+                self.logger.create_epoch_log("valid_best", train_accuracy, train_loss, valid_loss)
+                self.logger.save_model(self.model, f"checkpoints/valid_best/model.pth")
+                best_valid_loss = valid_loss
 
-        self.logger.save_model(self.model, "model_checkpoint_final.pth")
+        self.logger.create_epoch_log("final", train_accuracy, train_loss, valid_loss)
+        self.logger.save_model(self.model, "checkpoints/final/model_checkpoint_final.pth")
 
     def test(self) -> None:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
