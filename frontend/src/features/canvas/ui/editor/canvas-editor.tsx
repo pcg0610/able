@@ -21,6 +21,7 @@ import {
   initialNodes,
   initialEdges,
 } from '@features/canvas/model/initial-data';
+import { TOAST_MESSAGE } from '@features/canvas/costants/message.constant';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import {
   transformCanvasResponse,
@@ -77,7 +78,7 @@ const CanvasEditor = () => {
   // 노드를 연결할 때 호출
   const onConnect: OnConnect = (connection) => {
     if (!isValidConnection(nodes, edges)(connection)) {
-      toast.error('사이클 발생 위험이 있어요.');
+      toast.error(TOAST_MESSAGE.cycle);
       return;
     }
 
@@ -133,9 +134,9 @@ const CanvasEditor = () => {
         canvas: { blocks: transformedBlocks, edges: transformedEdges },
       }),
       {
-        loading: '저장 중...',
-        success: '저장이 완료되었어요.',
-        error: '저장에 실패했어요.',
+        loading: TOAST_MESSAGE.loading,
+        success: TOAST_MESSAGE.success,
+        error: TOAST_MESSAGE.error,
       }
     );
   };
