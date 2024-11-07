@@ -15,15 +15,13 @@ export const SidebarContainer = styled.div`
 
 export const EpochItem = styled.div<{ isSelected: boolean }>`
   padding: 0.75rem;
-  background-color: ${(props) =>
-    props.isSelected ? Common.colors.gray200 : "transparent"};
+  background-color: ${(props) => (props.isSelected ? Common.colors.gray200 : 'transparent')};
   border-radius: 0.375rem;
   font-weight: ${Common.fontWeights.regular};
   font-size: 0.9375rem;
   cursor: pointer;
   transition-property: background-color;
   transition-duration: 0.4s;
-
 
   &:hover {
     background-color: ${Common.colors.gray100};

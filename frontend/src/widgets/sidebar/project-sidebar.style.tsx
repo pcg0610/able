@@ -20,10 +20,8 @@ export const SidebarButton = styled.button<{ active: boolean }>`
   height: 2.8rem;
   margin: 0.6rem 0.6rem 0;
   border-radius: 0.625rem;
-  background-color: ${({ active }) =>
-    active ? Common.colors.primary : Common.colors.white};
-  color: ${({ active }) =>
-    active ? Common.colors.white : Common.colors.black};
+  background-color: ${({ active }) => (active ? Common.colors.primary : Common.colors.white)};
+  color: ${({ active }) => (active ? Common.colors.white : Common.colors.black)};
   border: none;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;

@@ -5,8 +5,7 @@ import Common from '@shared/styles/common';
 export const globalStyle = css`
   @font-face {
     font-family: 'Pretendard';
-    src: url('/src/assets/fonts/PretendardVariable.woff2')
-      format('woff2-variations');
+    src: url('/src/assets/fonts/PretendardVariable.woff2') format('woff2-variations');
     font-weight: 400 600;
     font-style: normal;
   }

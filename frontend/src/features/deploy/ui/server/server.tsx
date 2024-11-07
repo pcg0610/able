@@ -1,9 +1,5 @@
-
-
 const Server = () => {
-   return (
-      <></>
-   );
+  return <></>;
 };
 
-export default Server; 
+export default Server;

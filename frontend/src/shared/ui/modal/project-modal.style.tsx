@@ -86,16 +86,16 @@ export const Input = styled.input`
   border-radius: 0.25rem;
   font-size: ${Common.fontSizes.sm};
   &.readonly {
-    background-color: #f0f0f0; 
-    color: #888; 
+    background-color: #f0f0f0;
+    color: #888;
     cursor: not-allowed;
   }
   &::placeholder {
-    color: ${Common.colors.gray300}; 
+    color: ${Common.colors.gray300};
   }
   &:focus {
     border: 0.125rem solid #85b7d9;
-    outline: none; 
+    outline: none;
   }
 `;
 

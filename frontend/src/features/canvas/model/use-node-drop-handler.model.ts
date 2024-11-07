@@ -14,10 +14,7 @@ interface DropHandlerParams {
 }
 
 // 드래그한 블록을 캔버스에 드롭할 때, 해당 위치에 노드를 추가하고 중앙으로 위치 조정하는 함수
-export const useNodeDropHandler = ({
-  setNodes,
-  screenToFlowPosition,
-}: DropHandlerParams) => {
+export const useNodeDropHandler = ({ setNodes, screenToFlowPosition }: DropHandlerParams) => {
   // 새 노드 추가 및 마우스 커서 중앙에 위치하도록 조정하는 함수 호출
   const addCenteredNode = useAddCenteredNode({
     setNodes,

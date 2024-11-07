@@ -68,11 +68,7 @@ const HomeSideBar = () => {
 
       <S.FolderSection>
         {projects?.map((project, index) => (
-          <S.Folder
-            key={index}
-            isSelected={projectName === project}
-            onClick={() => handleClick(project)}
-          >
+          <S.Folder key={index} isSelected={projectName === project} onClick={() => handleClick(project)}>
             <FileIcon width={20} height={20} /> {project}
           </S.Folder>
         ))}
@@ -88,12 +84,7 @@ const HomeSideBar = () => {
         </div>
       </S.Footer>
       {isModalOpen && (
-        <ProjectModal
-          onClose={closeModal}
-          isClosing={isClosing}
-          onAnimationEnd={handleAnimationEnd}
-          type={'create'}
-        />
+        <ProjectModal onClose={closeModal} isClosing={isClosing} onAnimationEnd={handleAnimationEnd} type={'create'} />
       )}
     </S.SidebarContainer>
   );

@@ -40,9 +40,9 @@ export const GridContainer = styled.div`
 export const GraphCard = styled.div`
   background: ${Common.colors.white};
   padding: 1.25rem;
-  border-radius: .5rem;
-  box-shadow: 0 .0625rem .25rem rgba(0, 0, 0, 0.1);
-  border: .0625rem solid ${Common.colors.gray200};
+  border-radius: 0.5rem;
+  box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.1);
+  border: 0.0625rem solid ${Common.colors.gray200};
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -50,7 +50,7 @@ export const GraphCard = styled.div`
 `;
 
 export const GraphTitle = styled.h3`
-  margin: .2rem 0 .525rem .625rem;
+  margin: 0.2rem 0 0.525rem 0.625rem;
   margin-right: auto;
   font-size: ${Common.fontSizes.xl};
   font-weight: ${Common.fontWeights.medium};
@@ -58,7 +58,7 @@ export const GraphTitle = styled.h3`
 `;
 
 export const F1ScoreTitle = styled(GraphTitle)`
-  font-weight: ${Common.fontWeights.semiBold}; 
+  font-weight: ${Common.fontWeights.semiBold};
   margin-left: auto;
   font-size: ${Common.fontSizes['3xl']};
 `;

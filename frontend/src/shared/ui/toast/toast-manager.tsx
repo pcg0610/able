@@ -13,7 +13,7 @@ const ToastManager = () => {
       .forEach((t) => toast.dismiss(t.id));
   }, [toasts]);
 
-  return <Toaster position='top-center' />;
+  return <Toaster position="top-center" />;
 };
 
 export default ToastManager;

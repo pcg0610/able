@@ -46,7 +46,7 @@ export const DropdownList = styled.ul`
     background: ${Common.colors.gray100};
   }
 
-  &::-webkit-scrollbar-thumb  {
+  &::-webkit-scrollbar-thumb {
     background: ${Common.colors.gray300};
     border-radius: 0.3125rem;
   }

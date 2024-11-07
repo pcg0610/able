@@ -17,10 +17,7 @@ import toast from 'react-hot-toast';
 
 import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
-import {
-  initialNodes,
-  initialEdges,
-} from '@features/canvas/model/initial-data';
+import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
 import { TOAST_MESSAGE } from '@features/canvas/costants/message.constant';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import {
@@ -148,8 +145,7 @@ const CanvasEditor = () => {
           ...node,
           data: {
             ...node.data,
-            onFieldChange: (fieldName: string, value: string) =>
-              handleFieldChange(node.id, fieldName, value),
+            onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
           },
         }))}
         edges={edges}

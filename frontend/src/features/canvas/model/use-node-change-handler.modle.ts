@@ -10,11 +10,7 @@ interface NodeChangeHandlerProps {
   setSelectedNode: Dispatch<SetStateAction<Node | null>>;
 }
 
-export const useNodeChangeHandler = ({
-  nodes,
-  setNodes,
-  setSelectedNode,
-}: NodeChangeHandlerProps) => {
+export const useNodeChangeHandler = ({ nodes, setNodes, setSelectedNode }: NodeChangeHandlerProps) => {
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
       setNodes((nds) => {
@@ -31,13 +27,9 @@ export const useNodeChangeHandler = ({
       });
 
       // 노드가 변경될 때마다 선택된 노드 업데이트
-      const selectedChange = changes.find(
-        (change) =>
-          change.type === 'select' && 'id' in change && change.selected
-      );
+      const selectedChange = changes.find((change) => change.type === 'select' && 'id' in change && change.selected);
       if (selectedChange && 'id' in selectedChange) {
-        const selectedNode =
-          nodes.find((node) => node.id === selectedChange.id) || null;
+        const selectedNode = nodes.find((node) => node.id === selectedChange.id) || null;
         setSelectedNode(selectedNode);
       }
     },

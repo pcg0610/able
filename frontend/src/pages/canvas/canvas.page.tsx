@@ -14,7 +14,7 @@ const CanvasPage = () => {
     <DndProvider backend={HTML5Backend}>
       <ReactFlowProvider>
         <S.PageContainer>
-          <PageHeader title='프로젝트' />
+          <PageHeader title="프로젝트" />
           <S.Content>
             <CanvasSidebar />
             <CanvasEditor />

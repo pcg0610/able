@@ -1,9 +1,4 @@
-import {
-  getOutgoers,
-  type Node as XYFlowNode,
-  type Edge as XYFlowEdge,
-  type Connection,
-} from '@xyflow/react';
+import { getOutgoers, type Node as XYFlowNode, type Edge as XYFlowEdge, type Connection } from '@xyflow/react';
 
 // connection이 사이클 발생하는지 확인
 export const isValidConnection = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
@@ -14,10 +9,7 @@ export const isValidConnection = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
     if (!targetNode || targetNode.id === connection.source) return false;
 
     // 재귀적으로 자식 노드를 탐색하여 사이클을 감지
-    const hasCycle = (
-      node: XYFlowNode,
-      visited = new Set<string>()
-    ): boolean => {
+    const hasCycle = (node: XYFlowNode, visited = new Set<string>()): boolean => {
       // 이미 탐색한 노드이면 탐색 불필요
       if (visited.has(node.id)) return false;
 
@@ -28,8 +20,7 @@ export const isValidConnection = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
       // 자식 노드 중 하나가 출발 노드와 동일하다면 사이클 발생
       // getOutgoers: 현재 노드에서 출발하는 모든 자식 노드(outgoers) 반환
       return getOutgoers(node, nodes, edges).some(
-        (outgoer) =>
-          outgoer.id === connection.source || hasCycle(outgoer, visited)
+        (outgoer) => outgoer.id === connection.source || hasCycle(outgoer, visited)
       );
     };
 
