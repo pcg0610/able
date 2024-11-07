@@ -17,17 +17,17 @@ logger = logging.getLogger(__name__)
 
 pathManager = PathManager()
 
-def get_epochs(project_name: str, result_name: str, index: int, size: int) -> EpochsResponse:
-    epochs_path = pathManager.get_checkpoints_path(project_name, result_name)
-    epochs = get_directory(epochs_path)
+def get_checkpoints(project_name: str, result_name: str, index: int, size: int) -> EpochsResponse:
+    checkpoints_path = pathManager.get_checkpoints_path(project_name, result_name)
+    checkpoints = get_directory(checkpoints_path)
 
     page_item = handle_pagination(
-        [epoch.name for epoch in epochs if epoch.is_dir()],
+        [epoch.name for epoch in checkpoints if epoch.is_dir()],
         index,
         size
     )
 
-    return EpochsResponse(epochs=page_item, has_next=has_next_page(len(epochs), index, size))
+    return EpochsResponse(epochs=page_item, has_next=has_next_page(len(checkpoints), index, size))
 
 
 def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
@@ -46,7 +46,7 @@ def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
 
     return feature_map_list
 
-async def analyze(project_name: str, result_name: str, epoch_name:str, file: UploadFile) -> str:
+async def analyze(project_name: str, result_name: str, epoch_name:str, device_name: str, device_index: int, file: UploadFile) -> str:
     epoch_path = get_model_path(project_name, result_name, epoch_name)
     feature_maps_path = epoch_path / "feature_maps"
 
@@ -61,12 +61,16 @@ async def analyze(project_name: str, result_name: str, epoch_name:str, file: Upl
     create_directory(feature_maps_path)
     img_path = await save_img(feature_maps_path, "original.jpg", file)
 
+    # 디바이스
+    device = 'cpu'
+    if device_index != -1:
+        device = f"cuda:{device_index}"
+
     # 모델 로드
     model_path = epoch_path / "model.pth"
-    model = load_model(model_path)
+    model = load_model(model_path, device)
 
-
-    extractor = FeatureMapExtractor(model, epoch_path, feature_maps_path, transform_blocks, img_path, device="cpu")
+    extractor = FeatureMapExtractor(model, epoch_path, feature_maps_path, transform_blocks, img_path, device)
 
     # 피쳐맵 추출 훅 적용 후 실행
     extractor.analyze()
@@ -81,10 +85,10 @@ def get_block_graph(project_name: str, result_name: str) -> Canvas :
 
 def get_model_path(project_name: str, result_name: str, epoch_name: str) -> Path:
         if epoch_name == "train":
-             return pathManager.get_epochs_path(project_name, result_name) / "train_best"
+             return pathManager.get_checkpoints_path(project_name, result_name) / "train_best"
         if epoch_name == "valid":
-             return pathManager.get_epochs_path(project_name, result_name) / "valid_best"
+             return pathManager.get_checkpoints_path(project_name, result_name) / "valid_best"
         if epoch_name == "final":
-             return pathManager.get_epochs_path(project_name, result_name) / "final"
+             return pathManager.get_checkpoints_path(project_name, result_name) / "final"
 
-        return pathManager.get_epoch_path(project_name, result_name, get_epoch_id(epoch_name)) 
+        return pathManager.get_checkpoint_path(project_name, result_name, epoch_name) 
