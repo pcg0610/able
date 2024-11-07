@@ -13,20 +13,21 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
-import * as S from '@features/canvas/ui/canvas-editor.style';
+import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
 import {
   initialNodes,
   initialEdges,
-} from '@/features/canvas/model/initial-data';
+} from '@features/canvas/model/initial-data';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import {
   transformCanvasResponse,
   transformEdgesToEdgeSchema,
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
-import { useFetchCanvas } from '@/features/canvas/api/use-canvas.query';
+import { useFetchCanvas } from '@features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
 import { useNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
@@ -36,7 +37,6 @@ import BlockNode from '@entities/block-node/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
-import toast from 'react-hot-toast';
 
 const CanvasEditor = () => {
   const { data } = useFetchCanvas('춘식이');
