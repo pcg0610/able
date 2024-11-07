@@ -134,8 +134,8 @@ const CanvasEditor = () => {
       }),
       {
         loading: '저장 중...',
-        success: '저장 완료',
-        error: '저장 실패',
+        success: '저장이 완료되었어요.',
+        error: '저장에 실패했어요.',
       }
     );
   };
