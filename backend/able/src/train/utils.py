@@ -162,7 +162,12 @@ class Trainer:
     def train(self, epochs) -> None:
         best_train_loss = MAX_LOSS
         best_valid_loss = MAX_LOSS
-        
+
+        train_loss = 0
+        train_accuracy = 0
+        valid_loss = 0
+        valid_accuracy = 0
+
         for epoch in range(epochs):
 
             # Training and validation
@@ -178,12 +183,15 @@ class Trainer:
             if best_train_loss > train_loss:
                 self.logger.create_epoch_log("train_best", train_accuracy, train_loss, valid_loss)
                 self.logger.save_model(self.model, f"checkpoints/train_best/model.pth")
+                best_train_loss = train_loss
 
             if best_valid_loss > valid_loss:
                 self.logger.create_epoch_log("valid_best", train_accuracy, train_loss, valid_loss)
                 self.logger.save_model(self.model, f"checkpoints/valid_best/model.pth")
+                best_valid_loss = valid_loss
 
-        self.logger.save_model(self.model, "model_checkpoint_final.pth")
+        self.logger.create_epoch_log("final", train_accuracy, train_loss, valid_loss)
+        self.logger.save_model(self.model, "checkpoints/final/model_checkpoint_final.pth")
 
     def test(self) -> None:
         self.model.eval()  # 평가 모드로 전환 (드롭아웃 비활성화 등)
