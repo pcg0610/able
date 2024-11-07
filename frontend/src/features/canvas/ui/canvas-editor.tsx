@@ -7,12 +7,8 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
-  applyNodeChanges,
-  applyEdgeChanges,
   type OnConnect,
   MarkerType,
-  NodeChange,
-  EdgeChange,
   Node,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -20,19 +16,21 @@ import { useCallback, useEffect, useState } from 'react';
 
 import * as S from '@features/canvas/ui/canvas-editor.style';
 import Common from '@shared/styles/common';
-import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
 import {
   initialNodes,
   initialEdges,
 } from '@/features/canvas/model/initial-data';
-import { useFetchCanvas } from '@/features/canvas/api/use-canvas.query';
-import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import {
   transformCanvasResponse,
   transformEdgesToEdgeSchema,
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
+import { useFetchCanvas } from '@/features/canvas/api/use-canvas.query';
+import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
+import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
+import { useNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
+import { useEdgeChangeHandler } from '@features/canvas/model/use-edge-change-handler.model';
 
 import BlockNode from '@entities/block-node/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
@@ -47,6 +45,19 @@ const CanvasEditor = () => {
   const [nodes, setNodes] = useNodesState(initialNodes);
   const [edges, setEdges] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+
+  const { handleNodesChange } = useNodeChangeHandler({
+    nodes,
+    setNodes,
+    selectedNode,
+    setSelectedNode,
+  });
+  const { handleEdgesChange } = useEdgeChangeHandler({
+    edges,
+    setEdges,
+    nodes,
+    selectedNode,
+  });
 
   const { screenToFlowPosition } = useReactFlow();
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
@@ -93,65 +104,6 @@ const CanvasEditor = () => {
       );
     },
     [setNodes]
-  );
-
-  const handleNodesChange = useCallback(
-    (changes: NodeChange[]) => {
-      setNodes((nds) => {
-        const filteredChanges = changes.filter((change) => {
-          if (change.type === 'remove' && 'id' in change) {
-            const node = nds.find((node) => node.id === change.id);
-            const data = node?.data as { block: BlockItem };
-            return data?.block?.type !== 'data';
-          }
-          return true;
-        });
-
-        return applyNodeChanges(filteredChanges, nds);
-      });
-
-      // 노드가 변경될 때마다 선택된 노드 업데이트
-      const selectedChange = changes.find(
-        (change) =>
-          change.type === 'select' && 'id' in change && change.selected
-      );
-      if (selectedChange && 'id' in selectedChange) {
-        const selectedNode =
-          nodes.find((node) => node.id === selectedChange.id) || null;
-        setSelectedNode(selectedNode);
-      }
-    },
-    [setNodes, nodes]
-  );
-
-  const handleEdgesChange = useCallback(
-    (changes: EdgeChange[]) => {
-      setEdges((eds) => {
-        const filteredChanges = changes.filter((change) => {
-          if (change.type === 'remove' && selectedNode) {
-            // 현재 선택된 노드가 data 타입일 경우 해당 노드와 연결된 엣지는 삭제 불가
-            const sourceNode = nodes.find(
-              (node) => node.id === selectedNode.id
-            );
-            const data = sourceNode?.data as { block: BlockItem };
-            if (data?.block?.type === 'data') {
-              const edge = eds.find((edge) => edge.id === change.id);
-              if (
-                edge &&
-                (edge.source === selectedNode.id ||
-                  edge.target === selectedNode.id)
-              ) {
-                return false;
-              }
-            }
-          }
-          return true;
-        });
-
-        return applyEdgeChanges(filteredChanges, eds);
-      });
-    },
-    [setEdges, nodes, selectedNode]
   );
 
   const handleTrainButtonClick = () => {
