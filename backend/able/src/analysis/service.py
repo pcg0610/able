@@ -20,18 +20,19 @@ pathManager = PathManager()
 def get_checkpoints(project_name: str, result_name: str, index: int, size: int) -> CheckpointResponse:
     checkpoints_path = pathManager.get_checkpoints_path(project_name, result_name)
     checkpoints = get_directory(checkpoints_path)
+    items = [epoch.name for epoch in checkpoints if epoch.is_dir() and epoch.name not in {"train_best", "valid_best", "final"}]
 
     page_item = handle_pagination(
-        [epoch.name for epoch in checkpoints if epoch.is_dir()],
+        items,
         index,
         size
     )
 
-    return CheckpointResponse(epochs=page_item, has_next=has_next_page(len(checkpoints), index, size))
+    return CheckpointResponse(epochs=page_item, has_next=has_next_page(len(items), index, size))
 
 
 def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
-    feature_map_path = get_model_path(request.project_name, request.result_name, request.epoch_name) / "feature_maps"
+    feature_map_path = pathManager.get_feature_maps_path(request.project_name, request.result_name, request.epoch_name)
     
     feature_map_list = []
 
@@ -46,8 +47,8 @@ def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
 
     return feature_map_list
 
-async def analyze(project_name: str, result_name: str, checkpoint_name:str, device_name: str, device_index: int, file: UploadFile) -> str:
-    checkpoint_path = get_model_path(project_name, result_name, checkpoint_name)
+async def analyze(project_name: str, result_name: str, checkpoint_name:str, device_index: int, file: UploadFile) -> str:
+    checkpoint_path = pathManager.get_checkpoint_path(project_name, result_name, checkpoint_name)
     feature_maps_path = checkpoint_path / "feature_maps"
 
     #block_graph.json 파일에서 블록 읽어오기
@@ -82,13 +83,3 @@ def get_block_graph(project_name: str, result_name: str) -> Canvas :
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
     block = Canvas(**str_to_json(get_file(block_graph_path)))
     return block
-
-def get_model_path(project_name: str, result_name: str, checkpoint_name: str) -> Path:
-        if checkpoint_name == "train":
-             return pathManager.get_checkpoints_path(project_name, result_name) / "train_best"
-        if checkpoint_name == "valid":
-             return pathManager.get_checkpoints_path(project_name, result_name) / "valid_best"
-        if checkpoint_name == "final":
-             return pathManager.get_checkpoints_path(project_name, result_name) / "final"
-
-        return pathManager.get_checkpoint_path(project_name, result_name, checkpoint_name) 
