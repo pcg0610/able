@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List
 from pydantic import BaseModel
 import logging
 import base64
@@ -45,3 +45,21 @@ def get_epoch_id(epoch_dir_name: str) -> int:
         return int(epoch_id.group(1))
     else :
         raise FileNotFoundException(f"{epoch_dir_name}을 찾을 수 없습니다.")
+    
+def handle_pagination(items: List[Any], index: int, size: int) -> List[Any]:
+    items_length = len(items)
+    if(index * size) >= items_length:
+        logger.error("범위를 넘어간 페이지 조회")
+        return None
+    
+    if (index * size + size) > items_length:
+        logger.info(f"마지막 페이지 조회 성공")
+        return items[index * size:]
+    
+    logger.info(f"{index + 1}페이지 조회 성공")
+    return items[index * size:index * size + size]
+
+def has_next_page(items_length: int, index: int, size: int) -> bool:
+    if(index * size + size < items_length):
+        return True
+    return False
