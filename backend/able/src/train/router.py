@@ -1,7 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks
 from starlette.responses import Response
 
-from .dto import TrainResultRequest, TrainRequest
+from .dto import TrainRequest
 from .service import train_in_background, load_train_result
 from src.train.schemas import TrainResultResponse
 from src.response.utils import ok
@@ -18,9 +18,7 @@ train_router = router = APIRouter()
 )
 def get_train_result(project_name: str, train_result_name: str):
     return ok(
-        data=TrainResultResponse(
-            train_result=load_train_result(project_name, train_result_name)
-        )
+        data=load_train_result(project_name, train_result_name)
     )
 
 

@@ -98,7 +98,7 @@ def train(request: TrainRequest):
 def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
 
     # 결과 디렉터리 경로 설정
-    result_path = path_manager.get_train_results_path(project_name) / result_name
+    result_path = path_manager.get_train_result_path(project_name, result_name)
 
     # 혼동 행렬 이미지 로드 및 인코딩
     image_bytes = read_image_file(result_path / "confusion_matrix.jpg")  # 파일 경로에서 bytes 읽기
@@ -109,7 +109,7 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     performance_metrics = PerformanceMetrics.model_validate(performance_metrics_data["metrics"])
 
     # F1 스코어 로드
-    f1_score = json.loads(get_file(result_path / "f1_score.json"))["f1_score"]
+    f1_score = str_to_json(get_file(result_path / "f1_score.json"))["f1_score"]
 
     # 에포크 결과 로드
     epochs_path = path_manager.get_checkpoints_path(project_name, result_name)
@@ -118,20 +118,21 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     for epoch_dir in epochs_path.iterdir():
         if epoch_dir.is_dir():
             epoch_id = epoch_dir.name
-            training_loss_data = json.loads(get_file(epoch_dir / "training_loss.json"))
-            validation_loss_data = json.loads(get_file(epoch_dir / "validation_loss.json"))
-            accuracy_data = json.loads(get_file(epoch_dir / "accuracy.json"))
+
+            training_loss_data = str_to_json(get_file(epoch_dir / "training_loss.json"))
+            validation_loss_data = str_to_json(get_file(epoch_dir / "validation_loss.json"))
+            accuracy_data = str_to_json(get_file(epoch_dir / "accuracy.json"))
 
             # 각 파일을 로드하여 모델 인스턴스로 변환
-            training_loss = Loss.model_validate(training_loss_data)
-            validation_loss = Loss.model_validate(validation_loss_data)
-            accuracy = Accuracy.model_validate(accuracy_data)
+            training_loss = Loss(training=training_loss_data["loss"], validation=validation_loss_data["loss"])
+            # validation_loss = Loss.model_validate(validation_loss_data)
+            accuracy = Accuracy(accuracy=accuracy_data["accuracy"])
 
             # 에포크 결과 인스턴스 생성
             epoch_result = EpochResult(
                 epoch=epoch_id,
-                losses=Loss(training=training_loss.training, validation=validation_loss.validation),
-                accuracies=Accuracy(accuracy=accuracy.accuracy)
+                losses=training_loss,
+                accuracies=accuracy
             )
             epoch_results.append(epoch_result)
 
@@ -139,6 +140,6 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     return TrainResultResponse(
         confusion_matrix=confusion_matrix,
         performance_metrics=performance_metrics,
-        f1_score=f1_score,
+        f1_score=str(f1_score),
         epoch_result=epoch_results
     )
