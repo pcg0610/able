@@ -3,13 +3,8 @@
     "type": "optimizer",
     "args": [
         {
-            "name": "params",
-            "value": "[]",
-            "is_required": true
-        },
-        {
             "name": "lr",
-            "value": "0.001",
+            "value": 0.001,
             "is_required": false
         },
         {
@@ -24,12 +19,12 @@
         },
         {
             "name": "weight_decay",
-            "value": "0",
+            "value": 0,
             "is_required": false
         },
         {
             "name": "amsgrad",
-            "value": "false",
+            "value": false,
             "is_required": false
         }
     ]

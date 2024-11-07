@@ -4,6 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ReactFlowProvider } from '@xyflow/react';
 
 import * as S from '@pages/canvas/canvas.style';
+
 import CanvasSidebar from '@features/canvas/ui/sidebar/canvas-sidebar';
 import CanvasEditor from '@features/canvas/ui/canvas-editor';
 import PageHeader from '@widgets/header/page-header';

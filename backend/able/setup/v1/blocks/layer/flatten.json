@@ -1,15 +1,15 @@
 {
-    "name": "dropout",
+    "name": "flatten",
     "type": "layer",
     "args": [
         {
-            "name": "p",
-            "value": 0.5,
+            "name": "start_dim",
+            "value": 1,
             "is_required": false
         },
         {
-            "name": "inplace",
-            "value": false,
+            "name": "end_dim",
+            "value": -1,
             "is_required": false
         }
     ]

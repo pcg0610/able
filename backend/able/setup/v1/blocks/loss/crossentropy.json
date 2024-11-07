@@ -4,22 +4,22 @@
     "args": [
         {
             "name": "weight",
-            "value": "null",
+            "value": null,
             "is_required": false
         },
         {
             "name": "size_average",
-            "value": "true",
+            "value": true,
             "is_required": false
         },
         {
             "name": "ignore_index",
-            "value": "-100",
+            "value": -100,
             "is_required": false
         },
         {
             "name": "reduce",
-            "value": "true",
+            "value": true,
             "is_required": false
         },
         {

@@ -1,6 +1,6 @@
 import * as S from '@shared/ui/button/arrow-button.style';
 
-import ArrowIcon from '@assets/icons/arrow.svg?react';
+import ArrowIcon from '@icons/arrow.svg?react';
 import Common from '@/shared/styles/common';
 
 interface ArrowButtonProps {

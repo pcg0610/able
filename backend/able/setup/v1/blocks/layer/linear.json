@@ -4,17 +4,17 @@
     "args": [
         {
             "name": "in_features",
-            "value": "128",
+            "value": 128,
             "is_required": true
         },
         {
             "name": "out_features",
-            "value": "64",
+            "value": 64,
             "is_required": true
         },
         {
             "name": "bias",
-            "value": "true",
+            "value": true,
             "is_required": false
         }
     ]

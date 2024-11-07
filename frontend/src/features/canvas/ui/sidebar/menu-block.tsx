@@ -6,7 +6,7 @@ import { blockColors } from '@shared/constants/block';
 import { BlockField } from '@features/canvas/types/block.type';
 import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
 
-import MenuIcon from '@assets/icons/menu.svg?react';
+import MenuIcon from '@icons/menu.svg?react';
 import Tooltip from '@shared/ui/tooltip/tooltip';
 
 interface MenuBlockProps {

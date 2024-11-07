@@ -7,8 +7,8 @@ class CanvasBlock(Block):
 
 class Edge(ImmutableBaseModel):
     id: str
-    source: int
-    target: int
+    source: str
+    target: str
 
 class Canvas(ImmutableBaseModel):
     blocks: list[CanvasBlock] = []
