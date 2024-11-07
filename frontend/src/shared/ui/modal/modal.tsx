@@ -21,21 +21,21 @@ const Modal = ({
   CancelText = '취소',
   ConfirmText = '확인',
 }: ModalProps) => (
-  <ModalPortal>
-    <S.ModalOverlay onClick={onClose} onAnimationEnd={onAnimationEnd} className={isClosing ? 'fadeOut' : 'fadeIn'}>
-      <S.ModalWrapper onClick={(e) => e.stopPropagation()}>
-        <S.ModalHeader>
-          <S.Title>{title}</S.Title>
-          <S.CloseButton onClick={onClose}>&times;</S.CloseButton>
-        </S.ModalHeader>
-        <S.ModalBody>{children}</S.ModalBody>
-        <S.ModalFooter>
-          <S.CancelButton onClick={onClose}>{CancelText}</S.CancelButton>
-          <S.ConfirmButton>{ConfirmText}</S.ConfirmButton>
-        </S.ModalFooter>
-      </S.ModalWrapper>
-    </S.ModalOverlay>
-  </ModalPortal>
+  // <ModalPortal>
+  <S.ModalOverlay onClick={onClose} onAnimationEnd={onAnimationEnd} className={isClosing ? 'fadeOut' : 'fadeIn'}>
+    <S.ModalWrapper onClick={(e) => e.stopPropagation()}>
+      <S.ModalHeader>
+        <S.Title>{title}</S.Title>
+        <S.CloseButton onClick={onClose}>&times;</S.CloseButton>
+      </S.ModalHeader>
+      <S.ModalBody>{children}</S.ModalBody>
+      <S.ModalFooter>
+        <S.CancelButton onClick={onClose}>{CancelText}</S.CancelButton>
+        <S.ConfirmButton>{ConfirmText}</S.ConfirmButton>
+      </S.ModalFooter>
+    </S.ModalWrapper>
+  </S.ModalOverlay>
+  // </ModalPortal>
 );
 
 export default Modal;
