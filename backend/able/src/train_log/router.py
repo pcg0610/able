@@ -13,8 +13,8 @@ train_log_router = router = APIRouter()
     summary="프로젝트 학습 기록 조회",
     description="프로젝트 이름으로 학습 기록 조회"
 )
-def get_train_logs(title:str, page: int, page_size: int):
-    result = service.get_train_logs(title, page, page_size)
+def get_train_logs(project_name: str, page: int, page_size: int):
+    result = service.get_train_logs(project_name, page, page_size)
 
     if len(result) == 0:
         return no_content()
