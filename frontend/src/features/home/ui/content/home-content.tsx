@@ -1,8 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as S from '@/features/home/ui/content/home-content.style';
 import Common from '@shared/styles/common';
+import { useProject } from '@features/home/api/use-home.query';
+import { useProjectStore, useProjectStateStore } from '@entities/project/model/project.model';
 
 import HistoryList from '@/features/home/ui/content/history-list';
 import Pagination from '@shared/ui/pagination/pagination';
@@ -16,8 +18,6 @@ const HomeContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  const modalRef = useRef<HTMLDivElement | null>(null);
-
   const historyItems = [
     { id: 1, date: '2024.10.23 16:35', accuracy: '73%', status: '완료' },
     { id: 2, date: '2024.10.23 16:40', accuracy: '85%', status: '진행 중' },
@@ -28,6 +28,13 @@ const HomeContent = () => {
 
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { projectName } = useProjectStateStore();
+  const { currentProject, setCurrentProject } = useProjectStore();
+
+  const { data: project, isLoading, error } = useProject(projectName, {
+    enabled: !!projectName,
+  });
 
   const handleCanvasClick = () => {
     navigate('/canvas');
@@ -49,25 +56,26 @@ const HomeContent = () => {
     }
   };
 
+  useEffect(() => {
+    if (project && project !== currentProject) {
+      setCurrentProject(project);
+    }
+  }, [project, currentProject, setCurrentProject]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading projects</div>;
+
   return (
     <>
       <S.HomeContentWrapper>
         <S.Title>
           <FolderIcon width={45} height={45} />
-          컴퓨터 비전 프로젝트
-          <span
-            style={{
-              fontSize: '14px',
-              fontWeight: `${Common.fontWeights.regular}`,
-              color: '#A9A9A9',
-            }}
-          >
-            python 3.9.6
-          </span>
+          {currentProject?.title || '프로젝트 이름 없음'}
+          <S.PythonTitle>python 3.9.6</S.PythonTitle>
           <SettingIcon
-            width={24}
-            height={24}
-            color={Common.colors.gray500}
+            width={22}
+            height={22}
+            color={Common.colors.gray400}
             onClick={handleSettingClick}
             style={{ cursor: 'pointer' }}
           />

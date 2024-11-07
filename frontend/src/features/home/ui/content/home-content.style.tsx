@@ -16,8 +16,8 @@ export const Title = styled.div`
   font-size: ${Common.fontSizes['3xl']};
   font-weight: bold;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: end;
+  gap: 0.75rem;
 `;
 
 export const SubTitle = styled.h2`
@@ -29,6 +29,12 @@ export const SubTitle = styled.h2`
   color: ${Common.colors.gray500};
   margin-bottom: 0.9375rem;
 `;
+
+export const PythonTitle = styled.span`
+  font-size: 14px;
+  font-weight: ${Common.fontWeights.regular};
+  color: #A9A9A9;
+`
 
 export const CanvasWrapper = styled.div`
   display: flex;

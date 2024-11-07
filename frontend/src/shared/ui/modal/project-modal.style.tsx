@@ -1,6 +1,7 @@
-// project-modal.style.ts
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
+
+import Common from '@shared/styles/common';
 
 const fadeIn = keyframes`
   from {
@@ -35,11 +36,11 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalWrapper = styled.div`
-  width: 400px;
+  width: 25rem;
   background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 24px;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 0.9375rem rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
   animation: ${fadeIn} 0.3s ease forwards;
 `;
 
@@ -47,25 +48,26 @@ export const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 `;
 
 export const Title = styled.h2`
-  font-size: 18px;
+  font-size: ${Common.fontSizes.lg};
   font-weight: bold;
 `;
 
 export const CloseButton = styled.button`
   background: none;
   border: none;
-  font-size: 24px;
+  padding: 0.3125rem 0.625rem;
+  font-size: ${Common.fontSizes['2xl']};
   cursor: pointer;
 `;
 
 export const ModalBody = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 `;
 
 export const InputWrapper = styled.div`
@@ -74,53 +76,57 @@ export const InputWrapper = styled.div`
 `;
 
 export const Label = styled.label`
-  font-size: 14px;
-  margin-bottom: 4px;
+  font-size: ${Common.fontSizes.sm};
+  margin-bottom: 0.25rem;
 `;
 
 export const Input = styled.input`
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 0.5rem;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.25rem;
+  font-size: ${Common.fontSizes.sm};
   &.readonly {
     background-color: #f0f0f0; 
     color: #888; 
     cursor: not-allowed;
   }
   &::placeholder {
-    color: #aaa; 
+    color: ${Common.colors.gray300}; 
+  }
+  &:focus {
+    border: 0.125rem solid #85b7d9;
+    outline: none; 
   }
 `;
 
 export const Select = styled.select`
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 0.5rem;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.25rem;
+  font-size: ${Common.fontSizes.sm};
 `;
 
 export const ModalFooter = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
+  margin-top: 1rem;
 `;
 
 export const CancelButton = styled.button`
   background-color: #f5f5f5;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
   cursor: pointer;
-  font-size: 14px;
+  font-size: ${Common.fontSizes.sm};
 `;
 
 export const ConfirmButton = styled.button`
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
   cursor: pointer;
-  font-size: 14px;
+  font-size: ${Common.fontSizes.sm};
 `;

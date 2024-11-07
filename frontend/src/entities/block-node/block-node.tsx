@@ -12,9 +12,11 @@ interface BlockNodeProps {
     block: BlockItem;
     onFieldChange: (fieldName: string, value: string) => void;
   };
+  sourcePosition?: Position;
+  targetPosition?: Position;
 }
 
-const BlockNode = ({ data }: BlockNodeProps) => {
+const BlockNode = ({ data, sourcePosition = Position.Bottom, targetPosition = Position.Top }: BlockNodeProps) => {
   const blockColor = useMemo(
     () =>
       data?.block?.type ? blockColors[data.block.type] : Common.colors.gray200,
@@ -23,7 +25,7 @@ const BlockNode = ({ data }: BlockNodeProps) => {
 
   return (
     <S.Container blockColor={blockColor}>
-      <Handle type='target' position={Position.Top} />
+      <Handle type="target" position={targetPosition} />
       <S.Label>{capitalizeFirstLetter(data?.block?.name || 'Unknown')}</S.Label>
       <S.FieldWrapper>
         {data?.block?.fields?.map((field) => (
@@ -32,7 +34,7 @@ const BlockNode = ({ data }: BlockNodeProps) => {
               {field.name} {field.isRequired ? '*' : ''}
             </S.Name>
             <S.Input
-              type='text'
+              type="text"
               placeholder={field.isRequired ? 'required' : ''}
               required={field.isRequired}
               value={field.value || ''}
@@ -41,7 +43,7 @@ const BlockNode = ({ data }: BlockNodeProps) => {
           </S.InputWrapper>
         ))}
       </S.FieldWrapper>
-      <Handle type='source' position={Position.Bottom} />
+      <Handle type="source" position={sourcePosition} />
     </S.Container>
   );
 };

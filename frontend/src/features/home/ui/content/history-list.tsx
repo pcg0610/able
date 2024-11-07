@@ -1,22 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 
+import { HistoryListProps } from '@features/home/types/home.type';
+
 import {
   HistoryListWrapper,
   HistoryRow,
   HistoryCell,
   StatusText,
 } from '@/features/home/ui/content/history-list.style';
-
-interface HistoryItem {
-  id: number;
-  date: string;
-  accuracy: string;
-  status: string;
-}
-
-interface HistoryListProps {
-  items: HistoryItem[];
-}
 
 const HistoryList = ({ items }: HistoryListProps) => {
   const navigate = useNavigate();
