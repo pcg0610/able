@@ -2,7 +2,17 @@ import styled from '@emotion/styled';
 
 import Common from '@shared/styles/common';
 
-export const DropdownContainer = styled.div`
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const Label = styled.label`
+  font-size: ${Common.fontSizes.sm};
+  margin-bottom: 0.25rem;
+`;
+
+export const DropdownWrapper = styled.div`
   position: relative;
 `;
 

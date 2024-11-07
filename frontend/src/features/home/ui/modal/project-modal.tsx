@@ -83,11 +83,12 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         placeholder=".exe"
         onChange={(e) => setPythonKernelPath(e.target.value)}
       />
-
-      <S.DropDownWrapper>
-        <S.Label>쿠다 버전</S.Label>
-        <DropDown options={options} onSelect={handleSelect} defaultValue={isReadOnly ? defaultOption : ''} />
-      </S.DropDownWrapper>
+      <DropDown
+        label="쿠다 버전"
+        options={options}
+        onSelect={handleSelect}
+        defaultValue={isReadOnly ? defaultOption : ''}
+      />
     </Modal>
   );
 };
