@@ -3,7 +3,7 @@ services:
     image: able-server
     container_name: able-server
     volumes:
-      - /home/ubuntu/able:/app/able/v1/data/projects
+      - /home/ubuntu/able:/app/able
     ports: 
       - "8000:8000"
     networks:
