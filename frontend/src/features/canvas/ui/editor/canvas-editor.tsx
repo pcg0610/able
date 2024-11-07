@@ -27,6 +27,7 @@ import {
   transformEdgesToEdgeSchema,
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
+import { useProjectStore } from '@/entities/project/model/project.model';
 import { useFetchCanvas } from '@features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
@@ -39,7 +40,8 @@ import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
 
 const CanvasEditor = () => {
-  const { data } = useFetchCanvas('춘식이');
+  const { currentProject } = useProjectStore();
+  const { data } = useFetchCanvas(currentProject?.title || '');
   const { mutateAsync: saveCanvas } = useSaveCanvas();
 
   const [nodes, setNodes] = useNodesState(initialNodes);
