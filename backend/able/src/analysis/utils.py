@@ -10,15 +10,18 @@ from pathlib import Path
 
 from src.train.utils import create_data_preprocessor, UserModel
 from src.canvas.schemas import CanvasBlock, Canvas
-from src.file.utils import get_file
-from src.utils import str_to_json
+from src.file.utils import get_file, create_file
+from src.utils import str_to_json, json_to_str
 from src.analysis.exceptions import ModelLoadException
+from src.analysis.schemas import ClassScore, ClassScores
+from src.train.schemas import TrainResultMetadata
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class FeatureMapExtractor:
-    def __init__(self, model: nn.Module, checkpoint_path: Path, feature_maps_path: Path, transform_blocks: List[CanvasBlock], img_path: Path, device: str = 'cpu') -> None:
+    def __init__(self, model: nn.Module,result_path: Path, checkpoint_path: Path, feature_maps_path: Path, transform_blocks: List[CanvasBlock], img_path: Path, device: str = 'cpu') -> None:
+        self.result_path = result_path
         self.checkpoint_path = checkpoint_path
         self.device: str = device
         self.model: nn.Module = model
@@ -31,7 +34,7 @@ class FeatureMapExtractor:
         self.transform_blocks = transform_blocks
 
     # 피쳐맵, 히트맵 생성
-    def analyze(self):
+    def analyze(self) -> ClassScores:
         self.build_model()
         self.model.eval()
 
@@ -40,6 +43,8 @@ class FeatureMapExtractor:
 
         self.output = self.model(input_img)
         self.save_heatmap()
+        scores = self.save_top_k_scores()
+        return scores
 
     # 훅 적용
     def build_model(self):
@@ -118,6 +123,30 @@ class FeatureMapExtractor:
         # 히트맵과 원본 이미지 결합 및 저장
         overlay = heatmap_resized * 0.4 + original_image
         cv2.imwrite(str(self.checkpoint_path / "heatmap.jpg"), overlay)
+    
+
+    # 상위 k개의 클래스 이름과 점수 반환(100점 만점)
+    def save_top_k_scores(self, k: int = 3) -> List[ClassScore]:
+        top_values, top_indices = self.output.topk(k, dim=1)
+        top_values = top_values[0].cpu().detach().numpy()
+        top_indices = top_indices[0].cpu().detach().numpy()
+
+        class_names = get_class_names(self.result_path / "metadata.json")
+
+
+        # 1을 기준으로 100점 만점으로 변환
+        scores = [
+            ClassScore(
+                class_name=class_names[idx] if class_names else f"Class {idx}",
+                class_score=round(score * 100)  # 1.0을 기준으로 100점 만점으로 변환
+            )
+            for idx, score in zip(top_indices, top_values)
+        ]
+
+        #파일 기록
+        create_file(self.checkpoint_path / "analysis_result.json", json_to_str(ClassScores(class_scores=scores)))
+
+        return scores
 
 
 
@@ -149,3 +178,6 @@ def load_parameter(model: nn.Module, path: str, device: str = 'cpu') :
         logger.error(f"파라미터 적용 실패: {e}")
         raise ModelLoadException("파라미터 적용에 실패하였습니다.")
 
+def get_class_names(path: Path) -> list[str]:
+        return TrainResultMetadata(**str_to_json(get_file(path))).classes
+    

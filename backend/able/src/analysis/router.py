@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Query
 
 from src.response.schemas import ResponseModel
-from src.analysis.schemas import CheckpointResponse, ImageResponse, FeatureMapRequest, FeatureMapResponse
+from src.analysis.schemas import CheckpointResponse, AnalyzeResponse, FeatureMapRequest, FeatureMapResponse
 import src.analysis.service as service
 from src.canvas.schemas import GetCanvasResponse
 from src.response.utils import ok, bad_request
@@ -25,13 +25,13 @@ async def get_feature_map( request: FeatureMapRequest):
     return ok(data=FeatureMapResponse(feature_map=feature_map_list))
 
 @router.post("", 
-             response_model=ResponseModel[ImageResponse],
+             response_model=ResponseModel[AnalyzeResponse],
              summary="분석 실행 및 히트맵 생성", description="특정 학습 결과의 에포크에 대해 샘플 이미지 1장을 받아 실행 후 히트맵을 반환" )
 async def analyze(project_name: str, result_name: str, epoch_name:str, device_index: int, file: UploadFile = File(...)):
     # if(file.content_type != "imge/jpeg"):
     #     return bad_request()
-    image = await service.analyze(project_name, result_name, epoch_name, device_index, file)
-    return ok(data=ImageResponse(image=image))
+    result = await service.analyze(project_name, result_name, epoch_name, device_index, file)
+    return ok(data=result)
 
 @router.get("/model",
              summary="특정 학습 결과의 모델(캔버스) 불러오기", description="분석 페이지 접근 시 보여지는 블록 그래프")
