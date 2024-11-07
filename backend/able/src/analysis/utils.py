@@ -18,8 +18,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class FeatureMapExtractor:
-    def __init__(self, model: nn.Module, epoch_path: Path, feature_maps_path: Path, transform_blocks: List[CanvasBlock], img_path: Path, device: str = 'cpu') -> None:
-        self.epoch_path = epoch_path
+    def __init__(self, model: nn.Module, checkpoint_path: Path, feature_maps_path: Path, transform_blocks: List[CanvasBlock], img_path: Path, device: str = 'cpu') -> None:
+        self.checkpoint_path = checkpoint_path
         self.device: str = device
         self.model: nn.Module = model
 
@@ -117,7 +117,7 @@ class FeatureMapExtractor:
     
         # 히트맵과 원본 이미지 결합 및 저장
         overlay = heatmap_resized * 0.4 + original_image
-        cv2.imwrite(str(self.epoch_path / "heatmap.jpg"), overlay)
+        cv2.imwrite(str(self.checkpoint_path / "heatmap.jpg"), overlay)
 
 
 

@@ -37,14 +37,6 @@ def json_to_str(obj: Any) -> str:
 
 def encode_image_to_base64(image_data: bytes) -> str:
     return base64.b64encode(image_data).decode("utf-8")
-
-def get_epoch_id(epoch_dir_name: str) -> int:
-    epoch_id = re.search(r'epoch_(\d+)', epoch_dir_name)
-
-    if epoch_id : 
-        return int(epoch_id.group(1))
-    else :
-        raise FileNotFoundException(f"{epoch_dir_name}을 찾을 수 없습니다.")
     
 def handle_pagination(items: List[Any], page: int, page_size: int) -> List[Any]:
     items_length = len(items)
