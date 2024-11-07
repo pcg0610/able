@@ -6,7 +6,7 @@ import Common from '@shared/styles/common';
 import { useProject } from '@features/home/api/use-home.query';
 import {
   useProjectStore,
-  useProjectStateStore,
+  useProjectNameStore,
 } from '@entities/project/model/project.model';
 
 import HistoryList from '@/features/home/ui/content/history-list';
@@ -32,7 +32,7 @@ const HomeContent = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { projectName } = useProjectStateStore();
+  const { projectName } = useProjectNameStore();
   const { currentProject, setCurrentProject } = useProjectStore();
 
   const { data: project, isLoading, error } = useProject(projectName);
@@ -87,8 +87,8 @@ const HomeContent = () => {
             작업 중인 캔버스
           </S.SubTitle>
           <S.CanvasImage
-            src='src/assets/Frame 83.png'
-            alt='Canvas Image'
+            src="src/assets/Frame 83.png"
+            alt="Canvas Image"
             onClick={handleCanvasClick}
           />
         </div>

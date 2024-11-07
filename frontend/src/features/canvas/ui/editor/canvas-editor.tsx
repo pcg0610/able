@@ -29,7 +29,7 @@ import {
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
 import { isValidConnection } from '@features/canvas/utils/cycle-validator.util';
-import { useProjectStore } from '@/entities/project/model/project.model';
+import { useProjectNameStore } from '@/entities/project/model/project.model';
 import { useFetchCanvas } from '@features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
@@ -42,8 +42,8 @@ import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
 
 const CanvasEditor = () => {
-  const { currentProject } = useProjectStore();
-  const { data } = useFetchCanvas(currentProject?.title || '');
+  const { projectName } = useProjectNameStore();
+  const { data } = useFetchCanvas(projectName || '');
   const { mutateAsync: saveCanvas } = useSaveCanvas();
 
   const [nodes, setNodes] = useNodesState(initialNodes);
@@ -130,7 +130,7 @@ const CanvasEditor = () => {
 
     toast.promise(
       saveCanvas({
-        projectName: currentProject?.title || '',
+        projectName: projectName || '',
         canvas: { blocks: transformedBlocks, edges: transformedEdges },
       }),
       {
@@ -159,22 +159,22 @@ const CanvasEditor = () => {
         onNodeClick={(_, node) => setSelectedNode(node)}
         nodeTypes={{ custom: BlockNode }}
       >
-        <Controls position='bottom-center' orientation='horizontal' />
+        <Controls position="bottom-center" orientation="horizontal" />
         <Background variant={BackgroundVariant.Dots} />
       </ReactFlow>
       <S.OverlayButton>
         <BasicButton
-          text='실행'
+          text="실행"
           icon={<PlayIcon width={13} height={16} />}
-          width='5.5rem'
+          width="5.5rem"
           onClick={handleTrainButtonClick}
         />
         <BasicButton
-          text='저장'
+          text="저장"
           color={Common.colors.primary}
           backgroundColor={Common.colors.secondary}
           icon={<SaveIcon />}
-          width='5.5rem'
+          width="5.5rem"
           onClick={handleSavaButtonClick}
         />
       </S.OverlayButton>
