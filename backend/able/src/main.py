@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.block.router import block_router
 from src.deploy.router import deploy_router
+from src.device.router import device_router
 from src.train.router import train_router
 from src.canvas.router import canvas_router
 from src.project.router import project_router
@@ -42,6 +43,8 @@ app.include_router(validation_router, prefix="/validation", tags=["확인"])
 app.include_router(analysis_router, prefix="/analyses", tags=["분석"])
 
 app.include_router(deploy_router, prefix="/deploy", tags=["배포"])
+
+app.include_router(device_router, prefix="/devices", tags=["디바이스"])
 
 @app.exception_handler(HTTPException)
 async def base_custom_exception_handler(request: Request, exc: BaseCustomException):

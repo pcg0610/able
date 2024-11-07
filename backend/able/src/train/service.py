@@ -1,7 +1,6 @@
 import json
 from . import TrainRequest
-from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy, Device
-from .dto import TrainResultRequest, DeviceListResponse
+from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
 from .utils import *
 from src.file.path_manager import PathManager
 from src.file.utils import validate_file_format, get_file, create_directory
@@ -143,11 +142,3 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
         f1_score=f1_score,
         epoch_result=epoch_results
     )
-
-def get_device_list() -> DeviceListResponse:
-    device_list = [Device(index=-1, name='cpu')]
-
-    for index in range(torch.cuda.device_count()):
-        device_list.append(Device(index=index, name=torch.cuda.get_device_name(index)))
-
-    return DeviceListResponse(devices=device_list)

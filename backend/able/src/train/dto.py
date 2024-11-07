@@ -1,6 +1,6 @@
 from src.canvas.schemas import Canvas
+from src.device.schema import Device
 from src.response.schemas import ImmutableBaseModel
-from src.train.schemas import Device
 
 
 class TrainRequest(ImmutableBaseModel):
@@ -16,6 +16,3 @@ class TrainResponse(ImmutableBaseModel):
 class TrainResultRequest(ImmutableBaseModel):
     project_name: str
     train_result_name: str
-
-class DeviceListResponse(ImmutableBaseModel):
-    devices: list[Device]
