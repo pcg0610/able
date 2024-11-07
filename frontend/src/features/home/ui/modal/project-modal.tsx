@@ -4,6 +4,7 @@ import * as S from '@features/home/ui/modal/project-modal.style';
 import { useProjectStore } from '@entities/project/model/project.model';
 
 import Modal from '@shared/ui/modal/modal';
+import Input from '@shared/ui/input/input';
 import DropDown from '@shared/ui/dropdown/dropdown';
 
 interface ProjectModalProps {
@@ -58,40 +59,35 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
       isClosing={isClosing}
       onAnimationEnd={onAnimationEnd}
       title="프로젝트 정보를 입력하세요"
-      ConfirmText={isReadOnly ? '수정' : '확인'}
+      confirmText={isReadOnly ? '수정' : '확인'}
     >
-      <S.InputWrapper>
-        <S.Label>프로젝트 이름</S.Label>
-        <S.Input
-          value={projectTitle}
-          placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
-          readOnly={isReadOnly}
-          className={isReadOnly ? 'readonly' : ''}
-          onChange={(e) => setProjectTitle(e.target.value)}
-        />
-      </S.InputWrapper>
-      <S.InputWrapper>
-        <S.Label>프로젝트 설명 (선택)</S.Label>
-        <S.Input
-          value={projectDescription}
-          placeholder={isReadOnly ? '' : '50자 이내로 입력해주세요.'}
-          readOnly={isReadOnly}
-          className={isReadOnly ? 'readonly' : ''}
-          onChange={(e) => setProjectDescription(e.target.value)}
-        />
-      </S.InputWrapper>
-      <S.InputWrapper>
-        <S.Label>파이썬 커널 경로</S.Label>
-        <S.Input
-          defaultValue={isReadOnly ? currentProject?.pythonKernelPath : ''}
-          placeholder=".exe"
-          onChange={(e) => setPythonKernelPath(e.target.value)}
-        />
-      </S.InputWrapper>
-      <S.InputWrapper>
+      <Input
+        label="프로젝트 이름"
+        value={projectTitle}
+        placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
+        readOnly={isReadOnly}
+        className={isReadOnly ? 'readonly' : ''}
+        onChange={(e) => setProjectTitle(e.target.value)}
+      />
+      <Input
+        label="프로젝트 설명 (선택)"
+        value={projectDescription}
+        placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
+        readOnly={isReadOnly}
+        className={isReadOnly ? 'readonly' : ''}
+        onChange={(e) => setProjectTitle(e.target.value)}
+      />
+      <Input
+        label="파이썬 커널 경로"
+        defaultValue={isReadOnly ? currentProject?.pythonKernelPath : ''}
+        placeholder=".exe"
+        onChange={(e) => setPythonKernelPath(e.target.value)}
+      />
+
+      <S.DropDownWrapper>
         <S.Label>쿠다 버전</S.Label>
         <DropDown options={options} onSelect={handleSelect} defaultValue={isReadOnly ? defaultOption : ''} />
-      </S.InputWrapper>
+      </S.DropDownWrapper>
     </Modal>
   );
 };
