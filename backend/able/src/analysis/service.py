@@ -25,7 +25,7 @@ def get_epochs(project_name: str, result_name: str) -> List[str]:
 def get_result(project_name: str, result_name: str, epoch_name:str, block_id: str) -> str:
     feature_map_path = pathManager.get_feature_maps_path(project_name, result_name, get_epoch_id(epoch_name))
     
-    image_name = block_id + ".jpg"
+    image_name = 'layers.' + block_id + ".jpg"
     feature_map_image = encode_image_to_base64(read_image_file(feature_map_path / image_name))
 
     return feature_map_image
