@@ -7,7 +7,6 @@ import { useProjectStateStore } from '@entities/project/model/project.model';
 import SearchBox from '@shared/ui/searchbar/searchbar';
 
 const EpochListSidebar = () => {
-   const [selectedEpoch, setSelectedEpoch] = useState('');
    const [index, setIndex] = useState(0);
    const [size] = useState(10);
 
@@ -17,8 +16,8 @@ const EpochListSidebar = () => {
       "final",
    ];
 
-   const { projectName } = useProjectStateStore();
-   const { data: epochData, isLoading } = useEpochs(projectName, 'result1', index, size);
+   const { projectName, epochName, setEpochName } = useProjectStateStore();
+   const { data: epochData, isLoading } = useEpochs(projectName, '20241108_005251', index, size);
 
    const loadMoreEpochs = useCallback(() => {
       if (epochData?.hasNext && !isLoading) {
@@ -35,7 +34,7 @@ const EpochListSidebar = () => {
 
 
    const handleClick = (epoch: string) => {
-      setSelectedEpoch(epoch);
+      setEpochName(epoch);
    };
 
    const handleSearchChange = (value: string) => {
@@ -43,8 +42,8 @@ const EpochListSidebar = () => {
    };
 
    useEffect(() => {
-      if (epochData?.epochs && epochData.epochs.length > 0 && !selectedEpoch) {
-         setSelectedEpoch(epochData.epochs[0]);
+      if (epochData?.epochs && epochData.epochs.length > 0 && !epochName) {
+         setEpochName(epochData.epochs[0]);
       }
    }, [epochData?.epochs]);
 
@@ -54,7 +53,7 @@ const EpochListSidebar = () => {
             {bestEpochs.map((epoch, index) => (
                <S.EpochItem
                   key={`best-${index}`}
-                  isSelected={selectedEpoch === epoch}
+                  isSelected={epochName === epoch}
                   onClick={() => handleClick(epoch)}
                >
                   {epoch}
@@ -71,7 +70,7 @@ const EpochListSidebar = () => {
                epochData?.epochs.map((epoch, index) => (
                   <S.EpochItem
                      key={index}
-                     isSelected={selectedEpoch === epoch}
+                     isSelected={epochName === epoch}
                      onClick={() => handleClick(epoch)}
                   >
                      {epoch}
