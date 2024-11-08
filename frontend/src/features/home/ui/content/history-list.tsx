@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
-import { HistoryListProps } from '@features/home/types/home.type';
+import { HistoryItem } from '@features/home/types/home.type';
+import { useProjectStateStore } from '@entities/project/model/project.model';
 
 import {
   HistoryListWrapper,
@@ -9,10 +10,16 @@ import {
   StatusText,
 } from '@/features/home/ui/content/history-list.style';
 
-const HistoryList = ({ items }: HistoryListProps) => {
-  const navigate = useNavigate();
+interface HistoryListProps {
+  trainSummaries: HistoryItem[];
+}
 
-  const handleHistoryClick = () => {
+const HistoryList = ({ trainSummaries }: HistoryListProps) => {
+  const navigate = useNavigate();
+  const { setResultName } = useProjectStateStore();
+
+  const handleHistoryClick = (result: string) => {
+    setResultName(result);
     navigate('/train');
   };
 
@@ -35,9 +42,9 @@ const HistoryList = ({ items }: HistoryListProps) => {
         </tr>
       </thead>
       <tbody>
-        {items.map((item, index) => (
-          <HistoryRow key={item.id} onClick={handleHistoryClick}>
-            <HistoryCell width='10%'>{item.id}</HistoryCell>
+        {trainSummaries.map((item, index) => (
+          <HistoryRow key={item.index} onClick={() => handleHistoryClick(item.date)}>
+            <HistoryCell width='10%'>{item.index}</HistoryCell>
             <HistoryCell width='40%'>{item.date}</HistoryCell>
             <HistoryCell width='20%'>{item.accuracy}</HistoryCell>
             <HistoryCell width='20%'>
