@@ -2,11 +2,7 @@ import { useState } from 'react';
 
 import Modal from '@shared/ui/modal/modal';
 import Input from '@shared/ui/input/input';
-import DropDown from '@shared/ui/dropdown/dropdown';
-
-interface TrainModalProps {
-  onClose: () => void;
-}
+import DeviceSelect from '@features/common/ui/dropdown/device-select';
 
 interface TrainConfig {
   epoch: number | null;
@@ -14,17 +10,21 @@ interface TrainConfig {
   device: { index: number | null; name: string };
 }
 
+interface TrainModalProps {
+  onClose: () => void;
+}
+
 const TrainModal = ({ onClose }: TrainModalProps) => {
-  const [trainingConfig, setTrainingConfig] = useState<TrainConfig>({
+  const [trainConfig, setTrainConfig] = useState<TrainConfig>({
     epoch: null,
     batchSize: null,
     device: { index: null, name: '' },
   });
 
-  const handleInputChange = (field: keyof TrainConfig, value: number) => {
-    setTrainingConfig((prev) => ({
+  const handleConfigChange = <T extends keyof TrainConfig>(label: T, value: TrainConfig[T]) => {
+    setTrainConfig((prev) => ({
       ...prev,
-      [field]: value,
+      [label]: value,
     }));
   };
 
@@ -32,27 +32,15 @@ const TrainModal = ({ onClose }: TrainModalProps) => {
     <Modal onClose={onClose} title="학습 정보를 입력하세요" confirmText="학습하기">
       <Input
         label="학습 횟수 (epoch)"
-        value={trainingConfig.epoch || ''}
-        onChange={(e) => handleInputChange('epoch', Number(e.target.value))}
+        value={trainConfig.epoch ?? ''}
+        onChange={(e) => handleConfigChange('epoch', Number(e.target.value))}
       />
       <Input
         label="배치 크기 (batch size)"
-        value={trainingConfig.batchSize || ''}
-        onChange={(e) => handleInputChange('batchSize', Number(e.target.value))}
+        value={trainConfig.batchSize ?? ''}
+        onChange={(e) => handleConfigChange('batchSize', Number(e.target.value))}
       />
-      <DropDown
-        label="학습 장치 선택"
-        options={[
-          { label: 'CPU', value: 'CPU' },
-          { label: 'GPU', value: 'GPU' },
-        ]}
-        onSelect={(option) =>
-          setTrainingConfig((prev) => ({
-            ...prev,
-            device: { index: option.value === 'CPU' ? 0 : 1, name: option.value }, // 수정된 부분
-          }))
-        }
-      />
+      <DeviceSelect onSelect={(device) => handleConfigChange('device', device)} />
     </Modal>
   );
 };
