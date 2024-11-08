@@ -31,21 +31,19 @@ def get_checkpoints(project_name: str, result_name: str, index: int, size: int) 
     return CheckpointResponse(epochs=page_item, has_next=has_next_page(len(items), index, size))
 
 
-def get_feature_map(request: FeatureMapRequest) -> List[FeatureMap]:
+def get_feature_map(request: FeatureMapRequest) -> str:
     feature_map_path = pathManager.get_feature_maps_path(request.project_name, request.result_name, request.epoch_name)
     
-    feature_map_list = []
 
-    for id in request.block_id :
-        image_name = 'layers.' + id + ".jpg"
-        image_data = None
-        try:
-            image_data = encode_image_to_base64(read_image_file(feature_map_path / image_name))
-        except Exception as e:
-            logger.error(f"feature map이 존재하지 않는 블록: {id}")
-        feature_map_list.append(FeatureMap(block_id=id, img=image_data))
+    image_name = 'layers.' + request.block_id + ".jpg"
+    image_data = None
+    try:
+        image_data = encode_image_to_base64(read_image_file(feature_map_path / image_name))
+    except Exception as e:
+        logger.error(f"feature map이 존재하지 않는 블록: {id}")
+    
 
-    return feature_map_list
+    return image_data
 
 async def analyze(project_name: str, result_name: str, checkpoint_name:str, device_index: int, file: UploadFile) -> AnalyzeResponse:
     result_path = pathManager.get_train_result_path(project_name, result_name)
@@ -96,4 +94,4 @@ def get_heatmap(project_name: str, result_name:str, checkpoint_name:str) -> Opti
         logger.info(f"이전에 진행된 분석 결과가 없음: {e}")
         return None
     
-    return HeatMapResponse(original_img=original, heatmap_img=heatmap, class_scores=class_scores)
+    return HeatMapResponse(original_img=original, heatmap_img=heatmap, class_scores=class_scores.class_scores)

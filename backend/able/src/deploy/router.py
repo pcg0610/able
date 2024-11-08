@@ -2,6 +2,7 @@ import src.deploy.service as service
 from fastapi import APIRouter
 from starlette.responses import Response
 from src.response.utils import accepted
+from .schemas import RegisterApiRequest
 
 deploy_router = router = APIRouter()
 
@@ -16,11 +17,17 @@ def stop() -> Response:
     return accepted()
 
 @router.post("/routers")
-def register_router(uri: str) -> Response:
-    service.register_router(uri)
+def register_router(request: RegisterApiRequest) -> Response:
+    service.register_router(request)
     return accepted()
 
 @router.delete("/routers")
 def remove_router(uri: str) -> Response:
     service.remove_router(uri)
+    return accepted()
+
+@router.post("/restart")
+def restart() -> Response:
+    service.stop()
+    service.run()
     return accepted()

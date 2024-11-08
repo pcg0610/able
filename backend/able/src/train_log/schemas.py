@@ -2,6 +2,7 @@ from src.response.schemas import ImmutableBaseModel
 
 class TrainSummary(ImmutableBaseModel):
     index: int
+    origin_dir_name: str
     date: str
     accuracy: str
     status: str

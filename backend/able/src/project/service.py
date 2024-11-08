@@ -20,10 +20,12 @@ BLOCK_GRAPH = "block_graph.json"
 
 def create_project(project: Project) -> bool:
     project_path = path_manager.get_projects_path(project.title)
+    train_results_path = path_manager.get_train_results_path(project.title)
+
     metadata_path = project_path / METADATA
     block_graph_path = project_path / BLOCK_GRAPH
     
-    if create_directory(project_path):
+    if create_directory(train_results_path):
         create_file(block_graph_path, json_to_str(Canvas()))
         return create_file(metadata_path, json_to_str(project))
 

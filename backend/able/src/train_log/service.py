@@ -15,16 +15,22 @@ PERFORMANCE_METRICS = "performance_metrics.json"
 def get_train_logs(title:str, page:int, page_size:int) -> TrainLogResponse :
 
     train_results_path = path_manager.get_train_results_path(title)
+
     sorted_train_dirs = sorted(train_results_path.iterdir(), reverse=False)
 
     train_results = []
 
-    for index, folder_path in enumerate(sorted_train_dirs, start=1):
+    for folder_path in sorted_train_dirs:
         metadata_path = folder_path / METADATA
         performance_metrics_path = folder_path / PERFORMANCE_METRICS
 
         metadata = str_to_json(get_file(metadata_path))
         formatted_date = parse_train_result_date(folder_path.name)
+
+        if formatted_date == "":
+            continue
+
+        index = len(train_results) + 1
 
         performance_data = str_to_json(get_file(performance_metrics_path))
         raw_accuracy = performance_data["metrics"].get("accuracy")
@@ -32,6 +38,7 @@ def get_train_logs(title:str, page:int, page_size:int) -> TrainLogResponse :
 
         train_result = TrainSummary(
             index=index,
+            origin_dir_name=folder_path.name,
             date=formatted_date,
             accuracy=accuracy + "%",
             status=metadata["status"]
@@ -42,6 +49,9 @@ def get_train_logs(title:str, page:int, page_size:int) -> TrainLogResponse :
     train_results.reverse()
 
     paginated_train_results = handle_pagination(train_results, page, page_size)
+
+    if paginated_train_results is None:
+        return None
 
     result = TrainLogResponse(total_train_logs=len(train_results), train_summaries=paginated_train_results)
     return result
