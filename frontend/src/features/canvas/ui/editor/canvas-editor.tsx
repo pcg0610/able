@@ -196,6 +196,7 @@ const CanvasEditor = () => {
           onEdgesChange={handleEdgesChange}
           onConnect={onConnect}
           onNodeClick={(_, node) => setSelectedNode(node)}
+          onPaneClick={() => setSelectedNode(null)}
           nodeTypes={{ custom: BlockNode }}
         >
           <Controls position="bottom-center" orientation="horizontal" />
