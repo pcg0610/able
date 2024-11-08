@@ -38,6 +38,10 @@ def search(keyword: str) -> Block:
 
     for type_dir in types_dir:
         blocks_path = get_directory(type_dir)
+
+        if type_dir == "data":
+            continue
+
         for block_path in blocks_path:
             logger.debug(f"Checking path: {block_path}")
             if block_path.name == f"{keyword}.json":
