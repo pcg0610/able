@@ -7,6 +7,7 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
+  getOutgoers,
   type OnConnect,
   type Node as XYFlowNode,
   MarkerType,
@@ -17,6 +18,7 @@ import toast from 'react-hot-toast';
 
 import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
+import { DATA_BLOCK_ID } from '@features/canvas/costants/block.constant';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
 import { TOAST_MESSAGE } from '@features/canvas/costants/message.constant';
 import type { BlockItem } from '@features/canvas/types/block.type';
@@ -141,8 +143,31 @@ const CanvasEditor = () => {
     return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
   };
 
-  const isBlockConnected = (nodeId: string) => {
-    return edges.some((edge) => edge.source === nodeId || edge.target === nodeId);
+  // 데이터 블록이거나 그 자식인지 확인
+  const getDataBlockDescendants = (dataBlockId: string): Set<string> => {
+    const visited = new Set<string>([dataBlockId]);
+
+    // 데이터 블록의 모든 자식 노드를 탐색하는 재귀 함수
+    const traverse = (currentId: string) => {
+      const currentNode = nodes.find((node) => node.id === currentId);
+      if (!currentNode) return;
+
+      const outgoers = getOutgoers(currentNode, nodes, edges);
+      outgoers.forEach((outgoer) => {
+        if (!visited.has(outgoer.id)) {
+          visited.add(outgoer.id);
+          traverse(outgoer.id);
+        }
+      });
+    };
+
+    traverse(dataBlockId);
+    return visited;
+  };
+
+  const getConnectedStatus = (nodeId: string) => {
+    const dataDescendants = getDataBlockDescendants(DATA_BLOCK_ID);
+    return dataDescendants.has(nodeId);
   };
 
   const handleTrain = (trainConfig: TrainConfig) => {
@@ -187,7 +212,7 @@ const CanvasEditor = () => {
             data: {
               ...node.data,
               onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
-              isConnected: isBlockConnected(node.id),
+              isConnected: getConnectedStatus(node.id),
               isSelected: node.id === selectedNode?.id,
             },
           }))}
