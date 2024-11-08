@@ -20,6 +20,7 @@ import Common from '@shared/styles/common';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
 import { TOAST_MESSAGE } from '@features/canvas/costants/message.constant';
 import type { BlockItem } from '@features/canvas/types/block.type';
+import type { TrainConfig, TrainRequest } from '@features/canvas/types/train.type';
 import {
   transformCanvasResponse,
   transformEdgesToEdgeSchema,
@@ -29,6 +30,7 @@ import { isValidConnection } from '@features/canvas/utils/cycle-validator.util';
 import { useProjectNameStore } from '@/entities/project/model/project.model';
 import { useFetchCanvas } from '@features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
+import { useStartTrain } from '@features/canvas/api/use-train.mutation';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
 import { useNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
 import { useEdgeChangeHandler } from '@features/canvas/model/use-edge-change-handler.model';
@@ -43,6 +45,7 @@ const CanvasEditor = () => {
   const { projectName } = useProjectNameStore();
   const { data } = useFetchCanvas(projectName || '');
   const { mutateAsync: saveCanvas } = useSaveCanvas();
+  const { mutate: startTrain } = useStartTrain();
 
   const [nodes, setNodes] = useNodesState(initialNodes);
   const [edges, setEdges] = useEdgesState(initialEdges);
@@ -119,12 +122,27 @@ const CanvasEditor = () => {
     [setNodes]
   );
 
-  const handleTrainButtonClick = () => {
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleRunButtonClick = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleTrain = (trainConfig: TrainConfig) => {
+    const transformedBlocks = transformNodesToBlockSchema(nodes);
+    const transformedEdges = transformEdgesToEdgeSchema(edges);
+
+    const trainRequest: TrainRequest = {
+      projectName: projectName || '',
+      epoch: trainConfig.epoch ?? 0,
+      batchSize: trainConfig.batchSize ?? 0,
+      device: trainConfig.device,
+      canvas: { blocks: transformedBlocks, edges: transformedEdges },
+    };
+
+    startTrain(trainRequest);
   };
 
   const handleSavaButtonClick = async () => {
@@ -146,7 +164,7 @@ const CanvasEditor = () => {
 
   return (
     <>
-      {isModalOpen && <TrainModal onClose={handleCloseModal} />}
+      {isModalOpen && <TrainModal onClose={handleModalClose} onSubmit={handleTrain} />}
       <S.Canvas ref={dropRef}>
         <ReactFlow
           nodes={nodes.map((node) => ({
@@ -171,7 +189,7 @@ const CanvasEditor = () => {
             text="실행"
             icon={<PlayIcon width={13} height={16} />}
             width="5.5rem"
-            onClick={handleTrainButtonClick}
+            onClick={handleRunButtonClick}
           />
           <BasicButton
             text="저장"
