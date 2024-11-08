@@ -2,12 +2,17 @@ import os
 import subprocess
 import sys
 import json
+import logging
 from pathlib import Path
 from src.deploy.enums import DeployStatus
-from src.file.utils import get_file, create_file
+from src.deploy.exceptions import AlreadyExistApiException, AlreadyRunException, AlreadyStopException
+from src.deploy.schemas import RegisterApiRequest
+from src.file.utils import get_file, create_file, remove_file
 from src.file.path_manager import PathManager
 from src.utils import str_to_json, json_to_str
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 path_manager = PathManager()
 
 DEFAULT_METADATA = """{
@@ -26,8 +31,7 @@ def run() -> bool:
     metadata = str_to_json(get_file(metadata_path))
 
     if metadata["status"] == DeployStatus.RUNNING.value:
-        # 예외 처리 필요
-        pass
+        raise AlreadyRunException()
 
     process = subprocess.Popen([
         sys.executable, "-m", "uvicorn", "deploy_server.src.main:app",
@@ -45,8 +49,7 @@ def stop() -> bool:
     metadata = str_to_json(get_file(metadata_path))
 
     if metadata["status"] == DeployStatus.STOP.value:
-        # 예외 처리 필요
-        pass
+        raise AlreadyStopException()
 
     pid = metadata.get("pid")
     if pid:
@@ -68,23 +71,94 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent / "deploy_server/src"
 ROUTER_DIR = BASE_DIR / "routers"
 MAIN_FILE_PATH = BASE_DIR / "main.py"
 
-def register_router(uri: str):
-
-    path_name = uri.strip("/").replace("/", "_")
+def register_router(request: RegisterApiRequest) -> bool:
+    
+    path_name = request.uri.strip("/").replace("/", "_")
     file_path = Path(f"{ROUTER_DIR}/{path_name}.py")
+    
+    # TODO: path_name 중복 확인
+    if file_path.exists():
+        raise AlreadyExistApiException()
+    
+    # TODO: path_name.json 파일 만들어야 함 <- api 정보
+    deploy_path = path_manager.get_deploy_path() / f"{ path_name }.json"
+    if create_file(deploy_path, json_to_str(request)):
+        return True
+    
 
     content = f'''
-from fastapi import APIRouter
+import torch
+import json
+import base64
+import io
+import numpy as np
+
+from PIL import Image
+from fastapi import APIRouter, Body
+from src.analysis.utils import read_blocks
+from src.deploy.schemas import InferenceResponse
+from src.file.path_manager import PathManager
+from src.file.utils import get_file
+from src.response.utils import ok
+from src.train.schemas import TrainResultMetadata
+from src.train.utils import create_data_preprocessor, split_blocks
+from src.utils import str_to_json
 
 router = APIRouter()
+path_manager = PathManager()
 
-@router.get("{uri}")
-async def {path_name}_route():
-    return {json.dumps({"message": "running"})}
+@router.post("{request.uri}")
+async def path_name_route(image: str = Body(...)):
+    
+    project_name = "{request.project_name}"
+    train_result = "{request.train_result}"
+    checkpoint = "{request.checkpoint}"
+    
+    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / "metadata.json"
+    metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
+
+    #block_graph.json 파일에서 블록 읽어오기
+    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / "block_graph.json"
+    block_graph = read_blocks(block_graph_path)
+
+    # base64를 이미지로 변환 
+    image = Image.open(io.BytesIO(image))
+    image = np.array(image)
+    
+    # 블록 카테고리 별로 나누기
+    _, transform_blocks, _, _, _ = split_blocks(block_graph.blocks)
+    transforms = create_data_preprocessor(transform_blocks)
+    
+    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    
+    image = transforms(image)
+    image.to(device)
+
+    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth")
+    
+    model.to(device)
+    
+    predicted = model(image).cpu().numpy()
+    
+    max_value = predicted.max()
+    predicted_idx = -1
+    for idx, value in enumerate(predicted):
+        if value == max_value:
+            predicted_idx = idx
+            break
+        
+    predicted_label = metadata.classes[predicted_idx]
+    
+    return ok(
+        data=InferenceResponse(
+            label = predicted_label,
+            probablity = max_value
+        )
+    )
 '''
 
     if not create_file(file_path, content):
-        return False, f"Failed to create router file for path '{uri}'"
+        return False, f"Failed to create router file for path '{request.uri}'"
 
     include_statement = f'from deploy_server.src.routers.{path_name} import router as {path_name}_router\n'
     include_statement += f'app.include_router({path_name}_router)\n'
@@ -111,10 +185,22 @@ async def {path_name}_route():
     except Exception as e:
         return False
 
+    # └── /data                                           # 사용자 데이터 저장 폴더
+    #     ├── /deploy                                     # 배포 관리 폴더
+    #     │   ├── metadata.json                           # 배포 메타데이터  
+    #     │   └── path_name.json                          # API 정보
+
 def remove_router(uri: str) -> bool:
 
     path_name = uri.strip("/").replace("/", "_")
     file_path = ROUTER_DIR / f"{path_name}.py"
+    
+    # TODO: path_name.json 파일 삭제
+    json_path = path_manager.get_deploy_path() / f"{path_name}.json"
+    if remove_file(json_path):
+        logger.info(f"파일 삭제 완료: {json_path}")
+    else:
+        logger.error(f"파일 삭제 실패: {json_path}")
 
     # 라우터 파일이 존재하면 삭제
     if file_path.exists():

@@ -15,6 +15,9 @@ class PathManager:
         self.deploy_path = self.data_path / "deploy"
         self.projects_path = self.data_path / "projects"
 
+    def get_deploy_path(self) -> Path:
+        return self.deploy_path
+
     def get_block_path(self, block_type: BlockType) -> Path:
         """특정 블록 타입 경로"""
         return self.blocks_path / block_type.value
