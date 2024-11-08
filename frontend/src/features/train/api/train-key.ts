@@ -16,10 +16,23 @@ const trainKey = {
     projectName: string,
     resultName: string,
     epochName: string,
-    blockIds: string[]
+    deviceIndex: number
   ) => [
     ...trainKey.default,
     'featureMap',
+    projectName,
+    resultName,
+    epochName,
+    deviceIndex,
+  ],
+  select: (
+    projectName: string,
+    resultName: string,
+    epochName: string,
+    blockIds: string[]
+  ) => [
+    ...trainKey.default,
+    'select',
     projectName,
     resultName,
     epochName,

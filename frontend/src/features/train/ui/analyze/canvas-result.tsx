@@ -48,7 +48,7 @@ const CanvasResult = () => {
 
    const { projectName } = useProjectStateStore();
    const { uploadedImage } = useImageStore();
-   const { data: canvas } = useModel(projectName, 'result1');
+   const { data: canvas } = useModel(projectName, '20241108_005251');
    const { fitView } = useReactFlow();
    const { mutate: fetchCreateModel } = useCreateFeatureMap();
    const { mutate: fetchFeatureMap } = useFetchFeatureMap();
@@ -56,18 +56,11 @@ const CanvasResult = () => {
 
    useAutoLayout({ direction });
 
-   const handleNodeClick = useCallback((nodeId: string) => {
-      setAutoFit(false);
-      setSelectedBlockIds((prev) =>
-         prev.includes(nodeId) ? prev.filter((id) => id !== nodeId) : [...prev, nodeId]
-      );
-   }, []);
-
    const handleCreateModel = () => {
       fetchCreateModel(
          {
             projectName,
-            resultName: 'result1',
+            resultName: '20241108_005251',
             epochName: 'epoch_1',
             deviceIndex: -1,
             image: uploadedImage,
@@ -80,30 +73,26 @@ const CanvasResult = () => {
       );
    };
 
-   const handleFeaatureImages = () => {
+   const handleNodeClick = (blockId: string) => {
+      setAutoFit(false);
       fetchFeatureMap(
-         { projectName, resultName: 'result1', epochName: 'epoch1', blockIds: selectedBlockIds },
+         {
+            projectName,
+            resultName: '20241108_005251',
+            epochName: 'epoch_1',
+            blockIds: [blockId], // 클릭한 노드의 blockId를 전달
+         },
          {
             onSuccess: (data) => {
-               setFeatureMap(data); // 성공 시 응답 데이터 설정
-               // 각 노드의 data에 featureMap을 포함하여 setNodes로 업데이트
-               setNodes((prevNodes) =>
-                  prevNodes.map((node) => ({
-                     ...node,
-                     data: {
-                        ...node.data,
-                        featureMap: data, // 각 노드에 featureMap 추가
-                     },
-                  }))
-               );
+               setFeatureMap(data); // featureMap 업데이트
             },
          }
       );
    };
 
    const handleLayoutChange = (newDirection) => {
+      setAutoFit(true);
       setDirection(newDirection);
-      setAutoFit(true); // 정렬 버튼을 클릭할 때 autoFit을 true로 설정하여 fitView 호출 허용
    };
 
    useEffect(() => {
@@ -114,7 +103,7 @@ const CanvasResult = () => {
             id: block.id,
             type: 'custom',
             position: { x: 0, y: 0 },
-            data: { block, featureMap }, // featureMap을 data에 포함
+            data: { block, featureMap },
          }));
 
          const newEdges = edges.map((edge) => ({

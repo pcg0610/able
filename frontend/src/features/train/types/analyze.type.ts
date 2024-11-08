@@ -19,3 +19,11 @@ export interface ImageStore {
   uploadedImage: string | null;
   setUploadedImage: (image: string | null) => void;
 }
+
+export interface CreateFeatureMapProps {
+  projectName: string;
+  resultName: string;
+  epochName: string;
+  deviceIndex: number;
+  image: string | null;
+}
