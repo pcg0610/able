@@ -11,6 +11,7 @@ interface BlockNodeProps {
   data: {
     block: BlockItem;
     onFieldChange: (fieldName: string, value: string) => void;
+    isConnected: boolean;
   };
   sourcePosition?: Position;
   targetPosition?: Position;
@@ -23,7 +24,7 @@ const BlockNode = ({ data, sourcePosition = Position.Bottom, targetPosition = Po
   );
 
   return (
-    <S.Container blockColor={blockColor}>
+    <S.Container blockColor={blockColor} isConnected={data.isConnected}>
       <Handle type="target" position={targetPosition} />
       <S.Label>{capitalizeFirstLetter(data?.block?.name || 'Unknown')}</S.Label>
       <S.FieldWrapper>

@@ -141,6 +141,10 @@ const CanvasEditor = () => {
     return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
   };
 
+  const isBlockConnected = (nodeId: string) => {
+    return edges.some((edge) => edge.source === nodeId || edge.target === nodeId);
+  };
+
   const handleTrain = (trainConfig: TrainConfig) => {
     const transformedBlocks = transformNodesToBlockSchema(nodes);
     const transformedEdges = transformEdgesToEdgeSchema(edges);
@@ -183,6 +187,7 @@ const CanvasEditor = () => {
             data: {
               ...node.data,
               onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
+              isConnected: isBlockConnected(node.id),
             },
           }))}
           edges={edges}

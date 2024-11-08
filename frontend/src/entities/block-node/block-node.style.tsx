@@ -1,12 +1,13 @@
 import styled from '@emotion/styled';
 import Common from '@/shared/styles/common';
 
-export const Container = styled.div<{ blockColor: string }>`
+export const Container = styled.div<{ blockColor: string; isConnected: boolean }>`
   width: 15.625rem;
   border-radius: 0.25rem;
   background-color: ${({ blockColor }) => blockColor};
   border: 0.0625rem solid ${({ blockColor }) => blockColor};
   overflow: hidden;
+  opacity: ${({ isConnected }) => (isConnected ? 1 : 0.3)};
 `;
 
 export const Label = styled.div`
@@ -57,9 +58,9 @@ export const Input = styled.input<{ required: boolean }>`
 `;
 
 export const Image = styled.img`
-  width: 100%; 
-  max-height: 9.375rem; 
-  object-fit: contain; 
+  width: 100%;
+  max-height: 9.375rem;
+  object-fit: contain;
 `;
 
 export const CustomUploadContainer = styled.div`
