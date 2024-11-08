@@ -17,3 +17,9 @@ export const SidebarContainer = styled.div`
 
   ${scrollbarHiddenMixin}
 `;
+
+export const Text = styled.p`
+  color: ${Common.colors.gray300};
+  font-size: ${Common.fontSizes.sm};
+  text-align: center;
+`;
