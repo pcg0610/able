@@ -40,6 +40,10 @@ def encode_image_to_base64(image_data: bytes) -> str:
     
 def handle_pagination(items: List[Any], page: int, page_size: int) -> List[Any]:
     items_length = len(items)
+    if items_length == 0:
+        logger.info("빈 페이지 조회")
+        return []
+
     if(page * page_size) >= items_length:
         logger.error("범위를 넘어간 페이지 조회")
         return None
