@@ -292,6 +292,13 @@ def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
 
     return convert_block_to_module(layer_block)
 
+def convert_activation_block_to_module(layer_block: Block) -> nn.Module | None:
+
+    if layer_block.type != BlockType.ACTIVATION:
+        return None
+
+    return convert_block_to_module(layer_block)
+
 def convert_criterion_block_to_module(loss_block: Block) -> nn.Module | None:
 
     if loss_block.type != BlockType.LOSS:
@@ -356,6 +363,8 @@ def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -
     for block in blocks:
         if block.type == BlockType.LAYER:
             module = convert_layer_block_to_module(block)
+        elif block.type == BlockType.ACTIVATION:
+            module = convert_activation_block_to_module(block)
         elif block.type == BlockType.OPERATION:
             module = convert_operation_block_to_module(block)
         else:
