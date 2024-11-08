@@ -24,12 +24,12 @@ class FeatureMapRequest(ImmutableBaseModel):
     project_name: str
     result_name: str
     epoch_name: str
-    block_id: List[str]
+    block_id: str
 
 class FeatureMapResponse(ImmutableBaseModel):
-    feature_map: List[FeatureMap]
+    feature_map: str
 
 class HeatMapResponse(ImmutableBaseModel):
     original_img: str
     heatmap_img: str
-    class_scores: ClassScores
+    class_scores: List[ClassScore]
