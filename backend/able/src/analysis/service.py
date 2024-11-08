@@ -1,7 +1,7 @@
 import logging
 
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from fastapi import UploadFile
 
 from src.file.path_manager import PathManager
@@ -10,7 +10,7 @@ from src.utils import encode_image_to_base64, str_to_json, handle_pagination, ha
 from src.analysis.utils import FeatureMapExtractor, read_blocks, load_model
 from src.train.utils import split_blocks
 from src.canvas.schemas import Canvas
-from src.analysis.schemas import FeatureMapRequest, FeatureMap, CheckpointResponse, AnalyzeResponse
+from src.analysis.schemas import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ async def analyze(project_name: str, result_name: str, checkpoint_name:str, devi
 
     # 피쳐맵을 저장할 디렉터리 생성 및 원본 이미지 저장
     create_directory(feature_maps_path)
-    img_path = await save_img(feature_maps_path, "original.jpg", file)
+    img_path = await save_img(checkpoint_path, "original.jpg", file)
 
     # 디바이스
     device = 'cpu'
@@ -84,3 +84,16 @@ def get_block_graph(project_name: str, result_name: str) -> Canvas :
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / "block_graph.json"
     block = Canvas(**str_to_json(get_file(block_graph_path)))
     return block
+
+
+def get_heatmap(project_name: str, result_name:str, checkpoint_name:str) -> Optional[HeatMapResponse]:
+    checkpoint_path = pathManager.get_checkpoint_path(project_name, result_name, checkpoint_name)
+    try: 
+        heatmap = encode_image_to_base64(read_image_file(checkpoint_path / "heatmap.jpg"))
+        original = encode_image_to_base64(read_image_file(checkpoint_path / "original.jpg"))
+        class_scores = ClassScores(**str_to_json(get_file(checkpoint_path / "analysis_result.json")))
+    except Exception as e:
+        logger.info(f"이전에 진행된 분석 결과가 없음: {e}")
+        return None
+    
+    return HeatMapResponse(original_img=original, heatmap_img=heatmap, class_scores=class_scores)

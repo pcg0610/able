@@ -1,10 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, Query
 
 from src.response.schemas import ResponseModel
-from src.analysis.schemas import CheckpointResponse, AnalyzeResponse, FeatureMapRequest, FeatureMapResponse
+from src.analysis.schemas import CheckpointResponse, AnalyzeResponse, FeatureMapRequest, FeatureMapResponse, HeatMapResponse
 import src.analysis.service as service
 from src.canvas.schemas import GetCanvasResponse
-from src.response.utils import ok, bad_request
+from src.response.utils import *
 
 analysis_router = router = APIRouter()
 
@@ -26,7 +26,7 @@ async def get_feature_map( request: FeatureMapRequest):
 
 @router.post("", 
              response_model=ResponseModel[AnalyzeResponse],
-             summary="분석 실행 및 히트맵 생성", description="특정 학습 결과의 에포크에 대해 샘플 이미지 1장을 받아 실행 후 히트맵을 반환" )
+             summary="분석 실행 및 히트맵 생성", description="특정 학습 결과의 에포크에 대해 샘플 이미지 1장을 받아 실행 후 히트맵과 상위 3개의 클래스 점수(막대그래프 데이터) 반환" )
 async def analyze(project_name: str, result_name: str, epoch_name:str, device_index: int, file: UploadFile = File(...)):
     # if(file.content_type != "imge/jpeg"):
     #     return bad_request()
@@ -38,3 +38,13 @@ async def analyze(project_name: str, result_name: str, epoch_name:str, device_in
 async def get_model(project_name:str, result_name:str):
     canvas = service.get_block_graph(project_name, result_name)
     return ok(data=GetCanvasResponse(canvas=canvas))
+
+@router.get("/heatmap",
+            response_model=ResponseModel[HeatMapResponse],
+            summary="원본 이미지, 히트맵과 상위 3개의 클래스 반환",
+            description="이전 분석 결과가 있는 경우 원본 이미지.jpg, 히트맵.jgp, 상위 3개 클래스 이름과 점수를 반환. 이전 분석 결과가 없는 경우 204 반환")
+async def get_heatmap(project_name: str, result_name:str, epoch_name:str):
+    heatmap = service.get_heatmap(project_name, result_name, epoch_name)
+    if heatmap is None:
+        return no_content()
+    return ok(data=heatmap)

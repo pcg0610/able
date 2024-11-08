@@ -28,3 +28,8 @@ class FeatureMapRequest(ImmutableBaseModel):
 
 class FeatureMapResponse(ImmutableBaseModel):
     feature_map: List[FeatureMap]
+
+class HeatMapResponse(ImmutableBaseModel):
+    original_img: str
+    heatmap_img: str
+    class_scores: ClassScores
