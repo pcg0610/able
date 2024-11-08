@@ -24,31 +24,19 @@ const ResultSidebar = ({ onSelectionChange, type }: ResultSidebarProps) => {
     <S.SidebarContainer>
       {isTrain ? (
         <>
-          <S.SidebarButton
-            active={activeButton === 'result'}
-            onClick={() => handleButtonClick('result')}
-          >
+          <S.SidebarButton active={activeButton === 'result'} onClick={() => handleButtonClick('result')}>
             <ResultIcon width={30} height={30} />
           </S.SidebarButton>
-          <S.SidebarButton
-            active={activeButton === 'analyze'}
-            onClick={() => handleButtonClick('analyze')}
-          >
+          <S.SidebarButton active={activeButton === 'analyze'} onClick={() => handleButtonClick('analyze')}>
             <AnalyzeIcon width={25} height={25} />
           </S.SidebarButton>
         </>
       ) : (
         <>
-          <S.SidebarButton
-            active={activeButton === 'server'}
-            onClick={() => handleButtonClick('server')}
-          >
+          <S.SidebarButton active={activeButton === 'server'} onClick={() => handleButtonClick('server')}>
             <RocketLineIcon width={30} height={30} />
           </S.SidebarButton>
-          <S.SidebarButton
-            active={activeButton === 'api'}
-            onClick={() => handleButtonClick('api')}
-          >
+          <S.SidebarButton active={activeButton === 'api'} onClick={() => handleButtonClick('api')}>
             <ApiIcon width={25} height={25} />
           </S.SidebarButton>
         </>

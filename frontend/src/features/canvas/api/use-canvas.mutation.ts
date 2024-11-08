@@ -1,11 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import axiosInstance from '@/shared/api/axios-instance';
-import type {
-  BlockSchema,
-  CanvasResponse,
-  EdgeSchema,
-} from '@features/canvas/types/canvas.type';
+import axiosInstance from '@shared/api/config/axios-instance';
+import type { BlockSchema, CanvasResponse, EdgeSchema } from '@features/canvas/types/canvas.type';
 import canvasKey from '@features/canvas/api/canvas-key';
 
 interface SaveCanvasProps {
@@ -29,16 +25,13 @@ export const useSaveCanvas = () => {
   return useMutation({
     mutationFn: saveCanvas,
     onSuccess: (_data, variables) => {
-      queryClient.setQueryData<CanvasResponse>(
-        canvasKey.canvas(variables.projectName),
-        (oldData) => ({
-          ...oldData,
-          canvas: {
-            blocks: variables.canvas.blocks,
-            edges: variables.canvas.edges,
-          },
-        })
-      );
+      queryClient.setQueryData<CanvasResponse>(canvasKey.canvas(variables.projectName), (oldData) => ({
+        ...oldData,
+        canvas: {
+          blocks: variables.canvas.blocks,
+          edges: variables.canvas.edges,
+        },
+      }));
     },
   });
 };

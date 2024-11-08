@@ -1,31 +1,21 @@
-import {
-  Node as XYFlowNode,
-  Edge as XYFlowEdge,
-  MarkerType,
-} from '@xyflow/react';
+import { Node as XYFlowNode, Edge as XYFlowEdge, MarkerType } from '@xyflow/react';
 
-import type {
-  BlockSchema,
-  CanvasResponse,
-  EdgeSchema,
-} from '@features/canvas/types/canvas.type';
+import type { BlockSchema, CanvasResponse, EdgeSchema } from '@features/canvas/types/canvas.type';
 import type { BlockItem } from '@features/canvas/types/block.type';
 
 export const transformCanvasResponse = (response: CanvasResponse) => {
-  const transformedNodes: XYFlowNode[] = response.canvas.blocks.map(
-    (block) => ({
-      id: block.id,
-      type: 'custom',
-      position: JSON.parse(block.position),
-      data: {
-        block: {
-          type: block.type,
-          name: block.name,
-          fields: block.args,
-        } as BlockItem,
-      },
-    })
-  );
+  const transformedNodes: XYFlowNode[] = response.canvas.blocks.map((block) => ({
+    id: block.id,
+    type: 'custom',
+    position: JSON.parse(block.position),
+    data: {
+      block: {
+        type: block.type,
+        name: block.name,
+        fields: block.args,
+      } as BlockItem,
+    },
+  }));
 
   const transformedEdges: XYFlowEdge[] = response.canvas.edges.map((edge) => ({
     id: edge.id,
@@ -38,9 +28,7 @@ export const transformCanvasResponse = (response: CanvasResponse) => {
   return { nodes: transformedNodes, edges: transformedEdges };
 };
 
-export const transformNodesToBlockSchema = (
-  nodes: XYFlowNode[]
-): BlockSchema[] => {
+export const transformNodesToBlockSchema = (nodes: XYFlowNode[]): BlockSchema[] => {
   return nodes.map((node) => {
     const data = node.data as { block: BlockItem };
     return {
@@ -53,9 +41,7 @@ export const transformNodesToBlockSchema = (
   });
 };
 
-export const transformEdgesToEdgeSchema = (
-  edges: XYFlowEdge[]
-): EdgeSchema[] => {
+export const transformEdgesToEdgeSchema = (edges: XYFlowEdge[]): EdgeSchema[] => {
   return edges.map((edge) => ({
     id: edge.id,
     source: edge.source,

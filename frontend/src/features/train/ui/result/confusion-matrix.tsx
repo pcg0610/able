@@ -1,8 +1,5 @@
-
 const ConfusionMatrix = () => {
-   return (
-      <></>
-   );
+  return <></>;
 };
 
 export default ConfusionMatrix;

@@ -10,6 +10,7 @@ export const StyledButton = styled.div<{
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: transform 0.3s;
 
   transform: ${({ direction }) => {
     switch (direction) {
@@ -18,7 +19,7 @@ export const StyledButton = styled.div<{
       case 'left':
         return 'rotate(0deg)';
       case 'down':
-        return 'rotate(-90deg)';
+        return 'rotate(270deg)';
       case 'right':
         return 'rotate(180deg)';
       default:

@@ -14,8 +14,7 @@ const Tooltip = ({ text, children }: TooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const showTooltip = (event: React.MouseEvent) => {
-    const { top, left, width, height } =
-      event.currentTarget.getBoundingClientRect();
+    const { top, left, width, height } = event.currentTarget.getBoundingClientRect();
     setPosition({
       top: top + height / 2,
       left: left + width + 8,
@@ -30,11 +29,7 @@ const Tooltip = ({ text, children }: TooltipProps) => {
       {children}
       {isVisible && (
         <TooltipPortal>
-          <S.Text
-            style={{ top: `${position.top}px`, left: `${position.left}px` }}
-          >
-            {text}
-          </S.Text>
+          <S.Text style={{ top: `${position.top}px`, left: `${position.left}px` }}>{text}</S.Text>
         </TooltipPortal>
       )}
     </S.Container>

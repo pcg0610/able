@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import * as S from '@/features/home/ui/content/home-content.style';
 import Common from '@shared/styles/common';
 import { useProject } from '@features/home/api/use-home.query';
-import { useProjectStore, useProjectStateStore } from '@entities/project/model/project.model';
+import { useProjectStore, useProjectNameStore } from '@entities/project/model/project.model';
 
-import HistoryList from '@/features/home/ui/content/history-list';
+import HistoryList from '@features/home/ui/content/history-list';
 import Pagination from '@shared/ui/pagination/pagination';
-import ProjectModal from '@shared/ui/modal/project-modal';
+import ProjectModal from '@features/home/ui/modal/project-modal';
 import WritingIcon from '@icons/writing.svg?react';
 import ClockIcon from '@icons/clock.svg?react';
 import FolderIcon from '@icons/folder.svg?react';
@@ -29,12 +29,10 @@ const HomeContent = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { projectName } = useProjectStateStore();
+  const { projectName } = useProjectNameStore();
   const { currentProject, setCurrentProject } = useProjectStore();
 
-  const { data: project, isLoading, error } = useProject(projectName, {
-    enabled: !!projectName,
-  });
+  const { data: project, isLoading, error } = useProject(projectName);
 
   const handleCanvasClick = () => {
     navigate('/canvas');
@@ -68,28 +66,27 @@ const HomeContent = () => {
   return (
     <>
       <S.HomeContentWrapper>
-        <S.Title>
-          <FolderIcon width={45} height={45} />
-          {currentProject?.title || '프로젝트 이름 없음'}
-          <S.PythonTitle>python 3.9.6</S.PythonTitle>
-          <SettingIcon
-            width={22}
-            height={22}
-            color={Common.colors.gray400}
-            onClick={handleSettingClick}
-            style={{ cursor: 'pointer' }}
-          />
-        </S.Title>
+        <div>
+          <S.Title>
+            <FolderIcon width={45} height={45} />
+            {currentProject?.title || '프로젝트 이름 없음'}
+            <S.PythonTitle>python 3.9.6</S.PythonTitle>
+            <SettingIcon
+              width={22}
+              height={22}
+              color={Common.colors.gray400}
+              onClick={handleSettingClick}
+              style={{ cursor: 'pointer' }}
+            />
+          </S.Title>
+          <S.Description>{currentProject?.description}</S.Description>
+        </div>
         <div>
           <S.SubTitle>
             <WritingIcon width={30} height={30} />
             작업 중인 캔버스
           </S.SubTitle>
-          <S.CanvasImage
-            src='src/assets/Frame 83.png'
-            alt='Canvas Image'
-            onClick={handleCanvasClick}
-          />
+          <S.CanvasImage src="src/assets/Frame 83.png" alt="Canvas Image" onClick={handleCanvasClick} />
         </div>
         <div>
           <S.SubTitle>
@@ -98,21 +95,12 @@ const HomeContent = () => {
           </S.SubTitle>
           <S.HistoryWrapper>
             <HistoryList items={historyItems} />
-            <Pagination
-              currentPage={currentPage}
-              totalPages={26}
-              onPageChange={setCurrentPage}
-            />
+            <Pagination currentPage={currentPage} totalPages={26} onPageChange={setCurrentPage} />
           </S.HistoryWrapper>
         </div>
       </S.HomeContentWrapper>
       {isModalOpen && (
-        <ProjectModal
-          onClose={closeModal}
-          isClosing={isClosing}
-          onAnimationEnd={handleAnimationEnd}
-          type={'modify'}
-        />
+        <ProjectModal onClose={closeModal} isClosing={isClosing} onAnimationEnd={handleAnimationEnd} type={'modify'} />
       )}
     </>
   );

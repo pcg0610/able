@@ -1,16 +1,7 @@
 import { useEffect } from 'react';
-import {
-  type Node,
-  type Edge,
-  useReactFlow,
-  useNodesInitialized,
-  useStore,
-} from '@xyflow/react';
+import { type Node, type Edge, useReactFlow, useNodesInitialized, useStore } from '@xyflow/react';
 
-import {
-  getSourceHandlePosition,
-  getTargetHandlePosition,
-} from '@/features/train/utils/auto-layout.util';
+import { getSourceHandlePosition, getTargetHandlePosition } from '@/features/train/utils/auto-layout.util';
 import layoutAlgorithms from '@features/train/types/algorithm.type';
 
 export type LayoutOptions = {
@@ -37,14 +28,10 @@ function useAutoLayout(options: LayoutOptions) {
       const nodes = elements.nodes.map((node) => ({ ...node }));
       const edges = elements.edges.map((edge) => ({ ...edge }));
 
-      const { nodes: nextNodes, edges: nextEdges } = await layoutAlgorithm(
-        nodes,
-        edges,
-        {
-          spacing: [50, 50],
-          direction: options.direction,
-        }
-      );
+      const { nodes: nextNodes, edges: nextEdges } = await layoutAlgorithm(nodes, edges, {
+        spacing: [50, 50],
+        direction: options.direction,
+      });
 
       for (const node of nextNodes) {
         node.style = { ...node.style, opacity: 1 };
@@ -84,10 +71,7 @@ function compareNodes(xs: Array<Node>, ys: Array<Node>) {
 
     if (!y) return false;
     if (x.resizing || x.dragging) return true;
-    if (
-      x.measured?.width !== y.measured?.width ||
-      x.measured?.height !== y.measured?.height
-    ) {
+    if (x.measured?.width !== y.measured?.width || x.measured?.height !== y.measured?.height) {
       return false;
     }
   }

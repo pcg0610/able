@@ -33,12 +33,17 @@ export const SubTitle = styled.h2`
 export const PythonTitle = styled.span`
   font-size: 14px;
   font-weight: ${Common.fontWeights.regular};
-  color: #A9A9A9;
-`
+  color: #a9a9a9;
+`;
+
+export const Description = styled.p`
+  margin-top: 1rem;
+  color: ${Common.colors.gray400};
+`;
 
 export const CanvasWrapper = styled.div`
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
   background-color: #fff;
   padding: 1rem;
@@ -57,5 +62,5 @@ export const CanvasImage = styled.img`
 export const HistoryWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem; 
+  gap: 1rem;
 `;

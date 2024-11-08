@@ -2,7 +2,17 @@ import styled from '@emotion/styled';
 
 import Common from '@shared/styles/common';
 
-export const DropdownContainer = styled.div`
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const Label = styled.label`
+  font-size: ${Common.fontSizes.sm};
+  margin-bottom: 0.25rem;
+`;
+
+export const DropdownWrapper = styled.div`
   position: relative;
 `;
 
@@ -17,15 +27,6 @@ export const DropdownHeader = styled.div<{ isPlaceholder: boolean }>`
   align-items: center;
   background-color: #fff;
   color: ${({ isPlaceholder }) => (isPlaceholder ? Common.colors.gray300 : 'inherit')};
-`;
-
-export const Arrow = styled.span<{ isOpen: boolean }>`
-  border: solid #000;
-  border-width: 0 0.125rem 0.125rem 0;
-  display: inline-block;
-  padding: 0.1875rem;
-  transform: ${({ isOpen }) => (isOpen ? 'rotate(-135deg)' : 'rotate(45deg)')};
-  transition: transform 0.2s;
 `;
 
 export const DropdownList = styled.ul`
@@ -46,7 +47,7 @@ export const DropdownList = styled.ul`
     background: ${Common.colors.gray100};
   }
 
-  &::-webkit-scrollbar-thumb  {
+  &::-webkit-scrollbar-thumb {
     background: ${Common.colors.gray300};
     border-radius: 0.3125rem;
   }

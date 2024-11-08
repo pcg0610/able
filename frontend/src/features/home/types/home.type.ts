@@ -15,14 +15,3 @@ export interface Project {
   cudaVersion: string;
   pythonKernelPath: string;
 }
-
-export interface ProjectNameStore {
-  projectName: string;
-  setProjectName: (project: string) => void;
-}
-
-export interface ProjectStore {
-  currentProject: Project | null;
-  setCurrentProject: (project: Project) => void;
-  resetProject: () => void;
-}
