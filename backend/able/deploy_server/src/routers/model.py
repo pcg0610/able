@@ -1,3 +1,4 @@
+
 import torch
 import json
 import base64
@@ -18,12 +19,12 @@ from src.utils import str_to_json
 router = APIRouter()
 path_manager = PathManager()
 
-@router.post("{request.uri}")
+@router.post("/model")
 async def path_name_route(image: str = Body(...)):
     
-    project_name = "{request.project_name}"
-    train_result = "{request.train_result}"
-    checkpoint = "{request.checkpoint}"
+    project_name = "string"
+    train_result = "20241108_163451"
+    checkpoint = "final"
     
     train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / "metadata.json"
     metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
@@ -33,6 +34,7 @@ async def path_name_route(image: str = Body(...)):
     block_graph = read_blocks(block_graph_path)
 
     # base64를 이미지로 변환 
+    image = base64.b64decode(image)
     image = Image.open(io.BytesIO(image))
     image = np.array(image)
     
@@ -42,27 +44,26 @@ async def path_name_route(image: str = Body(...)):
     
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     
-    image = transforms(image)
-    image.to(device)
+    image: torch.Tensor = transforms(image)
+    image = image.unsqueeze(0).to(device=device)
 
-    model = torch.load({path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth"})
-    
+    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth")
+
     model.to(device)
-    
-    predicted = model(image).cpu().numpy()
 
-    max_value = predicted.max()
-    predicted_idx = -1
-    for idx, value in enumerate(predicted):
-        if value == max_value:
-            predicted_idx = idx
-            break
+    model.eval()
+    predicted = model(image)
+
+    top_values, top_indices = predicted.topk(1, dim=1)
+    top_values = top_values[0].cpu().detach().numpy()
+    top_indices = top_indices[0].cpu().detach().numpy()
         
-    predicted_label = metadata.classes[predicted_idx]
+    predicted_label = metadata.classes[top_indices[0]]
+    max_value = top_values[0]
     
     return ok(
         data=InferenceResponse(
             label = predicted_label,
-            probablity = max_value
+            probability = max_value
         )
     )
