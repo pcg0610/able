@@ -8,7 +8,11 @@ export const useProjectNameStore = create<ProjectNameState>()(
   persist(
     (set) => ({
       projectName: '',
+      resultName: '',
+      epochName: '',
       setProjectName: (project: string) => set({ projectName: project }),
+      setResultName: (result: string) => set({ resultName: result }),
+      setEpochName: (epoch: string) => set({ epochName: epoch }),
     }),
     {
       name: 'project-storage',
