@@ -127,7 +127,18 @@ const CanvasEditor = () => {
   };
 
   const handleRunButtonClick = () => {
+    if (!isDataBlockConnected()) {
+      toast.error(TOAST_MESSAGE.data);
+      return;
+    }
     setIsModalOpen(true);
+  };
+
+  const isDataBlockConnected = () => {
+    const dataBlock = nodes.find((node) => (node.data.block as BlockItem).name === 'data');
+    if (!dataBlock) return false;
+
+    return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
   };
 
   const handleTrain = (trainConfig: TrainConfig) => {
