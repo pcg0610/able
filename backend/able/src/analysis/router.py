@@ -16,6 +16,8 @@ async def get_checkpoints(project_name: str, result_name: str,
     response = service.get_checkpoints(project_name, result_name, index, size)
     if response.epochs is None:
         return bad_request()
+    if len(response.epochs) == 0:
+        return no_content()
     return ok(data=response)
 
 @router.post("/feature-map", response_model=ResponseModel[FeatureMapResponse],
