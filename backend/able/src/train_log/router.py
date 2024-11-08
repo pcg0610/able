@@ -2,7 +2,7 @@ import src.train_log.service as service
 from fastapi import APIRouter
 
 from src.response.schemas import ResponseModel
-from src.response.utils import no_content, ok
+from src.response.utils import no_content, ok, bad_request
 from src.train_log.schemas import TrainLogResponse
 
 train_log_router = router = APIRouter()
@@ -15,6 +15,9 @@ train_log_router = router = APIRouter()
 )
 def get_train_logs(project_name: str, page: int, page_size: int):
     result = service.get_train_logs(project_name, page, page_size)
+
+    if result is None:
+        return bad_request()
 
     if len(result.train_summaries) == 0:
         return no_content()
