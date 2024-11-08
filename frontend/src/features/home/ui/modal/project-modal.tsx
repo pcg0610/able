@@ -75,7 +75,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
         readOnly={isReadOnly}
         className={isReadOnly ? 'readonly' : ''}
-        onChange={(e) => setProjectTitle(e.target.value)}
+        onChange={(e) => setProjectDescription(e.target.value)}
       />
       <Input
         label="파이썬 커널 경로"
