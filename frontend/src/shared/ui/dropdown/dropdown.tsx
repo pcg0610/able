@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 
 import * as S from '@shared/ui/dropdown/dropdown.style';
+import type { Option } from '@shared/types/common.type';
 
 import ArrowButton from '@shared/ui/button/arrow-button';
-
-interface Option {
-  value: string;
-  label: string;
-}
 
 interface DropdownProps {
   label?: string;
