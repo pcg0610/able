@@ -82,8 +82,8 @@ def register_router(request: RegisterApiRequest) -> bool:
     
     # TODO: path_name.json 파일 만들어야 함 <- api 정보
     deploy_path = path_manager.get_deploy_path() / f"{ path_name }.json"
-    if create_file(deploy_path, json_to_str(request)):
-        return True
+    if not create_file(deploy_path, json_to_str(request)):
+        raise Exception()
     
 
     content = f'''
@@ -122,37 +122,37 @@ async def path_name_route(image: str = Body(...)):
     block_graph = read_blocks(block_graph_path)
 
     # base64를 이미지로 변환 
+    image = base64.b64decode(image)
     image = Image.open(io.BytesIO(image))
     image = np.array(image)
     
     # 블록 카테고리 별로 나누기
     _, transform_blocks, _, _, _ = split_blocks(block_graph.blocks)
     transforms = create_data_preprocessor(transform_blocks)
-    
+   
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     
-    image = transforms(image)
-    image.to(device)
+    image: torch.Tensor = transforms(image)
+    image = image.unsqueeze(0).to(device=device)
 
     model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth")
-    
+
     model.to(device)
-    
-    predicted = model(image).cpu().numpy()
-    
-    max_value = predicted.max()
-    predicted_idx = -1
-    for idx, value in enumerate(predicted):
-        if value == max_value:
-            predicted_idx = idx
-            break
+
+    model.eval()
+    predicted = model(image)
+
+    top_values, top_indices = predicted.topk(1, dim=1)
+    top_values = top_values[0].cpu().detach().numpy()
+    top_indices = top_indices[0].cpu().detach().numpy()
         
-    predicted_label = metadata.classes[predicted_idx]
+    predicted_label = metadata.classes[top_indices[0]]
+    max_value = top_values[0]
     
     return ok(
         data=InferenceResponse(
             label = predicted_label,
-            probablity = max_value
+            probability = max_value
         )
     )
 '''
@@ -171,24 +171,27 @@ async def path_name_route(image: str = Body(...)):
 
         # `pass` 위치에 라우터 포함 코드를 삽입
         if "pass" in content:
-            stop()
+            
+            metadata_path = path_manager.deploy_path / "metadata.json"
+            metadata = str_to_json(get_file(metadata_path))
+            before_status = metadata["status"]
+
+            if metadata["status"] == DeployStatus.RUNNING.value:
+                stop()
+
             content = content.replace("pass", include_statement)
 
             # 수정된 내용을 main.py에 다시 쓰기
             with MAIN_FILE_PATH.open("w", encoding="utf-8") as main_file:
                 main_file.write(content)
 
-            run()
+            if before_status == DeployStatus.RUNNING.value:
+                run()
             return True
         else:
             return False
     except Exception as e:
         return False
-
-    # └── /data                                           # 사용자 데이터 저장 폴더
-    #     ├── /deploy                                     # 배포 관리 폴더
-    #     │   ├── metadata.json                           # 배포 메타데이터  
-    #     │   └── path_name.json                          # API 정보
 
 def remove_router(uri: str) -> bool:
 
@@ -201,6 +204,7 @@ def remove_router(uri: str) -> bool:
         logger.info(f"파일 삭제 완료: {json_path}")
     else:
         logger.error(f"파일 삭제 실패: {json_path}")
+        return False
 
     # 라우터 파일이 존재하면 삭제
     if file_path.exists():

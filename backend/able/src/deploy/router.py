@@ -25,3 +25,9 @@ def register_router(request: RegisterApiRequest) -> Response:
 def remove_router(uri: str) -> Response:
     service.remove_router(uri)
     return accepted()
+
+@router.post("/restart")
+def restart() -> Response:
+    service.stop()
+    service.run()
+    return accepted()

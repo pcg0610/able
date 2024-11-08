@@ -1,3 +1,4 @@
+
 import torch
 import json
 import base64
@@ -18,12 +19,12 @@ from src.utils import str_to_json
 router = APIRouter()
 path_manager = PathManager()
 
-@router.post("{request.uri}")
+@router.post("/infer")
 async def path_name_route(image: str = Body(...)):
     
-    project_name = "{request.project_name}"
-    train_result = "{request.train_result}"
-    checkpoint = "{request.checkpoint}"
+    project_name = "string"
+    train_result = "20241108_162624"
+    checkpoint = "final"
     
     train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / "metadata.json"
     metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
@@ -33,6 +34,7 @@ async def path_name_route(image: str = Body(...)):
     block_graph = read_blocks(block_graph_path)
 
     # base64를 이미지로 변환 
+    image = base64.b64decode(image)
     image = Image.open(io.BytesIO(image))
     image = np.array(image)
     
@@ -45,12 +47,12 @@ async def path_name_route(image: str = Body(...)):
     image = transforms(image)
     image.to(device)
 
-    model = torch.load({path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth"})
+    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth")
     
     model.to(device)
     
     predicted = model(image).cpu().numpy()
-
+    
     max_value = predicted.max()
     predicted_idx = -1
     for idx, value in enumerate(predicted):
