@@ -38,6 +38,7 @@ def get_train_logs(title:str, page:int, page_size:int) -> TrainLogResponse :
 
         train_result = TrainSummary(
             index=index,
+            origin_dir_name=folder_path.name,
             date=formatted_date,
             accuracy=accuracy + "%",
             status=metadata["status"]
