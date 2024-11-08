@@ -11,6 +11,11 @@ export interface BlockItem {
   [key: string]: unknown;
 }
 
+export interface FeatureBlockItem {
+  blockId: string;
+  img: string | null;
+}
+
 export interface BlockField {
   name: string;
   value: string;

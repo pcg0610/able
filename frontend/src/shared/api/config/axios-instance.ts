@@ -25,7 +25,7 @@ axiosInstance.interceptors.response.use(
 // 요청: camelCase -> snake_case
 axiosInstance.interceptors.request.use(
   (config) => {
-    if (config.data) {
+    if (config.data && !(config.data instanceof FormData)) {
       config.data = snakecaseKeys(config.data, { deep: true });
     }
     if (config.params) {

@@ -1,3 +1,4 @@
+from math import ceil
 from typing import List, Optional
 import logging
 
@@ -19,10 +20,12 @@ BLOCK_GRAPH = "block_graph.json"
 
 def create_project(project: Project) -> bool:
     project_path = path_manager.get_projects_path(project.title)
+    train_results_path = path_manager.get_train_results_path(project.title)
+
     metadata_path = project_path / METADATA
     block_graph_path = project_path / BLOCK_GRAPH
     
-    if create_directory(project_path):
+    if create_directory(train_results_path):
         create_file(block_graph_path, json_to_str(Canvas()))
         return create_file(metadata_path, json_to_str(project))
 
@@ -35,7 +38,6 @@ def get_project(title: str) -> Optional[SelectedProject]:
     thumbnail_path = path_manager.get_projects_path(title) / THUMBNAIL
 
     data = get_file(metadata_path)
-    
     project = SelectedProject.model_validate(str_to_json(data))
     try :
         project.thumbnail = encode_image_to_base64(read_image_file(thumbnail_path))
@@ -44,7 +46,6 @@ def get_project(title: str) -> Optional[SelectedProject]:
         project.thumbnail = None
 
     return project
-
 
 def get_projects() -> List[str]:
     projects_path = path_manager.projects_path

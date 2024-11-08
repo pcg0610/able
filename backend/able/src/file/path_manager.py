@@ -35,14 +35,14 @@ class PathManager:
         """학습 결과 경로"""
         return self.get_projects_path(name) / "train_results" / result_name
 
-    def get_epochs_path(self, name:str, result_name: str):
+    def get_checkpoints_path(self, name:str, result_name: str):
         """에포크 목록 경로"""
-        return self.get_train_result_path(name, result_name) / "epochs"
+        return self.get_train_result_path(name, result_name) / "checkpoints"
 
-    def get_epoch_path(self, name: str, result_name: str, epoch: int) -> Path:
+    def get_checkpoint_path(self, name: str, result_name: str, checkpoint: str) -> Path:
         """에포크별 경로"""
-        return self.get_train_result_path(name, result_name) / "epochs" / f"epoch_{epoch}"
+        return self.get_train_result_path(name, result_name) / "checkpoints" / checkpoint
 
-    def get_feature_maps_path(self, name: str, result_name: str, epoch: int) -> Path:
+    def get_feature_maps_path(self, name: str, result_name: str, checkpoint: str) -> Path:
         """특정 에포크의 피처맵 이미지 디렉터리 경로"""
-        return self.get_epoch_path(name, result_name, epoch) / "feature_maps"
+        return self.get_checkpoint_path(name, result_name, checkpoint) / "feature_maps"

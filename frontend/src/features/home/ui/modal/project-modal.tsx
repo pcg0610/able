@@ -65,21 +65,19 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         label="프로젝트 이름"
         value={projectTitle}
         placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
-        readOnly={isReadOnly}
-        className={isReadOnly ? 'readonly' : ''}
         onChange={(e) => setProjectTitle(e.target.value)}
       />
       <Input
         label="프로젝트 설명 (선택)"
         value={projectDescription}
         placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
-        readOnly={isReadOnly}
-        className={isReadOnly ? 'readonly' : ''}
         onChange={(e) => setProjectDescription(e.target.value)}
       />
       <Input
         label="파이썬 커널 경로"
         defaultValue={isReadOnly ? currentProject?.pythonKernelPath : ''}
+        readOnly={isReadOnly}
+        className={isReadOnly ? 'readonly' : ''}
         placeholder=".exe"
         onChange={(e) => setPythonKernelPath(e.target.value)}
       />
