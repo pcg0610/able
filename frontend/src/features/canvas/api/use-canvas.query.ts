@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import axiosInstance from '@shared/api/axios-instance';
+import axiosInstance from '@shared/api/config/axios-instance';
 import canvasKey from '@features/canvas/api/canvas-key';
 import type { CanvasResponse } from '@features/canvas/types/canvas.type';
 

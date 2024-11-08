@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import axiosInstance from '@shared/api/axios-instance';
-import homeKey from '@/features/home/api/home-key';
+
+import axiosInstance from '@shared/api/config/axios-instance';
+import homeKey from '@features/home/api/home-key';
 
 const fetchProjects = async () => {
   try {

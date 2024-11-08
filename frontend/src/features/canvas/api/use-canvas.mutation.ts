@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import axiosInstance from '@/shared/api/axios-instance';
+import axiosInstance from '@shared/api/config/axios-instance';
 import type { BlockSchema, CanvasResponse, EdgeSchema } from '@features/canvas/types/canvas.type';
 import canvasKey from '@features/canvas/api/canvas-key';
 
