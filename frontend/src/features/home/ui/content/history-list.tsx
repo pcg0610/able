@@ -1,14 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 
 import { HistoryItem } from '@features/home/types/home.type';
-import { useProjectStateStore } from '@entities/project/model/project.model';
+import { useProjectNameStore } from '@entities/project/model/project.model';
 
-import {
-  HistoryListWrapper,
-  HistoryRow,
-  HistoryCell,
-  StatusText,
-} from '@/features/home/ui/content/history-list.style';
+import { HistoryListWrapper, HistoryRow, HistoryCell, StatusText } from '@/features/home/ui/content/history-list.style';
 
 interface HistoryListProps {
   trainSummaries: HistoryItem[];
@@ -16,7 +11,7 @@ interface HistoryListProps {
 
 const HistoryList = ({ trainSummaries }: HistoryListProps) => {
   const navigate = useNavigate();
-  const { setResultName } = useProjectStateStore();
+  const { setResultName } = useProjectNameStore();
 
   const handleHistoryClick = (result: string) => {
     setResultName(result);
@@ -27,16 +22,16 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
     <HistoryListWrapper>
       <thead>
         <tr>
-          <HistoryCell as='th' width='10%'>
+          <HistoryCell as="th" width="10%">
             번호
           </HistoryCell>
-          <HistoryCell as='th' width='40%'>
+          <HistoryCell as="th" width="40%">
             학습일
           </HistoryCell>
-          <HistoryCell as='th' width='20%'>
+          <HistoryCell as="th" width="20%">
             정확도
           </HistoryCell>
-          <HistoryCell as='th' width='20%'>
+          <HistoryCell as="th" width="20%">
             상태
           </HistoryCell>
         </tr>

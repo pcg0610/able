@@ -23,13 +23,7 @@ const BasicButton = ({
   onClick,
 }: BasicButtonProps) => {
   return (
-    <StyledButton
-      color={color}
-      backgroundColor={backgroundColor}
-      width={width}
-      height={height}
-      onClick={onClick}
-    >
+    <StyledButton color={color} backgroundColor={backgroundColor} width={width} height={height} onClick={onClick}>
       {icon && <StyledIcon>{icon}</StyledIcon>}
       {text}
     </StyledButton>

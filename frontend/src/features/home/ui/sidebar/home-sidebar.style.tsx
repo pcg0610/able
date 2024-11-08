@@ -3,11 +3,11 @@ import styled from '@emotion/styled';
 import Common from '@shared/styles/common';
 
 export const SidebarContainer = styled.div`
-  width: 15.625rem; 
+  width: 15.625rem;
   height: 100%;
-  background-color: #f8f9fc; 
-  padding: 1.25rem 1rem; 
-  border-right: 0.0625rem solid #ddd; 
+  background-color: #f8f9fc;
+  padding: 1.25rem 1rem;
+  border-right: 0.0625rem solid #ddd;
   display: flex;
   flex-direction: column;
 `;
@@ -40,7 +40,7 @@ export const Button = styled.button`
 
 export const FolderSection = styled.div`
   margin: 1rem 0;
-  flex:1;
+  flex: 1;
 `;
 
 export const Folder = styled.div<{ isSelected: boolean }>`
@@ -51,11 +51,10 @@ export const Folder = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
   gap: 0.625rem;
   width: 100%;
-  padding: 0.6875rem 1.25rem; 
+  padding: 0.6875rem 1.25rem;
   font-size: ${Common.fontSizes.sm};
   border-radius: 0.375rem;
-  background-color: ${(props) =>
-    props.isSelected ? Common.colors.gray100 : "transparent"};
+  background-color: ${(props) => (props.isSelected ? Common.colors.gray100 : 'transparent')};
   transition-property: background-color;
   transition-duration: 0.6s;
 
@@ -67,7 +66,7 @@ export const Folder = styled.div<{ isSelected: boolean }>`
 export const Footer = styled.div`
   display: flex;
   align-items: center;
-  background-color: #EAEEFF;
+  background-color: #eaeeff;
   border-radius: 0.5rem;
   padding: 0.625rem;
   margin-top: auto;
@@ -85,10 +84,10 @@ export const RocketCircle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #CED0FF;
-  border-radius: 50%; 
-  width: 60px; 
-  height: 60px; 
+  background-color: #ced0ff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
 `;
 
 export const FooterIcon = styled.span`
@@ -99,7 +98,7 @@ export const FooterIcon = styled.span`
 `;
 
 export const FooterText = styled.div`
-  font-size:  ${Common.fontSizes.xl};
+  font-size: ${Common.fontSizes.xl};
   font-weight: bold;
   color: #343a40;
 `;

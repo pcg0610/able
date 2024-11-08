@@ -1,8 +1,8 @@
-import { React, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import * as S from "@features/train/ui/sidebar/epoch-list-sidebar.style";
 import { useEpochs } from '@features/train/api/use-analyze.query';
-import { useProjectStateStore } from '@entities/project/model/project.model';
+import { useProjectNameStore } from '@entities/project/model/project.model';
 
 import SearchBox from '@shared/ui/searchbar/searchbar';
 
@@ -16,7 +16,7 @@ const EpochListSidebar = () => {
       "final",
    ];
 
-   const { projectName, epochName, setEpochName } = useProjectStateStore();
+   const { projectName, epochName, setEpochName } = useProjectNameStore();
    const { data: epochData, isLoading } = useEpochs(projectName, '20241108_005251', index, size);
 
    const loadMoreEpochs = useCallback(() => {

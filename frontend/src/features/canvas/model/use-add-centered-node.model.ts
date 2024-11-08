@@ -17,10 +17,7 @@ interface AddNodeProps {
 }
 
 // 노드가 마우스 커서 중앙에 위치하도록 새 노드 추가
-export const useAddCenteredNode = ({
-  setNodes,
-  screenToFlowPosition,
-}: AddNodeProps) => {
+export const useAddCenteredNode = ({ setNodes, screenToFlowPosition }: AddNodeProps) => {
   // 주어진 노드의 위치를 중앙으로 이동시키는 작업 수행
   // useCallback으로 캐싱
   const adjustNodePosition = useCallback(
@@ -39,13 +36,7 @@ export const useAddCenteredNode = ({
             y: clientOffset.y - height / 2,
           });
 
-          setNodes((nds) =>
-            nds.map((node) =>
-              node.id === nodeId
-                ? { ...node, position: centeredPosition }
-                : node
-            )
-          );
+          setNodes((nds) => nds.map((node) => (node.id === nodeId ? { ...node, position: centeredPosition } : node)));
         }
       }, 0);
     },

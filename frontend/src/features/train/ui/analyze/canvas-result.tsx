@@ -14,7 +14,7 @@ import '@xyflow/react/dist/style.css';
 import BlockNodeFeature from '@entities/block-node/block-node-feature';
 import useAutoLayout, { type LayoutOptions } from '@features/train/model/use-auto-layout.model';
 import { useModel } from '@features/train/api/use-analyze.query';
-import { useProjectStateStore } from '@entities/project/model/project.model';
+import { useProjectNameStore } from '@entities/project/model/project.model';
 import { useImageStore } from '@entities/train/model/train.model';
 import { useFetchFeatureMap, useCreateFeatureMap } from '@features/train/api/use-analyze.mutation';
 import {
@@ -46,7 +46,7 @@ const CanvasResult = () => {
    const [selectedBlockIds, setSelectedBlockIds] = useState<string[]>([]);
    const [featureMap, setFeatureMap] = useState<FeatureMapResponse[]>([]);
 
-   const { projectName } = useProjectStateStore();
+   const { projectName } = useProjectNameStore();
    const { uploadedImage } = useImageStore();
    const { data: canvas } = useModel(projectName, '20241108_005251');
    const { fitView } = useReactFlow();

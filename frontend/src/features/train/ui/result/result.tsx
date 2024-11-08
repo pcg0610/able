@@ -128,15 +128,15 @@ const Result = () => {
         <BasicButton
           color={Common.colors.primary}
           backgroundColor={Common.colors.secondary}
-          text='모델 배포하기'
-          width='10rem'
+          text="모델 배포하기"
+          width="10rem"
           onClick={() => {
             console.log('모델 실행 버튼 클릭됨');
           }}
         />
       </S.Header>
       <S.GridContainer>
-        <div className='top-row'>
+        <div className="top-row">
           <S.GraphCard>
             <S.GraphTitle>Training and validation loss</S.GraphTitle>
             <LossGraph data={lossData} />
@@ -146,7 +146,7 @@ const Result = () => {
             <EpochGraph data={accuracyData} />
           </S.GraphCard>
         </div>
-        <div className='bottom-row'>
+        <div className="bottom-row">
           <S.GraphCard>
             <S.GraphTitle>Confusion Matrix</S.GraphTitle>
             <ConfusionMatrix />

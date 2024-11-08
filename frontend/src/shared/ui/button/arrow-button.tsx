@@ -10,12 +10,7 @@ interface ArrowButtonProps {
   onClick?: () => void;
 }
 
-const ArrowButton = ({
-  direction = 'down',
-  size = 'sm',
-  color = Common.colors.black,
-  onClick,
-}: ArrowButtonProps) => {
+const ArrowButton = ({ direction = 'down', size = 'sm', color = Common.colors.black, onClick }: ArrowButtonProps) => {
   return (
     <S.StyledButton direction={direction} size={size} onClick={onClick}>
       <ArrowIcon fill={color} />

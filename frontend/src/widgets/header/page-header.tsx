@@ -16,12 +16,7 @@ const PageHeader = ({ title, date }: PageHeaderProps) => {
 
   return (
     <S.Header>
-      <ArrowButton
-        direction='left'
-        size='md'
-        color={Common.colors.white}
-        onClick={handleGoBack}
-      />
+      <ArrowButton direction="left" size="md" color={Common.colors.white} onClick={handleGoBack} />
       <div>
         <S.Title>{title}</S.Title>
         <S.Date>{date}</S.Date>

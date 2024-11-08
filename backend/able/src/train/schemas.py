@@ -5,6 +5,9 @@ from pydantic.v1 import ConfigDict
 from src.response.schemas import ImmutableBaseModel
 from matplotlib.figure import Figure
 
+from src.train.enums import TrainStatus
+
+
 class PerformanceMetrics(ImmutableBaseModel):
     accuracy: float
     top5_accuracy: float
@@ -50,3 +53,4 @@ class TrainResultMetadata(ImmutableBaseModel):
     data_path: str = Field(..., description="데이터셋의 경로")
     input_shape: List[int] = Field(..., description="입력 데이터 형상")
     classes: List[str] = Field(..., description="클래스 목록")
+    status: TrainStatus

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import axiosInstance from '@shared/api/axios-instance';
+import axiosInstance from '@shared/api/config/axios-instance';
 import homeKey from '@/features/home/api/home-key';
 import { HistoryResponse } from '@features/home/types/home.type';
 
@@ -25,11 +25,7 @@ const fetchProject = async (title: string) => {
   }
 };
 
-const fetchProjectHistory = async (
-  title: string,
-  page: number,
-  pageSize: number
-) => {
+const fetchProjectHistory = async (title: string, page: number, pageSize: number) => {
   try {
     const response = await axiosInstance.get(`/projects/${title}/train/logs`, {
       params: { page, pageSize },
@@ -57,11 +53,7 @@ export const useProject = (title: string) => {
   });
 };
 
-export const useProjectHistory = (
-  title: string,
-  page: number,
-  pageSize: number
-) => {
+export const useProjectHistory = (title: string, page: number, pageSize: number) => {
   return useQuery<HistoryResponse>({
     queryKey: homeKey.history(title, page, pageSize),
     queryFn: () => fetchProjectHistory(title, page, pageSize),
