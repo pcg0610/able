@@ -1,20 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import axiosInstance from '@/shared/api/axios-instance';
+import axiosInstance from '@/shared/api/config/axios-instance';
 import trainKey from '@features/train/api/train-key';
-import {
-  FeatureMapProps,
-  FeatureMapResponse,
-  CreateFeatureMapProps,
-} from '@features/train/types/analyze.type';
+import { FeatureMapProps, FeatureMapResponse, CreateFeatureMapProps } from '@features/train/types/analyze.type';
 
-const createFeatureMap = async ({
-  projectName,
-  resultName,
-  epochName,
-  deviceIndex,
-  image,
-}: CreateFeatureMapProps) => {
+const createFeatureMap = async ({ projectName, resultName, epochName, deviceIndex, image }: CreateFeatureMapProps) => {
   try {
     const formData = new FormData();
 
@@ -99,19 +89,12 @@ export const useFetchFeatureMap = () => {
     mutationFn: fetchFeatureMap,
     onSuccess: (featureMap, variables) => {
       queryClient.setQueryData<Array<FeatureMapResponse>>(
-        trainKey.select(
-          variables.projectName,
-          variables.resultName,
-          variables.epochName,
-          variables.blockIds
-        ),
+        trainKey.select(variables.projectName, variables.resultName, variables.epochName, variables.blockIds),
         (oldData) => {
           if (!oldData) return featureMap;
 
           const updatedFeatureMap = oldData.map((block) => {
-            const feature = featureMap.find(
-              (item) => item.blockId === block.blockId
-            );
+            const feature = featureMap.find((item) => item.blockId === block.blockId);
             return {
               ...block,
               img: feature ? feature.img : block.img,
