@@ -1,13 +1,14 @@
 import styled from '@emotion/styled';
 import Common from '@/shared/styles/common';
 
-export const Container = styled.div<{ blockColor: string; isConnected: boolean }>`
+export const Container = styled.div<{ blockColor: string; isConnected: boolean; isSelected: boolean }>`
   width: 15.625rem;
   border-radius: 0.25rem;
   background-color: ${({ blockColor }) => blockColor};
   border: 0.0625rem solid ${({ blockColor }) => blockColor};
   overflow: hidden;
-  opacity: ${({ isConnected }) => (isConnected ? 1 : 0.3)};
+  opacity: ${({ isConnected, isSelected }) => (isSelected || isConnected ? 1 : 0.3)};
+  box-shadow: ${({ isSelected, blockColor }) => (isSelected ? `0 0 0.4rem ${blockColor}` : '')};
 `;
 
 export const Label = styled.div`

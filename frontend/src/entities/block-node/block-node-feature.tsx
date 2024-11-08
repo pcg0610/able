@@ -53,7 +53,7 @@ const BlockNodeFeature = ({
   };
 
   return (
-    <S.Container blockColor={blockColor} isConnected>
+    <S.Container blockColor={blockColor} isConnected isSelected={false}>
       <Handle type="target" position={targetPosition} />
       <S.Label>{capitalizeFirstLetter(data?.block?.name || 'Unknown')}</S.Label>
       <S.FieldWrapper>

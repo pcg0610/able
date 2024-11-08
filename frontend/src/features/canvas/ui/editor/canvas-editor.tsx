@@ -188,6 +188,7 @@ const CanvasEditor = () => {
               ...node.data,
               onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
               isConnected: isBlockConnected(node.id),
+              isSelected: node.id === selectedNode?.id,
             },
           }))}
           edges={edges}
