@@ -12,7 +12,7 @@ THUMBNAIL = "thumbnail.jpg"
 BLOCK_GRAPH = "block_graph.json"
 PERFORMANCE_METRICS = "performance_metrics.json"
 
-def get_train_logs(title:str, page:int, page_size:int) -> list[TrainSummary] :
+def get_train_logs(title:str, page:int, page_size:int) -> TrainLogResponse :
 
     train_results_path = path_manager.get_train_results_path(title)
     sorted_train_dirs = sorted(train_results_path.iterdir(), reverse=False)
@@ -42,4 +42,6 @@ def get_train_logs(title:str, page:int, page_size:int) -> list[TrainSummary] :
     train_results.reverse()
 
     paginated_train_results = handle_pagination(train_results, page, page_size)
-    return paginated_train_results or []
+
+    result = TrainLogResponse(total_train_logs=len(train_results), train_summaries=paginated_train_results)
+    return result

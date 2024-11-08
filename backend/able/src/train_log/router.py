@@ -16,10 +16,10 @@ train_log_router = router = APIRouter()
 def get_train_logs(project_name: str, page: int, page_size: int):
     result = service.get_train_logs(project_name, page, page_size)
 
-    if len(result) == 0:
+    if len(result.train_summaries) == 0:
         return no_content()
 
     return ok(
-        data=TrainLogResponse(train_summaries=result)
+        data=result
     )
 
