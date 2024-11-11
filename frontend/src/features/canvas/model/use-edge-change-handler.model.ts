@@ -1,13 +1,13 @@
-import { EdgeChange, applyEdgeChanges, Edge, Node } from '@xyflow/react';
+import { applyEdgeChanges, type EdgeChange, type Node as XYFlowNode, type Edge as XYFlowEdge } from '@xyflow/react';
 import { Dispatch, SetStateAction, useCallback } from 'react';
 
 import type { BlockItem } from '@features/canvas/types/block.type';
 
 interface EdgeChangeHandlerProps {
-  edges: Edge[];
-  setEdges: Dispatch<SetStateAction<Edge[]>>;
-  nodes: Node[];
-  selectedNode: Node | null;
+  edges: XYFlowEdge[];
+  setEdges: Dispatch<SetStateAction<XYFlowEdge[]>>;
+  nodes: XYFlowNode[];
+  selectedNode: XYFlowNode | null;
 }
 
 export const useEdgeChangeHandler = ({ setEdges, nodes, selectedNode }: EdgeChangeHandlerProps) => {

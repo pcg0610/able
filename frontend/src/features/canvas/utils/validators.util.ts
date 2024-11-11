@@ -1,7 +1,36 @@
 import { getOutgoers, type Node as XYFlowNode, type Edge as XYFlowEdge, type Connection } from '@xyflow/react';
+import { toast } from 'react-hot-toast';
+
+import { TOAST_MESSAGES } from '@features/canvas/constants/message.constant';
+import type { BlockItem } from '@features/canvas/types/block.type';
+
+export const isDataBlockConnected = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
+  const dataBlock = nodes.find((node) => (node.data.block as BlockItem).name === 'data');
+  if (!dataBlock) return false;
+
+  return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
+};
+
+export const isValidConnection = (connection: Connection, nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
+  const targetNode = nodes.find((node) => node.id === connection.target);
+
+  // target이 data 블록이면 연결 불가
+  if ((targetNode?.data.block as BlockItem).type === 'data') {
+    toast.error(TOAST_MESSAGES.root);
+    return false;
+  }
+
+  // 사이클 검증
+  if (!canConnectWithoutCycle(nodes, edges)(connection)) {
+    toast.error(TOAST_MESSAGES.cycle);
+    return false;
+  }
+
+  return true;
+};
 
 // connection이 사이클 발생하는지 확인
-export const isValidConnection = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
+const canConnectWithoutCycle = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
   return (connection: Connection): boolean => {
     // 목적 노드(연결하려는 노드)
     const targetNode = nodes.find((node) => node.id === connection.target);

@@ -1,7 +1,7 @@
 import { KeyboardEvent, useState } from 'react';
 
 import * as S from '@features/canvas/ui/sidebar/canvas-sidebar.style';
-import { BLOCK_MENU } from '@features/canvas/costants/block-menu.constant';
+import { BLOCK_MENU } from '@features/canvas/constants/block-menu.constant';
 import { useSearchBlock } from '@features/canvas/api/use-blocks.query';
 
 import SearchBar from '@shared/ui/input/search-bar';

@@ -1,11 +1,11 @@
 import { Handle, Position } from '@xyflow/react';
 import React, { useMemo } from 'react';
 
-import * as S from '@entities/block-node/block-node.style';
+import * as S from '@entities/block-node/ui/block-node.style';
 import Common from '@shared/styles/common';
-import { blockColors } from '@shared/constants/block';
+import { BLOCK_COLORS } from '@shared/constants/block';
+import type { BlockItem } from '@features/canvas/types/block.type';
 import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
-import { BlockItem } from '@/features/canvas/types/block.type';
 import { useImageStore } from '@entities/train/model/train.model';
 
 import UploadImageIcon from '@icons/uploadImage.svg?react';
@@ -28,7 +28,7 @@ const BlockNodeFeature = ({
   const { uploadedImage, setUploadedImage, heatMapImage, classScores, lastConv2dId } = useImageStore();
 
   const blockColor = useMemo(
-    () => (data?.block?.type ? blockColors[data.block.type] : Common.colors.gray200),
+    () => (data?.block?.type ? BLOCK_COLORS[data.block.type] : Common.colors.gray200),
     [data?.block?.type]
   );
 
