@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
-import * as S from '@features/home/ui/modal/project-modal.style';
 import { useProjectStore } from '@entities/project/model/project.model';
+import { useCreateProject } from '@features/home/api/use-home.mutation';
 
 import Modal from '@shared/ui/modal/modal';
 import Input from '@shared/ui/input/input';
@@ -13,21 +14,19 @@ interface ProjectModalProps {
   onAnimationEnd: () => void;
   type: 'create' | 'modify';
 }
-interface Option {
-  value: string;
-  label: string;
-}
 
 const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModalProps) => {
   const isReadOnly = type === 'modify';
   const { currentProject } = useProjectStore();
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string>(null);
   const [projectTitle, setProjectTitle] = useState(currentProject?.title || '');
   const [projectDescription, setProjectDescription] = useState(currentProject?.description || '');
+  const [projectCudaVersion, setProjectCudaVersion] = useState(currentProject?.cudaVersion || '');
   const [pythonKernelPath, setPythonKernelPath] = useState(currentProject?.pythonKernelPath || '');
+  const { mutate: createProject } = useCreateProject();
 
   const options = [
-    { value: 'string', label: 'string' },
+    { value: 'option0', label: 'Option 0' },
     { value: 'option1', label: 'Option 1' },
     { value: 'option2', label: 'Option 2' },
     { value: 'option3', label: 'Option 3' },
@@ -39,27 +38,49 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
     if (isReadOnly && currentProject) {
       setProjectTitle(currentProject.title || '');
       setProjectDescription(currentProject.description || '');
+      setProjectCudaVersion(currentProject.cudaVersion || '');
+      setPythonKernelPath(currentProject.pythonKernelPath || '');
     } else {
-      // isReadOnly가 false일 때는 빈 문자열로 초기화
       setProjectTitle('');
       setProjectDescription('');
+      setProjectCudaVersion('');
+      setPythonKernelPath('');
     }
   }, [isReadOnly, currentProject]);
 
-  const defaultOption = options.find((option) => option.label === currentProject?.cudaVersion) || null;
+  const handleSelect = (option: string) => {
+    setSelectedOption(option);
+  };
 
-  const handleSelect = (option: Option) => {
-    setSelectedOption(option.label); // 선택된 옵션을 저장
-    console.log('선택된 옵션:', option);
+  const handleCreateProject = () => {
+    if (!isReadOnly) {
+      createProject(
+        {
+          title: projectTitle,
+          description: projectDescription,
+          cudaVersion: selectedOption,
+          pythonKernelPath: pythonKernelPath,
+        },
+        {
+          onSuccess: (data) => {
+            if (data) {
+              toast.success("프로젝트가 생성되었습니다.");
+              onClose();
+            }
+          },
+        }
+      );
+    }
   };
 
   return (
     <Modal
       onClose={onClose}
+      onConfirm={handleCreateProject}
       isClosing={isClosing}
       onAnimationEnd={onAnimationEnd}
       title="프로젝트 정보를 입력하세요"
-      confirmText={isReadOnly ? '수정' : '확인'}
+      confirmText={isReadOnly ? '수정' : '생성'}
     >
       <Input
         label="프로젝트 이름"
@@ -81,12 +102,18 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         placeholder=".exe"
         onChange={(e) => setPythonKernelPath(e.target.value)}
       />
-      <DropDown
+      {isReadOnly ? <Input
         label="쿠다 버전"
-        options={options}
-        onSelect={handleSelect}
-        defaultValue={isReadOnly ? defaultOption : ''}
-      />
+        defaultValue={currentProject?.cudaVersion}
+        readOnly={isReadOnly}
+        className={'readonly'}
+      /> :
+        <DropDown
+          label="쿠다 버전"
+          options={options}
+          onSelect={handleSelect}
+        />
+      }
     </Modal>
   );
 };
