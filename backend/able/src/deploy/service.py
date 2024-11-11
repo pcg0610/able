@@ -34,9 +34,10 @@ def run() -> bool:
     if metadata["status"] == DeployStatus.RUNNING.value:
         raise AlreadyRunException()
 
+    main_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../deploy_server/src/main.py"))
+
     process = subprocess.Popen([
-        sys.executable, "-m", "uvicorn", "deploy_server.src.main:app",
-        "--host", "127.0.0.1", "--port", "8088"
+        sys.executable, main_py_path
     ])
 
     metadata.update({"pid": process.pid, "status": DeployStatus.RUNNING.value})
