@@ -25,12 +25,12 @@ def create_project(project: Project) -> bool:
     metadata_path = project_path / METADATA
     block_graph_path = project_path / BLOCK_GRAPH
     
-    if create_directory(train_results_path):
-        create_file(block_graph_path, json_to_str(Canvas()))
-        return create_file(metadata_path, json_to_str(project))
-
-    logger.error(f"동일한 디렉터리 이름 존재: {project.title}")
-    raise ProjectNameAlreadyExistsException()
+    if not create_directory(train_results_path):
+        logger.error(f"동일한 디렉터리 이름 존재: {project.title}")
+        raise ProjectNameAlreadyExistsException("동일한 이름을 가진 프로젝트가 이미 존재합니다.")
+    
+    create_file(block_graph_path, json_to_str(Canvas()))
+    return create_file(metadata_path, json_to_str(project))
 
 
 def get_project(title: str) -> Optional[SelectedProject]:
@@ -58,9 +58,8 @@ def update_project(updated_project: UpdatedProject) -> bool:
     new_project_path = path_manager.get_projects_path(updated_project.title)
     metadata_path = new_project_path / METADATA
 
-    if not (rename_path(prev_project_path, updated_project.title) 
-            and updated_project.prev_title != updated_project.title) :
-        return False
+    if updated_project.prev_title != updated_project.title:
+        rename_path(prev_project_path, updated_project.title)
 
     project_data = updated_project.model_dump(exclude={"prev_title", "prev_description"})
     new_project = Project(**project_data)
