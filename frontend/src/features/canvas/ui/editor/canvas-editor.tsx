@@ -113,23 +113,27 @@ const CanvasEditor = () => {
     if (canvasRef.current) {
       const canvasImage = await html2canvas(canvasRef.current);
       const dataUrl = canvasImage.toDataURL('image/png');
-      // dataUrl 백엔드로 전송
+
+      const transformedBlocks = transformNodesToBlockSchema(nodes);
+      const transformedEdges = transformEdgesToEdgeSchema(edges);
+
+      toast.promise(
+        saveCanvas({
+          projectName: projectName || '',
+          canvas: { blocks: transformedBlocks, edges: transformedEdges },
+          thumbnail: dataUrl,
+        }),
+        {
+          loading: TOAST_MESSAGES.loading,
+          success: TOAST_MESSAGES.success,
+          error: TOAST_MESSAGES.error,
+        }
+      );
+
+      return;
     }
 
-    const transformedBlocks = transformNodesToBlockSchema(nodes);
-    const transformedEdges = transformEdgesToEdgeSchema(edges);
-
-    toast.promise(
-      saveCanvas({
-        projectName: projectName || '',
-        canvas: { blocks: transformedBlocks, edges: transformedEdges },
-      }),
-      {
-        loading: TOAST_MESSAGES.loading,
-        success: TOAST_MESSAGES.success,
-        error: TOAST_MESSAGES.error,
-      }
-    );
+    toast.error('캔버스가 준비되지 않았어요.');
   };
 
   // 노드를 연결할 때 호출
