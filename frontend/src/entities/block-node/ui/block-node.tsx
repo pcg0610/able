@@ -31,6 +31,11 @@ const BlockNode = ({
 
   const blockColor = useMemo(() => (block?.type ? BLOCK_COLORS[block.type] : Common.colors.gray200), [block.type]);
 
+  const handleFieldChange = (fieldName: string, value: string | boolean) => {
+    const updatedFields = block.fields.map((f) => (f.name === fieldName ? { ...f, value } : f));
+    updateNodeData(id, { block: { ...block, fields: updatedFields } });
+  };
+
   return (
     <S.Container blockColor={blockColor} isConnected={isConnected} isSelected={isSelected}>
       <CustomHandle type="target" position={targetPosition} connectionCount={CONNECTION_LIMIT_COOUNT} />
@@ -41,20 +46,21 @@ const BlockNode = ({
             <S.Name>
               {field.name} {field.isRequired ? '*' : ''}
             </S.Name>
-            <S.Input
-              type="text"
-              placeholder={field.isRequired ? 'required' : ''}
-              required={field.isRequired}
-              value={field.value || ''}
-              onChange={(e) =>
-                updateNodeData(id, {
-                  block: {
-                    ...block,
-                    fields: block.fields.map((f) => (f.name === field.name ? { ...f, value: e.target.value } : f)),
-                  },
-                })
-              }
-            />
+            {typeof field.value === 'boolean' ? (
+              <S.Checkbox
+                type="checkbox"
+                blockColor={blockColor}
+                checked={field.value}
+                onChange={(e) => handleFieldChange(field.name, e.target.checked)}
+              />
+            ) : (
+              <S.Input
+                type="text"
+                required={field.isRequired}
+                value={field.value || ''}
+                onChange={(e) => handleFieldChange(field.name, e.target.value)}
+              />
+            )}
           </S.InputWrapper>
         ))}
       </S.FieldWrapper>

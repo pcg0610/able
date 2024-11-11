@@ -18,7 +18,7 @@ export interface FeatureBlockItem {
 
 export interface BlockField {
   name: string;
-  value: string;
+  value: string | boolean;
   isRequired: boolean;
 }
 
