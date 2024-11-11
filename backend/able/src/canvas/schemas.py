@@ -19,3 +19,4 @@ class GetCanvasResponse(ImmutableBaseModel):
 
 class SaveCanvasRequest(ImmutableBaseModel):
     canvas: Canvas
+    thumbnail: str
