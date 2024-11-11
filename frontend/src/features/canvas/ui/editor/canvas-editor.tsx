@@ -15,8 +15,9 @@ import {
   type Edge as XYFlowEdge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import html2canvas from 'html2canvas';
 
 import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
@@ -70,6 +71,7 @@ const CanvasEditor = () => {
 
   const { screenToFlowPosition } = useReactFlow();
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
+  const canvasRef = useRef<HTMLDivElement | null>(null);
 
   // 백엔드에서 캔버스 정보를 받아오면 노드와 엣지 상태를 업데이트
   useEffect(() => {
@@ -108,6 +110,12 @@ const CanvasEditor = () => {
   };
 
   const handleSaveButtonClick = async () => {
+    if (canvasRef.current) {
+      const canvasImage = await html2canvas(canvasRef.current);
+      const dataUrl = canvasImage.toDataURL('image/png');
+      // dataUrl 백엔드로 전송
+    }
+
     const transformedBlocks = transformNodesToBlockSchema(nodes);
     const transformedEdges = transformEdgesToEdgeSchema(edges);
 
@@ -155,6 +163,7 @@ const CanvasEditor = () => {
       {isModalOpen && <TrainModal onClose={handleModalClose} onSubmit={handleTrain} />}
       <S.Canvas ref={dropRef}>
         <ReactFlow
+          ref={canvasRef}
           nodes={nodes.map((node) => ({
             ...node,
             data: {
@@ -172,7 +181,9 @@ const CanvasEditor = () => {
           onPaneClick={() => setSelectedNode(null)}
           nodeTypes={{ custom: BlockNode }}
         >
-          <Controls position="bottom-center" orientation="horizontal" />
+          <div data-html2canvas-ignore="true">
+            <Controls position="bottom-center" orientation="horizontal" />
+          </div>
           <Background variant={BackgroundVariant.Dots} />
         </ReactFlow>
         <S.OverlayButton>
