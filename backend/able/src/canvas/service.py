@@ -3,11 +3,10 @@ from src.canvas.schemas import SaveCanvasRequest, Canvas
 from src.file.utils import get_file, create_file, save_img_from_base64
 from src.file.path_manager import PathManager
 from src.utils import str_to_json, json_to_str
+from src.file.constants import *
 
 logger = logging.getLogger(__name__)
 path_manager = PathManager()
-block_graph = "block_graph.json"
-thumbnail = "thumbnail.jpg"
 
 def get_canvas(
         project_name: str
@@ -21,10 +20,10 @@ def get_canvas(
 def save_block_graph(project_name: str, data: SaveCanvasRequest) -> bool:
 
     project_path = path_manager.get_projects_path(project_name)
-    block_graph_path =  project_path / block_graph
+    block_graph_path =  project_path / BLOCK_GRAPH
 
     if create_file(block_graph_path, json_to_str(data.canvas)):
-        save_img_from_base64(project_path, thumbnail, data.thumbnail)
+        save_img_from_base64(project_path, THUMBNAIL, data.thumbnail)
         return True
     
     raise

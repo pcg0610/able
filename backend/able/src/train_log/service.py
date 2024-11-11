@@ -5,12 +5,9 @@ from src.file.utils import get_file
 from src.train_log.utils import parse_train_result_date, format_float
 from src.train_log.schemas import TrainLogResponse, TrainSummary
 from src.utils import str_to_json, handle_pagination
+from src.file.constants import *
 
 path_manager = PathManager()
-METADATA = "metadata.json"
-THUMBNAIL = "thumbnail.jpg"
-BLOCK_GRAPH = "block_graph.json"
-PERFORMANCE_METRICS = "performance_metrics.json"
 
 def get_train_logs(title:str, page:int, page_size:int) -> TrainLogResponse :
 

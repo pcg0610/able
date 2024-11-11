@@ -1,5 +1,6 @@
 from pathlib import Path
 from src.block.enums import BlockType
+from src.file.constants import *
 
 HOME_PATH = Path.home()
 APPLICATION_NAME = "able"
@@ -35,24 +36,24 @@ class PathManager:
 
     def get_block_graph_path(self, name: str) -> Path:
         """프로젝트 블록 그래프 파일 경로"""
-        return self.get_projects_path(name) / "block_graph.json"
+        return self.get_projects_path(name) / BLOCK_GRAPH
 
     def get_train_results_path(self, name: str) -> Path:
         """학습 결과 목록 경로"""
-        return self.get_projects_path(name) / "train_results"
+        return self.get_projects_path(name) / TRAIN_RESULTS
 
     def get_train_result_path(self, name: str, result_name: str) -> Path:
         """학습 결과 경로"""
-        return self.get_projects_path(name) / "train_results" / result_name
+        return self.get_projects_path(name) / TRAIN_RESULTS / result_name
 
     def get_checkpoints_path(self, name:str, result_name: str):
         """에포크 목록 경로"""
-        return self.get_train_result_path(name, result_name) / "checkpoints"
+        return self.get_train_result_path(name, result_name) / CHECKPOINTS
 
     def get_checkpoint_path(self, name: str, result_name: str, checkpoint: str) -> Path:
         """에포크별 경로"""
-        return self.get_train_result_path(name, result_name) / "checkpoints" / checkpoint
+        return self.get_train_result_path(name, result_name) / CHECKPOINTS / checkpoint
 
     def get_feature_maps_path(self, name: str, result_name: str, checkpoint: str) -> Path:
         """특정 에포크의 피처맵 이미지 디렉터리 경로"""
-        return self.get_checkpoint_path(name, result_name, checkpoint) / "feature_maps"
+        return self.get_checkpoint_path(name, result_name, checkpoint) / FEATURE_MAPS

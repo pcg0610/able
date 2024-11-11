@@ -1,4 +1,3 @@
-
 import torch
 import json
 import base64
@@ -20,22 +19,21 @@ from src.file.constants import *
 router = APIRouter()
 path_manager = PathManager()
 
-@router.post("/infer")
+@router.post("{request.uri}")
 async def path_name_route(image: str = Body(...)):
     
-    project_name = "string"
-    train_result = "20241108_162624"
-    checkpoint = "final"
+    project_name = "{request.project_name}"
+    train_result = "{request.train_result}"
+    checkpoint = "{request.checkpoint}"
     
-    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / METADATA
+    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / {METADATA}
     metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
 
     #block_graph.json 파일에서 블록 읽어오기
-    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / BLOCK_GRAPH
+    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / {BLOCK_GRAPH}
     block_graph = read_blocks(block_graph_path)
 
     # base64를 이미지로 변환 
-    image = base64.b64decode(image)
     image = Image.open(io.BytesIO(image))
     image = np.array(image)
     
@@ -48,12 +46,12 @@ async def path_name_route(image: str = Body(...)):
     image = transforms(image)
     image.to(device)
 
-    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / {MODEL})
+    model = torch.load({path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / MODEL})
     
     model.to(device)
     
     predicted = model(image).cpu().numpy()
-    
+
     max_value = predicted.max()
     predicted_idx = -1
     for idx, value in enumerate(predicted):

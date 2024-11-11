@@ -11,6 +11,7 @@ from src.deploy.schemas import RegisterApiRequest, ApiInformation
 from src.file.utils import get_file, create_file, remove_file, get_files
 from src.file.path_manager import PathManager
 from src.utils import str_to_json, json_to_str, handle_pagination
+from src.file.constants import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ DEFAULT_METADATA = """{
 
 
 def run() -> bool:
-    metadata_path = path_manager.deploy_path / "metadata.json"
+    metadata_path = path_manager.deploy_path / METADATA
     if not metadata_path.exists():
         create_file(metadata_path, DEFAULT_METADATA)
 
@@ -47,7 +48,7 @@ def run() -> bool:
 
 
 def stop() -> bool:
-    metadata_path = path_manager.deploy_path / "metadata.json"
+    metadata_path = path_manager.deploy_path / METADATA
     metadata = str_to_json(get_file(metadata_path))
 
     if metadata["status"] == DeployStatus.STOP.value:
@@ -116,11 +117,11 @@ async def path_name_route(image: str = Body(...)):
     train_result = "{request.train_result}"
     checkpoint = "{request.checkpoint}"
     
-    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / "metadata.json"
+    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / {METADATA}
     metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
 
     #block_graph.json 파일에서 블록 읽어오기
-    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / "block_graph.json"
+    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / {BLOCK_GRAPH}
     block_graph = read_blocks(block_graph_path)
 
     # base64를 이미지로 변환 
@@ -137,7 +138,7 @@ async def path_name_route(image: str = Body(...)):
     image: torch.Tensor = transforms(image)
     image = image.unsqueeze(0).to(device=device)
 
-    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth")
+    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / {MODEL})
 
     model.to(device)
 
@@ -174,7 +175,7 @@ async def path_name_route(image: str = Body(...)):
         # `pass` 위치에 라우터 포함 코드를 삽입
         if "pass" in content:
             
-            metadata_path = path_manager.deploy_path / "metadata.json"
+            metadata_path = path_manager.deploy_path / METADATA
             metadata = str_to_json(get_file(metadata_path))
             before_status = metadata["status"]
 
