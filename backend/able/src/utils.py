@@ -36,7 +36,8 @@ def json_to_str(obj: Any) -> str:
         raise
 
 def encode_image_to_base64(image_data: bytes) -> str:
-    return base64.b64encode(image_data).decode("utf-8")
+    base64_str = base64.b64encode(image_data).decode("utf-8")
+    return f"data:image/jpeg;base64,{base64_str}"
     
 def handle_pagination(items: List[Any], page: int, page_size: int) -> List[Any]:
     items_length = len(items)
