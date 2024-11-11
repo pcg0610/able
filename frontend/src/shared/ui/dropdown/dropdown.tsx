@@ -9,15 +9,15 @@ interface DropdownProps {
   label?: string;
   options: Option[];
   placeholder?: string;
-  defaultValue?: Option;
-  onSelect: (option: Option) => void;
+  defaultValue?: string | null;
+  onSelect: (option: string) => void;
 }
 
 const Dropdown = ({ label, options, placeholder = '버전을 선택하세요', defaultValue, onSelect }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<Option | null>(defaultValue || null);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const handleSelect = (option: Option) => {
+  const handleSelect = (option: string) => {
     setSelectedOption(option);
     setIsOpen(false);
     onSelect(option);
@@ -34,13 +34,13 @@ const Dropdown = ({ label, options, placeholder = '버전을 선택하세요', d
       {label && <S.Label>{label}</S.Label>}
       <S.DropdownWrapper>
         <S.DropdownHeader onClick={() => setIsOpen(!isOpen)} isPlaceholder={!selectedOption}>
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption : placeholder}
           <ArrowButton direction={isOpen ? 'up' : 'down'} />
         </S.DropdownHeader>
         {isOpen && (
           <S.DropdownList>
             {options.map((option) => (
-              <S.DropdownItem key={option.value} onClick={() => handleSelect(option)}>
+              <S.DropdownItem key={option.value} onClick={() => handleSelect(option.value.toString())}>
                 {option.label}
               </S.DropdownItem>
             ))}
