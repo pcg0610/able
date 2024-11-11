@@ -2,7 +2,7 @@ import { ComponentType } from 'react';
 import { useDrag } from 'react-dnd';
 
 import * as S from '@features/canvas/ui/sidebar/menu-block.style';
-import { blockColors } from '@shared/constants/block';
+import { BLOCK_COLORS } from '@shared/constants/block';
 import { BlockField } from '@features/canvas/types/block.type';
 import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
 
@@ -27,11 +27,7 @@ const MenuBlock = ({ type, name, fields, Icon }: MenuBlockProps) => {
 
   return (
     <Tooltip text={capitalizeFirstLetter(name)}>
-      <S.Container
-        ref={drag}
-        isDragging={isDragging}
-        blockColor={blockColors[type]}
-      >
+      <S.Container ref={drag} isDragging={isDragging} blockColor={BLOCK_COLORS[type]}>
         <S.Content>
           <S.LabelWrapper>
             {Icon && <Icon />}

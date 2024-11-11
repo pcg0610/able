@@ -40,8 +40,13 @@ const Dropdown = ({ label, options, placeholder = '버전을 선택하세요', d
         {isOpen && (
           <S.DropdownList>
             {options.map((option) => (
-              <S.DropdownItem key={option.value} onClick={() => handleSelect(option)}>
+              <S.DropdownItem
+                key={option.value}
+                onClick={() => handleSelect(option)}
+                isSelectable={option.canSelect !== false}
+              >
                 {option.label}
+                {option.canSelect === false && <S.Description>(사용 중)</S.Description>}
               </S.DropdownItem>
             ))}
           </S.DropdownList>

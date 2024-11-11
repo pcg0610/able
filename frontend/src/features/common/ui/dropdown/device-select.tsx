@@ -15,6 +15,7 @@ const DeviceSelect = ({ onSelect }: DeviceSelectProps) => {
   const options = devices.map((device) => ({
     value: device.index,
     label: device.name,
+    canSelect: device.status === 'not_in_use',
   }));
 
   const handleSelect = (option: Option) => {

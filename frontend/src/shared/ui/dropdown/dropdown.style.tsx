@@ -53,11 +53,18 @@ export const DropdownList = styled.ul`
   }
 `;
 
-export const DropdownItem = styled.li`
+export const DropdownItem = styled.div<{ isSelectable: boolean }>`
+  display: flex;
+  justify-content: space-between;
   padding: 0.625rem 0.9375rem;
   font-size: ${Common.fontSizes.sm};
-  cursor: pointer;
-  &:hover {
-    background-color: ${Common.colors.gray100};
-  }
+
+  color: ${({ isSelectable }) => (isSelectable ? Common.colors.black : Common.colors.gray300)};
+  background-color: ${({ isSelectable }) => (isSelectable ? Common.colors.white : Common.colors.gray100)};
+  cursor: ${({ isSelectable }) => (isSelectable ? 'pointer' : 'default')};
+  pointer-events: ${({ isSelectable }) => (isSelectable ? 'auto' : 'none')};
+`;
+
+export const Description = styled.span`
+  font-size: ${Common.fontSizes.xs};
 `;

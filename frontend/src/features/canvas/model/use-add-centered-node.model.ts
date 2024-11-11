@@ -1,5 +1,5 @@
+import type { Node as XYFlowNode } from '@xyflow/react';
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { Node as XYFlowNode } from '@xyflow/react';
 
 import { BlockItem } from '@features/canvas/types/block.type';
 

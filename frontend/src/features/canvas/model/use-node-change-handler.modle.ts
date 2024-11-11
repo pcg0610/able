@@ -1,13 +1,13 @@
-import { NodeChange, applyNodeChanges, Node } from '@xyflow/react';
 import { Dispatch, SetStateAction, useCallback } from 'react';
+import { applyNodeChanges, type NodeChange, Node as XYFlowNode } from '@xyflow/react';
 
 import type { BlockItem } from '@features/canvas/types/block.type';
 
 interface NodeChangeHandlerProps {
-  nodes: Node[];
-  setNodes: Dispatch<SetStateAction<Node[]>>;
-  selectedNode: Node | null;
-  setSelectedNode: Dispatch<SetStateAction<Node | null>>;
+  nodes: XYFlowNode[];
+  setNodes: Dispatch<SetStateAction<XYFlowNode[]>>;
+  selectedNode: XYFlowNode | null;
+  setSelectedNode: Dispatch<SetStateAction<XYFlowNode | null>>;
 }
 
 export const useNodeChangeHandler = ({ nodes, setNodes, setSelectedNode }: NodeChangeHandlerProps) => {

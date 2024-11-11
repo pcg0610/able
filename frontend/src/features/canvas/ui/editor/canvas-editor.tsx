@@ -4,32 +4,34 @@ import {
   Background,
   BackgroundVariant,
   addEdge,
+  reconnectEdge,
   useNodesState,
   useEdgesState,
   useReactFlow,
-  getOutgoers,
-  type OnConnect,
-  type Node as XYFlowNode,
   MarkerType,
+  type OnConnect,
+  type Connection,
+  type Node as XYFlowNode,
+  type Edge as XYFlowEdge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import html2canvas from 'html2canvas';
 
 import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
-import { DATA_BLOCK_ID } from '@features/canvas/costants/block.constant';
+import { TOAST_MESSAGES } from '@features/canvas/constants/message.constant';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
-import { TOAST_MESSAGE } from '@features/canvas/costants/message.constant';
-import type { BlockItem } from '@features/canvas/types/block.type';
 import type { TrainConfig, TrainRequest } from '@features/canvas/types/train.type';
 import {
   transformCanvasResponse,
   transformEdgesToEdgeSchema,
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
-import { isValidConnection } from '@features/canvas/utils/cycle-validator.util';
-import { useProjectNameStore } from '@/entities/project/model/project.model';
+import { isDataBlockConnected, isValidConnection } from '@features/canvas/utils/validators.util';
+import { getConnectedStatus } from '@features/canvas/utils/visibility.util';
+import { useProjectNameStore } from '@entities/project/model/project.model';
 import { useFetchCanvas } from '@features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
 import { useStartTrain } from '@features/canvas/api/use-train.mutation';
@@ -37,7 +39,7 @@ import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler
 import { useNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
 import { useEdgeChangeHandler } from '@features/canvas/model/use-edge-change-handler.model';
 
-import BlockNode from '@entities/block-node/block-node';
+import BlockNode from '@entities/block-node/ui/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';
@@ -69,6 +71,7 @@ const CanvasEditor = () => {
 
   const { screenToFlowPosition } = useReactFlow();
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
+  const canvasRef = useRef<HTMLDivElement | null>(null);
 
   // 백엔드에서 캔버스 정보를 받아오면 노드와 엣지 상태를 업데이트
   useEffect(() => {
@@ -79,95 +82,16 @@ const CanvasEditor = () => {
     }
   }, [data, setNodes, setEdges]);
 
-  // 노드를 연결할 때 호출
-  const onConnect: OnConnect = (connection) => {
-    if (!isValidConnection(nodes, edges)(connection)) {
-      toast.error(TOAST_MESSAGE.cycle);
-      return;
-    }
-
-    // 사이클이 발생하지 않으면 엣지 추가
-    setEdges((eds) =>
-      addEdge(
-        {
-          ...connection,
-          type: 'smoothstep',
-          markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
-        },
-        eds
-      )
-    );
-  };
-
-  // 특정 노드의 블록 필드 변경
-  const handleFieldChange = useCallback(
-    (nodeId: string, fieldName: string, value: string) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === nodeId
-            ? {
-                ...node,
-                data: {
-                  ...node.data,
-                  block: {
-                    ...(node.data.block as BlockItem),
-                    fields: (node.data.block as BlockItem).fields.map((field) =>
-                      field.name === fieldName ? { ...field, value } : field
-                    ),
-                  },
-                },
-              }
-            : node
-        )
-      );
-    },
-    [setNodes]
-  );
-
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
 
   const handleRunButtonClick = () => {
-    if (!isDataBlockConnected()) {
-      toast.error(TOAST_MESSAGE.data);
+    if (!isDataBlockConnected(nodes, edges)) {
+      toast.error(TOAST_MESSAGES.data);
       return;
     }
     setIsModalOpen(true);
-  };
-
-  const isDataBlockConnected = () => {
-    const dataBlock = nodes.find((node) => (node.data.block as BlockItem).name === 'data');
-    if (!dataBlock) return false;
-
-    return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
-  };
-
-  // 데이터 블록이거나 그 자식인지 확인
-  const getDataBlockDescendants = (dataBlockId: string): Set<string> => {
-    const visited = new Set<string>([dataBlockId]);
-
-    // 데이터 블록의 모든 자식 노드를 탐색하는 재귀 함수
-    const traverse = (currentId: string) => {
-      const currentNode = nodes.find((node) => node.id === currentId);
-      if (!currentNode) return;
-
-      const outgoers = getOutgoers(currentNode, nodes, edges);
-      outgoers.forEach((outgoer) => {
-        if (!visited.has(outgoer.id)) {
-          visited.add(outgoer.id);
-          traverse(outgoer.id);
-        }
-      });
-    };
-
-    traverse(dataBlockId);
-    return visited;
-  };
-
-  const getConnectedStatus = (nodeId: string) => {
-    const dataDescendants = getDataBlockDescendants(DATA_BLOCK_ID);
-    return dataDescendants.has(nodeId);
   };
 
   const handleTrain = (trainConfig: TrainConfig) => {
@@ -185,46 +109,85 @@ const CanvasEditor = () => {
     startTrain(trainRequest);
   };
 
-  const handleSavaButtonClick = async () => {
-    const transformedBlocks = transformNodesToBlockSchema(nodes);
-    const transformedEdges = transformEdgesToEdgeSchema(edges);
+  const handleSaveButtonClick = async () => {
+    if (canvasRef.current) {
+      const canvasImage = await html2canvas(canvasRef.current);
+      const dataUrl = canvasImage.toDataURL('image/png');
 
-    toast.promise(
-      saveCanvas({
-        projectName: projectName || '',
-        canvas: { blocks: transformedBlocks, edges: transformedEdges },
-      }),
-      {
-        loading: TOAST_MESSAGE.loading,
-        success: TOAST_MESSAGE.success,
-        error: TOAST_MESSAGE.error,
-      }
+      const transformedBlocks = transformNodesToBlockSchema(nodes);
+      const transformedEdges = transformEdgesToEdgeSchema(edges);
+
+      toast.promise(
+        saveCanvas({
+          projectName: projectName || '',
+          canvas: { blocks: transformedBlocks, edges: transformedEdges },
+          thumbnail: dataUrl,
+        }),
+        {
+          loading: TOAST_MESSAGES.loading,
+          success: TOAST_MESSAGES.success,
+          error: TOAST_MESSAGES.error,
+        }
+      );
+
+      return;
+    }
+
+    toast.error('캔버스가 준비되지 않았어요.');
+  };
+
+  // 노드를 연결할 때 호출
+  const handleConnect: OnConnect = (connection) => {
+    if (!isValidConnection(connection, nodes, edges)) return;
+
+    // 사이클이 발생하지 않으면 엣지 추가
+    setEdges((eds) =>
+      addEdge(
+        {
+          ...connection,
+          type: 'smoothstep',
+          markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
+        },
+        eds
+      )
     );
   };
+
+  const handleReconnect = useCallback(
+    (oldEdge: XYFlowEdge, newConnection: Connection) => {
+      if (!isValidConnection(newConnection, nodes, edges)) return;
+
+      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    },
+    [nodes, edges, setEdges]
+  );
 
   return (
     <>
       {isModalOpen && <TrainModal onClose={handleModalClose} onSubmit={handleTrain} />}
       <S.Canvas ref={dropRef}>
         <ReactFlow
+          ref={canvasRef}
           nodes={nodes.map((node) => ({
             ...node,
             data: {
               ...node.data,
-              onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
-              isConnected: getConnectedStatus(node.id),
+              isConnected: getConnectedStatus(node.id, nodes, edges),
               isSelected: node.id === selectedNode?.id,
             },
           }))}
           edges={edges}
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
-          onConnect={onConnect}
+          onConnect={handleConnect}
+          onReconnect={handleReconnect}
           onNodeClick={(_, node) => setSelectedNode(node)}
           onPaneClick={() => setSelectedNode(null)}
           nodeTypes={{ custom: BlockNode }}
         >
-          <Controls position="bottom-center" orientation="horizontal" />
+          <div data-html2canvas-ignore="true">
+            <Controls position="bottom-center" orientation="horizontal" />
+          </div>
           <Background variant={BackgroundVariant.Dots} />
         </ReactFlow>
         <S.OverlayButton>
@@ -240,7 +203,7 @@ const CanvasEditor = () => {
             backgroundColor={Common.colors.secondary}
             icon={<SaveIcon />}
             width="5.5rem"
-            onClick={handleSavaButtonClick}
+            onClick={handleSaveButtonClick}
           />
         </S.OverlayButton>
       </S.Canvas>
