@@ -4,7 +4,6 @@ from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, WebSocket
 import argparse
-import os
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -67,14 +66,45 @@ async def websocket_endpoint(websocket: WebSocket):
 async def welcome():
     return {"message": "running"}
 
+logging_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        }
+    },
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": f"{str(log_file_path)}",
+            "formatter": "default"
+        }
+    },
+    "loggers": {
+        "uvicorn": {
+            "level": "INFO",
+            "handlers": ["file"],
+            "propagate": False
+        },
+        "uvicorn.error": {
+            "level": "INFO",
+            "handlers": ["file"],
+            "propagate": False
+        },
+        "uvicorn.access": {
+            "level": "INFO",
+            "handlers": ["file"],
+            "propagate": False
+        }
+    }
+}
+
 if __name__=="__main__":
-    # 현재 파일과 같은 디렉터리에 있는 logging_config.yaml 파일을 절대 경로로 지정
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    default_log_config = os.path.join(current_dir, "logging_config.yaml")
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-p", "--port", dest="port", default=8088, type=int)
-    parser.add_argument("--log-config", dest="log_config", default=default_log_config, type=str)
+    parser.add_argument("--log-config", dest="log_config", default=logging_config, type=str)
 
     args = parser.parse_args()
 
