@@ -7,12 +7,13 @@ import canvasKey from '@features/canvas/api/canvas-key';
 interface SaveCanvasProps {
   projectName: string;
   canvas: { blocks: BlockSchema[]; edges: EdgeSchema[] };
+  thumbnail: string;
 }
 
-const saveCanvas = async ({ projectName, canvas }: SaveCanvasProps) => {
+const saveCanvas = async ({ projectName, canvas, thumbnail }: SaveCanvasProps) => {
   await axiosInstance.post(
     '/canvas',
-    { canvas },
+    { canvas, thumbnail },
     {
       params: { projectName },
     }

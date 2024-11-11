@@ -1,4 +1,4 @@
-export const blockColors: Record<string, string> = {
+export const BLOCK_COLORS: Record<string, string> = {
   data: '#FF6347',
   transform: '#FF5680',
   layer: '#FFA436',

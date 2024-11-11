@@ -15,6 +15,7 @@ from src.response.utils import ok
 from src.train.schemas import TrainResultMetadata
 from src.train.utils import create_data_preprocessor, split_blocks
 from src.utils import str_to_json
+from src.file.constants import *
 
 router = APIRouter()
 path_manager = PathManager()
@@ -26,11 +27,11 @@ async def path_name_route(image: str = Body(...)):
     train_result = "20241108_162624"
     checkpoint = "final"
     
-    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / "metadata.json"
+    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / METADATA
     metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
 
     #block_graph.json 파일에서 블록 읽어오기
-    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / "block_graph.json"
+    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / BLOCK_GRAPH
     block_graph = read_blocks(block_graph_path)
 
     # base64를 이미지로 변환 
@@ -47,7 +48,7 @@ async def path_name_route(image: str = Body(...)):
     image = transforms(image)
     image.to(device)
 
-    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / "model.pth")
+    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / {MODEL})
     
     model.to(device)
     

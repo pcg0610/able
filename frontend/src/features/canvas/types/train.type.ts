@@ -4,7 +4,7 @@ import { CanvasSchema } from './canvas.type';
 export interface TrainConfig {
   epoch: number | null;
   batchSize: number | null;
-  device: { index: number; name: string };
+  device: Device;
 }
 
 export interface TrainRequest {

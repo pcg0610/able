@@ -15,6 +15,7 @@ from src.utils import str_to_json, json_to_str
 from src.analysis.exceptions import ModelLoadException
 from src.analysis.schemas import ClassScore, ClassScores
 from src.train.schemas import TrainResultMetadata
+from src.file.constants import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -107,7 +108,7 @@ class FeatureMapExtractor:
         heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
 
         overlay = heatmap_resized * 0.4 + original_image
-        cv2.imwrite(str(self.checkpoint_path / "heatmap.jpg"), overlay)
+        cv2.imwrite(str(self.checkpoint_path / HEATMAP), overlay)
     
 
     def save_top_k_scores(self, k: int = 3) -> List[ClassScore]:
@@ -115,7 +116,7 @@ class FeatureMapExtractor:
         top_values = top_values[0].cpu().detach().numpy()
         top_indices = top_indices[0].cpu().detach().numpy()
 
-        class_names = get_class_names(self.result_path / "metadata.json")
+        class_names = get_class_names(self.result_path / METADATA)
         logger.info(f"상위 {k}개의 클래스: {[class_names[idx] for idx in top_indices ]}")
         logger.info(f"상위 {k}개의 클래스 점수: {top_values}")
 
@@ -126,11 +127,9 @@ class FeatureMapExtractor:
             )
             for idx, score in zip(top_indices, top_values)
         ]
-        create_file(self.checkpoint_path / "analysis_result.json", json_to_str(ClassScores(class_scores=scores)))
+        create_file(self.checkpoint_path / ANALYSIS_RESULT, json_to_str(ClassScores(class_scores=scores)))
 
         return scores
-
-
 
 
 # json 파일을 읽고 블록 리스트를 반환

@@ -6,15 +6,13 @@ export const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1rem;
+  padding: 0.4rem 1rem;
   border-bottom: 0.0625rem solid #ddd;
   height: 2.5rem;
 `;
 
-export const LeftText = styled.div`
-  font-size: ${Common.fontSizes.lg};
-  font-weight: bold;
-  color: ${Common.colors.primary};
+export const Logo = styled.img`
+  height: 100%;
 `;
 
 export const RightText = styled.div`

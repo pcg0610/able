@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import Common from '@/shared/styles/common';
+import Common from '@shared/styles/common';
 
 export const Container = styled.div<{ blockColor: string; isConnected: boolean; isSelected: boolean }>`
   width: 15.625rem;
@@ -32,7 +32,7 @@ export const InputWrapper = styled.div<{ blockColor: string }>`
   border-bottom: 0.0625rem solid ${({ blockColor }) => blockColor};
 
   &:last-of-type {
-    border-bottom: none; /* 마지막 필드에는 선 없음 */
+    border-bottom: none;
   }
 `;
 
@@ -40,7 +40,37 @@ export const Name = styled.label`
   font-size: ${Common.fontSizes.xs};
 `;
 
-export const Input = styled.input<{ required: boolean }>`
+export const Checkbox = styled.input<{ blockColor: string }>`
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid ${Common.colors.gray200};
+  border-radius: 0.1rem;
+  background-color: ${Common.colors.white};
+  cursor: pointer;
+  position: relative;
+
+  &:checked {
+    background-color: ${({ blockColor }) => blockColor};
+    border-color: ${({ blockColor }) => blockColor};
+  }
+
+  &:checked::after {
+    content: '✓';
+    color: ${Common.colors.white};
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: ${Common.fontSizes.sm};
+  }
+
+  &:hover {
+    border-color: ${({ blockColor }) => blockColor};
+  }
+`;
+
+export const Input = styled.input`
   width: 40%;
   height: 1.5rem;
   padding: 0 0.5rem;
