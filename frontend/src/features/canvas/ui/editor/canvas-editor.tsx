@@ -4,12 +4,15 @@ import {
   Background,
   BackgroundVariant,
   addEdge,
+  reconnectEdge,
+  getOutgoers,
   useNodesState,
   useEdgesState,
   useReactFlow,
-  getOutgoers,
   type OnConnect,
+  type Connection,
   type Node as XYFlowNode,
+  type Edge as XYFlowEdge,
   MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -78,6 +81,27 @@ const CanvasEditor = () => {
       setEdges(transformedData.edges);
     }
   }, [data, setNodes, setEdges]);
+
+  const onReconnect = useCallback(
+    (oldEdge: XYFlowEdge, newConnection: Connection) => {
+      const targetNode = nodes.find((node) => node.id === newConnection.target);
+
+      // target이 data 블록이면 연결 불가
+      if ((targetNode?.data.block as BlockItem).type === 'data') {
+        toast.error(TOAST_MESSAGES.root);
+        return;
+      }
+
+      // 사이클 검증
+      if (!isValidConnection(nodes, edges)(newConnection)) {
+        toast.error(TOAST_MESSAGES.cycle);
+        return;
+      }
+
+      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    },
+    [nodes, edges, setEdges]
+  );
 
   // 노드를 연결할 때 호출
   const onConnect: OnConnect = (connection) => {
@@ -229,6 +253,7 @@ const CanvasEditor = () => {
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
           onConnect={onConnect}
+          onReconnect={onReconnect}
           onNodeClick={(_, node) => setSelectedNode(node)}
           onPaneClick={() => setSelectedNode(null)}
           nodeTypes={{ custom: BlockNode }}
