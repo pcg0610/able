@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List
 from PIL import Image
 from fastapi import UploadFile
-from src.file.exceptions import FileNotFoundException, FileUnreadableException, ImageSaveFailException
+from src.file.exceptions import FileNotFoundException, FileUnreadableException, ImageSaveFailException, DirectoryCreationException, DirectoryUpdateException
 
 
 logging.basicConfig(level=logging.INFO)
@@ -18,9 +18,12 @@ def create_directory(path: Path) -> bool:
             path.mkdir(parents=True)
             logger.info(f"디렉터리 생성 성공: {path}")
             return True
+        except PermissionError:
+            logger.error("디렉터리를 생성할 권한이 없음")
+            raise DirectoryCreationException("디렉터리를 생성할 권한이 없습니다.")
         except Exception as e:
             logger.error(f"디렉터리 생성 실패: {e}", exc_info=True)
-            return False
+            raise DirectoryCreationException("디렉터리 생성에 실패하였습니다.")
     return False
 
 def get_directory(path: Path) -> List[Path]:
@@ -88,6 +91,9 @@ def remove_file(path: Path) -> bool:
     return False
 
 def rename_path(path: Path, new_name: str) -> bool:
+    if not path.exists():
+        raise FileNotFoundException("디렉터리를 찾을 수 없습니다.")
+    
     if path.exists() and new_name.strip() and path.name != new_name:
         new_path = path.parent / new_name
         try:
@@ -96,7 +102,7 @@ def rename_path(path: Path, new_name: str) -> bool:
             return True
         except Exception as e:
             logger.error(f"이름 변경 실패: {e}", exc_info=True)
-            return False
+            raise DirectoryUpdateException("디렉터리 이름 변경에 실패하였습니다.")
 
     logger.warning(f"이름 변경 실패: {path} -> {new_name}")
     return False
