@@ -107,7 +107,7 @@ const CanvasEditor = () => {
     startTrain(trainRequest);
   };
 
-  const handleSavaButtonClick = async () => {
+  const handleSaveButtonClick = async () => {
     const transformedBlocks = transformNodesToBlockSchema(nodes);
     const transformedEdges = transformEdgesToEdgeSchema(edges);
 
@@ -188,7 +188,7 @@ const CanvasEditor = () => {
             backgroundColor={Common.colors.secondary}
             icon={<SaveIcon />}
             width="5.5rem"
-            onClick={handleSavaButtonClick}
+            onClick={handleSaveButtonClick}
           />
         </S.OverlayButton>
       </S.Canvas>
