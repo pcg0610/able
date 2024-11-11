@@ -15,7 +15,7 @@ class SelectedProject(Project):
 class ProjectResponse(ImmutableBaseModel):
     project: SelectedProject
 
-class UpdatedProject(ImmutableBaseModel):
+class UpdatedProject(Project):
     prev_title: str                     # 변경 전 프로젝트명
     prev_description: str | None = None # 변경 전 설명
 
