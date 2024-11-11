@@ -27,6 +27,7 @@ const BlockNodeFeature = ({
   targetPosition = Position.Top,
 }: BlockNodeFeatureProps) => {
   const { uploadedImage, setUploadedImage, heatmapImage, classScores, heatMapId } = useImageStore();
+  const [isChanged, setIsChanged] = useState(false);
 
   const blockColor = useMemo(
     () => (data?.block?.type ? blockColors[data.block.type] : Common.colors.gray200),
@@ -34,7 +35,7 @@ const BlockNodeFeature = ({
   );
 
   const blockImage = useMemo(
-    () => (data.featureMap ? `data:image/jpeg;base64,${data.featureMap}` : null),
+    () => (data.featureMap ? data.featureMap : null),
     [data.featureMap]
   );
 
@@ -53,13 +54,6 @@ const BlockNodeFeature = ({
     document.getElementById('fileUpload')?.click();
   };
 
-  const displayUploadedImage = useMemo(() => {
-    return uploadedImage && !uploadedImage.startsWith('data:image/jpeg;base64,')
-      ? `data:image/jpeg;base64,${uploadedImage}`
-      : uploadedImage;
-  }, [uploadedImage]);
-
-
   const [isGraphVisible, setIsGraphVisible] = useState(false);
   const toggleGraphVisibility = () => {
     setIsGraphVisible(!isGraphVisible);
@@ -72,9 +66,9 @@ const BlockNodeFeature = ({
       <S.FieldWrapper>
         {data.block.type === 'data' ? (
           <>
-            {displayUploadedImage ? (
+            {uploadedImage ? (
               <S.Image
-                src={displayUploadedImage}
+                src={uploadedImage}
                 alt={data.block.name}
                 onClick={handleClickUpload}
                 style={{ cursor: 'pointer' }}
@@ -87,9 +81,9 @@ const BlockNodeFeature = ({
             )}
             <S.HiddenInput type="file" id="fileUpload" accept="image/jpeg" onChange={handleImageUpload} />
           </>
-        ) : data.block.id === heatMapId && heatmapImage && displayUploadedImage !== uploadedImage ? (
+        ) : data.block.id === heatMapId && heatmapImage ? (
           <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-            <S.Image src={`data:image/jpeg;base64,${heatmapImage}`} alt={data.block.name} />
+            <S.Image src={heatmapImage} alt={data.block.name} />
             <S.GraphButton onClick={toggleGraphVisibility}>
               {isGraphVisible ? 'Hidden Graph' : 'Show Graph'}
             </S.GraphButton>
@@ -109,7 +103,7 @@ const BlockNodeFeature = ({
             )}
           </div>
         ) : (
-          displayUploadedImage !== uploadedImage && blockImage && <S.Image src={blockImage} alt={data.block.name} />
+          uploadedImage && blockImage && <S.Image src={blockImage} alt={data.block.name} />
         )}
       </S.FieldWrapper>
       <Handle type="source" position={sourcePosition} />
