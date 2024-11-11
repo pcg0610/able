@@ -1,5 +1,5 @@
-import { Response } from '@shared/types/response.type';
-import { BLOCK_MENU } from '@/features/canvas/costants/block-menu.constant';
+import type { Response } from '@shared/types/response.type';
+import { BLOCK_MENU } from '@features/canvas/constants/block-menu.constant';
 
 export type BlockType = (typeof BLOCK_MENU)[number]['name'] | 'data';
 
