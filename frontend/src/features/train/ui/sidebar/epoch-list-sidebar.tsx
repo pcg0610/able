@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, KeyboardEvent } from 'react';
 
 import * as S from "@features/train/ui/sidebar/epoch-list-sidebar.style";
 import { useEpochs } from '@features/train/api/use-analyze.query';
 import { useProjectNameStore } from '@entities/project/model/project.model';
+import { useSearchBlock } from '@features/canvas/api/use-blocks.query';
 
-import SearchBox from '@shared/ui/searchbar/searchbar';
+import SearchBar from '@shared/ui/input/search-bar';
 
 const EpochListSidebar = () => {
    const [index, setIndex] = useState(0);
@@ -37,8 +38,27 @@ const EpochListSidebar = () => {
       setEpochName(epoch);
    };
 
-   const handleSearchChange = (value: string) => {
-      console.log("Search value changed:", value);
+   const [value, setValue] = useState<string>('');
+   const [keyword, setKeyword] = useState<string>('');
+
+   const { data } = useSearchBlock(keyword);
+   const searchBlock = data?.data.block;
+
+   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+         handleBlockSearch();
+      }
+   };
+
+   const handleBlockSearch = () => {
+      setKeyword(value);
+   };
+
+   const handleInputChange = (newValue: string) => {
+      setValue(newValue);
+      if (!newValue) {
+         setKeyword('');
+      }
    };
 
    useEffect(() => {
@@ -61,9 +81,12 @@ const EpochListSidebar = () => {
             ))}
          </S.BestSection>
          <S.Divider />
-         <SearchBox
-            placeholder="주문번호, 상품명, 구매자명, 전화번호"
-            onSearchChange={handleSearchChange}
+         <SearchBar
+            value={value}
+            placeholder="블록 검색"
+            onChange={handleInputChange}
+            onClick={handleBlockSearch}
+            onEnter={handleKeyDown}
          />
          <S.ScrollableSection onScroll={handleScroll}>
             {epochData?.epochs ? (
