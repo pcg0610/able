@@ -27,4 +27,13 @@ export const useImageStore = create<ImageStore>((set) => ({
          classScores: data.classScores,
       });
    },
+
+   resetImage: () => {
+      set({
+         uploadedImage: null,
+         heatmapImage: null,
+         classScores: [],
+         heatMapId: '',
+      });
+   },
 }));

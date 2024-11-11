@@ -50,7 +50,7 @@ const CanvasResult = () => {
    const { fitView } = useReactFlow();
 
    const { projectName, resultName, epochName } = useProjectNameStore();
-   const { uploadedImage, heatMapId, setHeatMapId, setHeatMapImage, setAllImage } = useImageStore();
+   const { uploadedImage, heatMapId, setHeatMapId, setHeatMapImage, setAllImage, resetImage } = useImageStore();
    const [autoFit, setAutoFit] = useState(false);
    const [hasSetInitialImages, setHasSetInitialImages] = useState(false);
 
@@ -192,6 +192,11 @@ const CanvasResult = () => {
          fitView();
       }
    }, [fitView, direction, nodes, autoFit]);
+
+   useEffect(() => {
+      setHasSetInitialImages(false);
+      resetImage();
+   }, [epochName, resetImage]);
 
    return (
       <ReactFlow

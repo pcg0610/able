@@ -44,4 +44,6 @@ export interface ImageStore {
   setHeatMapId: (id: string) => void;
   setHeatMapImage: (data: { heatmapImage: string; classScores: ClassScore[] }) => void;
   setAllImage: (data: { uploadedImage: string; heatmapImage: string; classScores: ClassScore[] }) => void;
+
+  resetImage: () => void;
 }
