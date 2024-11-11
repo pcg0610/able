@@ -15,3 +15,8 @@ def get_device_status(name: str) -> DeviceStatus:
         device_dict = str_to_json(get_file(device_file_path))
 
     return device_dict.get("status")
+
+def update_device_status(name: str, status: DeviceStatus):
+    device_file_path = path_manager.get_device_path(name)
+
+    create_file(device_file_path, json_to_str({"status": status}))
