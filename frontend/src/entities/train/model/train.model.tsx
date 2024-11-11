@@ -36,4 +36,5 @@ export const useImageStore = create<ImageStore>((set) => ({
          heatMapId: '',
       });
    },
+
 }));
