@@ -82,55 +82,39 @@ const CanvasEditor = () => {
     }
   }, [data, setNodes, setEdges]);
 
-  const onReconnect = useCallback(
-    (oldEdge: XYFlowEdge, newConnection: Connection) => {
-      const targetNode = nodes.find((node) => node.id === newConnection.target);
+  // 데이터 블록이거나 그 자식인지 확인
+  // 미사용한 블록은 투명도를 낮게 보여주기 위함
+  const getDataBlockDescendants = useCallback(
+    (dataBlockId: string): Set<string> => {
+      const visited = new Set<string>([dataBlockId]);
 
-      // target이 data 블록이면 연결 불가
-      if ((targetNode?.data.block as BlockItem).type === 'data') {
-        toast.error(TOAST_MESSAGES.root);
-        return;
-      }
+      // 데이터 블록의 모든 자식 노드를 탐색하는 재귀 함수
+      const traverse = (currentId: string) => {
+        const currentNode = nodes.find((node) => node.id === currentId);
+        if (!currentNode) return;
 
-      // 사이클 검증
-      if (!isValidConnection(nodes, edges)(newConnection)) {
-        toast.error(TOAST_MESSAGES.cycle);
-        return;
-      }
+        const outgoers = getOutgoers(currentNode, nodes, edges);
+        outgoers.forEach((outgoer) => {
+          if (!visited.has(outgoer.id)) {
+            visited.add(outgoer.id);
+            traverse(outgoer.id);
+          }
+        });
+      };
 
-      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+      traverse(dataBlockId);
+      return visited;
     },
-    [nodes, edges, setEdges]
+    [nodes, edges]
   );
 
-  // 노드를 연결할 때 호출
-  const onConnect: OnConnect = (connection) => {
-    const targetNode = nodes.find((node) => node.id === connection.target);
-
-    // target이 data 블록이면 연결 불가
-    if ((targetNode?.data.block as BlockItem).type === 'data') {
-      toast.error(TOAST_MESSAGES.root);
-      return;
-    }
-
-    // 사이클 검증
-    if (!isValidConnection(nodes, edges)(connection)) {
-      toast.error(TOAST_MESSAGES.cycle);
-      return;
-    }
-
-    // 사이클이 발생하지 않으면 엣지 추가
-    setEdges((eds) =>
-      addEdge(
-        {
-          ...connection,
-          type: 'smoothstep',
-          markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
-        },
-        eds
-      )
-    );
-  };
+  const getConnectedStatus = useCallback(
+    (nodeId: string) => {
+      const dataDescendants = getDataBlockDescendants(DATA_BLOCK_ID);
+      return dataDescendants.has(nodeId);
+    },
+    [getDataBlockDescendants]
+  );
 
   // 특정 노드의 블록 필드 변경
   const handleFieldChange = useCallback(
@@ -176,33 +160,6 @@ const CanvasEditor = () => {
     return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
   };
 
-  // 데이터 블록이거나 그 자식인지 확인
-  const getDataBlockDescendants = (dataBlockId: string): Set<string> => {
-    const visited = new Set<string>([dataBlockId]);
-
-    // 데이터 블록의 모든 자식 노드를 탐색하는 재귀 함수
-    const traverse = (currentId: string) => {
-      const currentNode = nodes.find((node) => node.id === currentId);
-      if (!currentNode) return;
-
-      const outgoers = getOutgoers(currentNode, nodes, edges);
-      outgoers.forEach((outgoer) => {
-        if (!visited.has(outgoer.id)) {
-          visited.add(outgoer.id);
-          traverse(outgoer.id);
-        }
-      });
-    };
-
-    traverse(dataBlockId);
-    return visited;
-  };
-
-  const getConnectedStatus = (nodeId: string) => {
-    const dataDescendants = getDataBlockDescendants(DATA_BLOCK_ID);
-    return dataDescendants.has(nodeId);
-  };
-
   const handleTrain = (trainConfig: TrainConfig) => {
     const transformedBlocks = transformNodesToBlockSchema(nodes);
     const transformedEdges = transformEdgesToEdgeSchema(edges);
@@ -235,6 +192,53 @@ const CanvasEditor = () => {
     );
   };
 
+  const validateConnection = useCallback(
+    (connection: Connection) => {
+      const targetNode = nodes.find((node) => node.id === connection.target);
+
+      // target이 data 블록이면 연결 불가
+      if ((targetNode?.data.block as BlockItem).type === 'data') {
+        toast.error(TOAST_MESSAGES.root);
+        return false;
+      }
+
+      // 사이클 검증
+      if (!isValidConnection(nodes, edges)(connection)) {
+        toast.error(TOAST_MESSAGES.cycle);
+        return false;
+      }
+
+      return true;
+    },
+    [nodes, edges]
+  );
+
+  const handleReconnect = useCallback(
+    (oldEdge: XYFlowEdge, newConnection: Connection) => {
+      if (!validateConnection(newConnection)) return;
+
+      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    },
+    [setEdges, validateConnection]
+  );
+
+  // 노드를 연결할 때 호출
+  const handleConnect: OnConnect = (connection) => {
+    if (!validateConnection(connection)) return;
+
+    // 사이클이 발생하지 않으면 엣지 추가
+    setEdges((eds) =>
+      addEdge(
+        {
+          ...connection,
+          type: 'smoothstep',
+          markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 },
+        },
+        eds
+      )
+    );
+  };
+
   return (
     <>
       {isModalOpen && <TrainModal onClose={handleModalClose} onSubmit={handleTrain} />}
@@ -252,8 +256,8 @@ const CanvasEditor = () => {
           edges={edges}
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
-          onConnect={onConnect}
-          onReconnect={onReconnect}
+          onConnect={handleConnect}
+          onReconnect={handleReconnect}
           onNodeClick={(_, node) => setSelectedNode(node)}
           onPaneClick={() => setSelectedNode(null)}
           nodeTypes={{ custom: BlockNode }}
