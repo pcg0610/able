@@ -20,7 +20,7 @@ import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
 import { DATA_BLOCK_ID } from '@features/canvas/costants/block.constant';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
-import { TOAST_MESSAGE } from '@features/canvas/costants/message.constant';
+import { TOAST_MESSAGES } from '@features/canvas/costants/message.constant';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import type { TrainConfig, TrainRequest } from '@features/canvas/types/train.type';
 import {
@@ -82,7 +82,7 @@ const CanvasEditor = () => {
   // 노드를 연결할 때 호출
   const onConnect: OnConnect = (connection) => {
     if (!isValidConnection(nodes, edges)(connection)) {
-      toast.error(TOAST_MESSAGE.cycle);
+      toast.error(TOAST_MESSAGES.cycle);
       return;
     }
 
@@ -130,7 +130,7 @@ const CanvasEditor = () => {
 
   const handleRunButtonClick = () => {
     if (!isDataBlockConnected()) {
-      toast.error(TOAST_MESSAGE.data);
+      toast.error(TOAST_MESSAGES.data);
       return;
     }
     setIsModalOpen(true);
@@ -195,9 +195,9 @@ const CanvasEditor = () => {
         canvas: { blocks: transformedBlocks, edges: transformedEdges },
       }),
       {
-        loading: TOAST_MESSAGE.loading,
-        success: TOAST_MESSAGE.success,
-        error: TOAST_MESSAGE.error,
+        loading: TOAST_MESSAGES.loading,
+        success: TOAST_MESSAGES.success,
+        error: TOAST_MESSAGES.error,
       }
     );
   };

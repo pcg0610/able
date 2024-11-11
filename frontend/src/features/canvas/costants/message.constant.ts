@@ -1,4 +1,4 @@
-export const TOAST_MESSAGE = {
+export const TOAST_MESSAGES = {
   loading: '저장 중...',
   success: '저장이 완료되었어요.',
   error: '저장에 실패했어요.',

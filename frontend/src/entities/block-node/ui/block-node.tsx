@@ -4,7 +4,7 @@ import { memo, useMemo } from 'react';
 import * as S from '@entities/block-node/ui/block-node.style';
 import Common from '@shared/styles/common';
 import { CONNECTION_LIMIT_COOUNT } from '@entities/block-node/constants/node.constant';
-import { blockColors } from '@shared/constants/block';
+import { BLOCK_COLORS } from '@shared/constants/block';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
 
@@ -26,7 +26,7 @@ const BlockNode = ({
   sourcePosition = Position.Bottom,
   targetPosition = Position.Top,
 }: BlockNodeProps) => {
-  const blockColor = useMemo(() => (block?.type ? blockColors[block.type] : Common.colors.gray200), [block.type]);
+  const blockColor = useMemo(() => (block?.type ? BLOCK_COLORS[block.type] : Common.colors.gray200), [block.type]);
 
   return (
     <S.Container blockColor={blockColor} isConnected={isConnected} isSelected={isSelected}>
