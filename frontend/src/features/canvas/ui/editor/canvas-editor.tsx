@@ -5,7 +5,6 @@ import {
   BackgroundVariant,
   addEdge,
   reconnectEdge,
-  getOutgoers,
   useNodesState,
   useEdgesState,
   useReactFlow,
@@ -21,7 +20,6 @@ import toast from 'react-hot-toast';
 
 import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
-import { DATA_BLOCK_ID } from '@features/canvas/constants/block.constant';
 import { TOAST_MESSAGES } from '@features/canvas/constants/message.constant';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
 import type { BlockItem } from '@features/canvas/types/block.type';
@@ -31,7 +29,8 @@ import {
   transformEdgesToEdgeSchema,
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
-import { isValidConnection } from '@/features/canvas/utils/validators.util';
+import { isDataBlockConnected, isValidConnection } from '@features/canvas/utils/validators.util';
+import { getConnectedStatus } from '@features/canvas/utils/visibility.util';
 import { useProjectNameStore } from '@entities/project/model/project.model';
 import { useFetchCanvas } from '@features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
@@ -82,40 +81,6 @@ const CanvasEditor = () => {
     }
   }, [data, setNodes, setEdges]);
 
-  // 데이터 블록이거나 그 자식인지 확인
-  // 미사용한 블록은 투명도를 낮게 보여주기 위함
-  const getDataBlockDescendants = useCallback(
-    (dataBlockId: string): Set<string> => {
-      const visited = new Set<string>([dataBlockId]);
-
-      // 데이터 블록의 모든 자식 노드를 탐색하는 재귀 함수
-      const traverse = (currentId: string) => {
-        const currentNode = nodes.find((node) => node.id === currentId);
-        if (!currentNode) return;
-
-        const outgoers = getOutgoers(currentNode, nodes, edges);
-        outgoers.forEach((outgoer) => {
-          if (!visited.has(outgoer.id)) {
-            visited.add(outgoer.id);
-            traverse(outgoer.id);
-          }
-        });
-      };
-
-      traverse(dataBlockId);
-      return visited;
-    },
-    [nodes, edges]
-  );
-
-  const getConnectedStatus = useCallback(
-    (nodeId: string) => {
-      const dataDescendants = getDataBlockDescendants(DATA_BLOCK_ID);
-      return dataDescendants.has(nodeId);
-    },
-    [getDataBlockDescendants]
-  );
-
   // 특정 노드의 블록 필드 변경
   const handleFieldChange = useCallback(
     (nodeId: string, fieldName: string, value: string) => {
@@ -146,18 +111,11 @@ const CanvasEditor = () => {
   };
 
   const handleRunButtonClick = () => {
-    if (!isDataBlockConnected()) {
+    if (!isDataBlockConnected(nodes, edges)) {
       toast.error(TOAST_MESSAGES.data);
       return;
     }
     setIsModalOpen(true);
-  };
-
-  const isDataBlockConnected = () => {
-    const dataBlock = nodes.find((node) => (node.data.block as BlockItem).name === 'data');
-    if (!dataBlock) return false;
-
-    return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
   };
 
   const handleTrain = (trainConfig: TrainConfig) => {
@@ -192,15 +150,6 @@ const CanvasEditor = () => {
     );
   };
 
-  const handleReconnect = useCallback(
-    (oldEdge: XYFlowEdge, newConnection: Connection) => {
-      if (!isValidConnection(newConnection, nodes, edges)) return;
-
-      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
-    },
-    [nodes, edges, setEdges]
-  );
-
   // 노드를 연결할 때 호출
   const handleConnect: OnConnect = (connection) => {
     if (!isValidConnection(connection, nodes, edges)) return;
@@ -218,6 +167,15 @@ const CanvasEditor = () => {
     );
   };
 
+  const handleReconnect = useCallback(
+    (oldEdge: XYFlowEdge, newConnection: Connection) => {
+      if (!isValidConnection(newConnection, nodes, edges)) return;
+
+      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    },
+    [nodes, edges, setEdges]
+  );
+
   return (
     <>
       {isModalOpen && <TrainModal onClose={handleModalClose} onSubmit={handleTrain} />}
@@ -228,7 +186,7 @@ const CanvasEditor = () => {
             data: {
               ...node.data,
               onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
-              isConnected: getConnectedStatus(node.id),
+              isConnected: getConnectedStatus(node.id, nodes, edges),
               isSelected: node.id === selectedNode?.id,
             },
           }))}

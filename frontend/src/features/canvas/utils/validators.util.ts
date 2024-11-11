@@ -4,6 +4,13 @@ import { toast } from 'react-hot-toast';
 import { TOAST_MESSAGES } from '@features/canvas/constants/message.constant';
 import type { BlockItem } from '@features/canvas/types/block.type';
 
+export const isDataBlockConnected = (nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
+  const dataBlock = nodes.find((node) => (node.data.block as BlockItem).name === 'data');
+  if (!dataBlock) return false;
+
+  return edges.some((edge) => edge.source === dataBlock.id || edge.target === dataBlock.id);
+};
+
 export const isValidConnection = (connection: Connection, nodes: XYFlowNode[], edges: XYFlowEdge[]) => {
   const targetNode = nodes.find((node) => node.id === connection.target);
 
