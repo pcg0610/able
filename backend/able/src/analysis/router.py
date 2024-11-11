@@ -24,14 +24,16 @@ async def get_checkpoints(project_name: str, result_name: str,
             summary="피쳐 맵 조회", description="블록의 피쳐맵 조회, 피쳐맵이 존재하지 않는 블록일 경우 null 반환")
 async def get_feature_map( request: FeatureMapRequest):
     feature_map = service.get_feature_map(request)
+    if feature_map is None:
+        return no_content()
     return ok(data=FeatureMapResponse(feature_map=feature_map))
 
 @router.post("", 
              response_model=ResponseModel[AnalyzeResponse],
              summary="분석 실행 및 히트맵 생성", description="특정 학습 결과의 에포크에 대해 샘플 이미지 1장을 받아 실행 후 히트맵과 상위 3개의 클래스 점수(막대그래프 데이터) 반환" )
 async def analyze(project_name: str, result_name: str, epoch_name:str, device_index: int, file: UploadFile = File(...)):
-    # if(file.content_type != "imge/jpeg"):
-    #     return bad_request()
+    if(file.content_type != "image/jpeg"):
+        return bad_request()
     result = await service.analyze(project_name, result_name, epoch_name, device_index, file)
     return ok(data=result)
 

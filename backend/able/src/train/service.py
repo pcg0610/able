@@ -11,6 +11,8 @@ from typing import List
 import logging
 
 from src.train_log.utils import format_float
+from ..device.schema import DeviceStatus
+from ..device.utils import get_device_status, update_device_status
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -71,7 +73,7 @@ def train(request: TrainRequest):
     save_metadata(project_name, result_name, data_block, dataset.classes)
 
     # 학습 모델 그래프 저장
-    save_result_block_graph(request.project_name, result_name, canvas_blocks, edges_model)
+    save_result_block_graph(request.project_name, result_name, canvas_blocks, edges)
 
     # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
     save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
@@ -79,6 +81,11 @@ def train(request: TrainRequest):
     device = 'cpu'
     if request.device.index != -1:
         device = f"cuda:{request.device.index}"
+
+    if get_device_status(request.device.name) == DeviceStatus.IN_USE:
+        raise Exception()
+
+    update_device_status(request.device.name, DeviceStatus.IN_USE)
 
     train_logger = TrainLogger(project_name, result_name)
 
@@ -96,6 +103,8 @@ def train(request: TrainRequest):
     except Exception as e:
         train_logger.update_status(TrainStatus.FAIL)
         raise e
+    finally:
+        update_device_status(request.device.name, DeviceStatus.NOT_IN_USE)
 
 def load_train_result(project_name: str, result_name: str) -> TrainResultResponse:
 
