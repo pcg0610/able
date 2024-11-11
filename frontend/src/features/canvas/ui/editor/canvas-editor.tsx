@@ -22,7 +22,6 @@ import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
 import { TOAST_MESSAGES } from '@features/canvas/constants/message.constant';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
-import type { BlockItem } from '@features/canvas/types/block.type';
 import type { TrainConfig, TrainRequest } from '@features/canvas/types/train.type';
 import {
   transformCanvasResponse,
@@ -80,31 +79,6 @@ const CanvasEditor = () => {
       setEdges(transformedData.edges);
     }
   }, [data, setNodes, setEdges]);
-
-  // 특정 노드의 블록 필드 변경
-  const handleFieldChange = useCallback(
-    (nodeId: string, fieldName: string, value: string) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === nodeId
-            ? {
-                ...node,
-                data: {
-                  ...node.data,
-                  block: {
-                    ...(node.data.block as BlockItem),
-                    fields: (node.data.block as BlockItem).fields.map((field) =>
-                      field.name === fieldName ? { ...field, value } : field
-                    ),
-                  },
-                },
-              }
-            : node
-        )
-      );
-    },
-    [setNodes]
-  );
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -185,7 +159,6 @@ const CanvasEditor = () => {
             ...node,
             data: {
               ...node.data,
-              onFieldChange: (fieldName: string, value: string) => handleFieldChange(node.id, fieldName, value),
               isConnected: getConnectedStatus(node.id, nodes, edges),
               isSelected: node.id === selectedNode?.id,
             },

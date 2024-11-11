@@ -1,4 +1,4 @@
-import { Position } from '@xyflow/react';
+import { Position, useReactFlow } from '@xyflow/react';
 import { memo, useMemo } from 'react';
 
 import * as S from '@entities/block-node/ui/block-node.style';
@@ -11,9 +11,9 @@ import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
 import CustomHandle from '@entities/block-node/ui/custom-handle';
 
 interface BlockNodeProps {
+  id: string;
   data: {
     block: BlockItem;
-    onFieldChange: (fieldName: string, value: string) => void;
     isConnected?: boolean;
     isSelected?: boolean;
   };
@@ -22,10 +22,13 @@ interface BlockNodeProps {
 }
 
 const BlockNode = ({
-  data: { block, onFieldChange, isConnected = false, isSelected = false },
+  id,
+  data: { block, isConnected = false, isSelected = false },
   sourcePosition = Position.Bottom,
   targetPosition = Position.Top,
 }: BlockNodeProps) => {
+  const { updateNodeData } = useReactFlow();
+
   const blockColor = useMemo(() => (block?.type ? BLOCK_COLORS[block.type] : Common.colors.gray200), [block.type]);
 
   return (
@@ -43,7 +46,14 @@ const BlockNode = ({
               placeholder={field.isRequired ? 'required' : ''}
               required={field.isRequired}
               value={field.value || ''}
-              onChange={(e) => onFieldChange(field.name, e.target.value)}
+              onChange={(e) =>
+                updateNodeData(id, {
+                  block: {
+                    ...block,
+                    fields: block.fields.map((f) => (f.name === field.name ? { ...f, value: e.target.value } : f)),
+                  },
+                })
+              }
             />
           </S.InputWrapper>
         ))}
