@@ -37,7 +37,7 @@ import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler
 import { useNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
 import { useEdgeChangeHandler } from '@features/canvas/model/use-edge-change-handler.model';
 
-import BlockNode from '@entities/block-node/block-node';
+import BlockNode from '@entities/block-node/ui/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import SaveIcon from '@icons/save.svg?react';

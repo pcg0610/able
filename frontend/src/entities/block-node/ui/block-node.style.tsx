@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import Common from '@/shared/styles/common';
+import Common from '@shared/styles/common';
 
 export const Container = styled.div<{ blockColor: string; isConnected: boolean; isSelected: boolean }>`
   width: 15.625rem;
