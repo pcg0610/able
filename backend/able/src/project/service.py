@@ -9,14 +9,12 @@ from src.utils import str_to_json, json_to_str, encode_image_to_base64
 from src.project.exceptions import ProjectNameAlreadyExistsException
 from src.file.exceptions import FileNotFoundException
 from src.canvas.schemas import Canvas
+from src.file.constants import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 path_manager = PathManager()
-METADATA = "metadata.json"
-THUMBNAIL = "thumbnail.jpg"
-BLOCK_GRAPH = "block_graph.json"
 
 def create_project(project: Project) -> bool:
     project_path = path_manager.get_projects_path(project.title)

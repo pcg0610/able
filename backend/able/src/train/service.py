@@ -13,6 +13,7 @@ import logging
 from src.train_log.utils import format_float
 from ..device.schema import DeviceStatus
 from ..device.utils import get_device_status, update_device_status
+from src.file.constants import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -112,15 +113,15 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
     result_path = path_manager.get_train_result_path(project_name, result_name)
 
     # 혼동 행렬 이미지 로드 및 인코딩
-    image_bytes = read_image_file(result_path / "confusion_matrix.jpg")  # 파일 경로에서 bytes 읽기
+    image_bytes = read_image_file(result_path / CONFUSION_METRICS)  # 파일 경로에서 bytes 읽기
     confusion_matrix = encode_image_to_base64(image_bytes)
 
     # 성능 지표 로드
-    performance_metrics_data = json.loads(get_file(result_path / "performance_metrics.json"))
+    performance_metrics_data = json.loads(get_file(result_path / PERFORMANCE_METRICS))
     performance_metrics = PerformanceMetrics.model_validate(performance_metrics_data["metrics"])
 
     # F1 스코어 로드
-    f1_score = format_float(str_to_json(get_file(result_path / "f1_score.json"))["f1_score"])
+    f1_score = format_float(str_to_json(get_file(result_path / F1_SCORE))["f1_score"])
 
     # 에포크 결과 로드
     epochs_path = path_manager.get_checkpoints_path(project_name, result_name)
@@ -130,9 +131,9 @@ def load_train_result(project_name: str, result_name: str) -> TrainResultRespons
         if epoch_dir.is_dir():
             epoch_id = epoch_dir.name
 
-            training_loss_data = str_to_json(get_file(epoch_dir / "training_loss.json"))
-            validation_loss_data = str_to_json(get_file(epoch_dir / "validation_loss.json"))
-            accuracy_data = str_to_json(get_file(epoch_dir / "accuracy.json"))
+            training_loss_data = str_to_json(get_file(epoch_dir / TRAINING_LOSS))
+            validation_loss_data = str_to_json(get_file(epoch_dir / VALIDATION_LOSS))
+            accuracy_data = str_to_json(get_file(epoch_dir / ACCURACY))
 
             # 각 파일을 로드하여 모델 인스턴스로 변환
             training_loss = Loss(training=training_loss_data["loss"], validation=validation_loss_data["loss"])
