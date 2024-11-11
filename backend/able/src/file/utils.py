@@ -1,6 +1,7 @@
 import shutil
 import logging
 import io
+import base64
 from pathlib import Path
 from typing import List
 from PIL import Image
@@ -110,12 +111,34 @@ async def save_img(path: Path, file_name: str, file: UploadFile) -> Path:
         with open(img_path, "wb") as image_file:
             content = await file.read()
             image_file.write(content)
+            
+        logger.info(f"이미지 저장 성공: {img_path}")
 
     except Exception as e:
-        logger.error(f"원본 이미지 저장 실패: {img_path}",exc_info=True)
-        raise ImageSaveFailException("원본 이미지 저장에 실패하였습니다.")
+        logger.error(f"이미지 저장 실패: {img_path}",exc_info=True)
+        raise ImageSaveFailException("이미지 저장에 실패하였습니다.")
     
     return img_path
+
+def save_img_from_base64(path: Path, file_name: str, base64_str: str) -> Path:
+    img_path = path / file_name
+    try:
+        if base64_str.startswith('data:image'):
+            base64_str = base64_str.split(',')[1]
+
+        image_data = base64.b64decode(base64_str)
+
+        with open(img_path, "wb") as image_file:
+            image_file.write(image_data)
+        
+        logger.info(f"이미지 저장 성공: {img_path}")
+        
+    except Exception as e:
+        logger.error(f"이미지 저장 실패: {img_path}", exc_info=True)
+        raise ImageSaveFailException("이미지 저장에 실패하였습니다.")
+    
+    return img_path
+
 
 def get_files(path: Path) -> List[str]:
     if path.exists() and path.is_dir():
