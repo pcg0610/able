@@ -15,6 +15,35 @@ export interface FeatureMapResponse {
   classScores: ClassScore[];
 }
 
+export interface GraphResponse {
+  confusionMatrix: string;
+  performanceMetrics: PerformanceMatrics;
+  f1Score: string;
+  epochResult: EpochResult[];
+}
+
+export interface PerformanceMatrics {
+  accuracy: number;
+  top5Accuracy: number;
+  precision: number;
+  recall: number;
+}
+
+export interface EpochResult {
+  epoch: string;
+  losses: Loss;
+  accuracies: Accuracies;
+}
+
+export interface Loss {
+  training: number;
+  validation: number;
+}
+
+export interface Accuracies {
+  accuracy: number;
+}
+
 export interface CreateFeatureMapProps {
   projectName: string;
   resultName: string;
