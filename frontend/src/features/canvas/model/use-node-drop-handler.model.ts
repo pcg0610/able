@@ -1,5 +1,5 @@
 import { useDrop } from 'react-dnd';
-import { Node as XYFlowNode } from '@xyflow/react';
+import type { Node as XYFlowNode } from '@xyflow/react';
 import { Dispatch, SetStateAction } from 'react';
 
 import type { BlockItem } from '@features/canvas/types/block.type';

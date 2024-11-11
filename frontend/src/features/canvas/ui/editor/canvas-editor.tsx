@@ -8,11 +8,11 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
+  MarkerType,
   type OnConnect,
   type Connection,
   type Node as XYFlowNode,
   type Edge as XYFlowEdge,
-  MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCallback, useEffect, useState } from 'react';

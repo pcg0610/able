@@ -1,4 +1,4 @@
-import { Node as XYFlowNode, Edge as XYFlowEdge, MarkerType } from '@xyflow/react';
+import { type Node as XYFlowNode, type Edge as XYFlowEdge, MarkerType } from '@xyflow/react';
 
 import type { BlockSchema, CanvasSchema, EdgeSchema } from '@features/canvas/types/canvas.type';
 import type { BlockItem } from '@features/canvas/types/block.type';
