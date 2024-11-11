@@ -12,5 +12,6 @@ export interface ProjectNameState {
 export interface ProjectState {
   currentProject: Project | null;
   setCurrentProject: (project: Project) => void;
+  updateCurrentProject: (prevTitle: string, prevDescription: string) => void;
   resetProject: () => void;
 }

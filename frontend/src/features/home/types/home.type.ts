@@ -22,3 +22,8 @@ export interface ProjectStore {
   setCurrentProject: (project: Project) => void;
   resetProject: () => void;
 }
+
+export interface UpdateProjectSchema {
+  title: string;
+  description: string;
+}

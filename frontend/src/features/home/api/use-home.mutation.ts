@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '@shared/api/config/axios-instance';
 
 import homeKey from '@features/home/api/home-key';
-import { Project } from '@features/home/types/home.type';
-import { useProjectNameStore } from '@entities/project/model/project.model';
+import { Project, UpdateProjectSchema } from '@features/home/types/home.type';
+import { useProjectNameStore, useProjectStore } from '@entities/project/model/project.model';
 
 const createProject = async (projectData: Project): Promise<Project> => {
   const response = await axiosInstance.post('/projects', {
@@ -20,17 +20,76 @@ const createProject = async (projectData: Project): Promise<Project> => {
   return response.data;
 };
 
+const updateProject = async ({
+  title,
+  description,
+  prevTitle,
+  prevDescription,
+}: {
+  title: string;
+  description: string;
+  prevTitle?: string;
+  prevDescription?: string;
+}): Promise<UpdateProjectSchema> => {
+  const response = await axiosInstance.put('/projects', {
+    title: title,
+    description: description,
+    prevTitle: prevTitle,
+    prevDescription: prevDescription,
+  });
+
+  if (response.status == 200) {
+    return { title, description };
+  }
+
+  return response.data;
+};
+
+const deleteProject = async ({ title }: { title: string }): Promise<boolean> => {
+  const response = await axiosInstance.delete('/projects', {
+    params: { title },
+  });
+
+  if (response.status == 204) {
+    return true;
+  }
+
+  return false;
+};
+
 export const useCreateProject = () => {
   const queryClient = useQueryClient();
   const { setProjectName } = useProjectNameStore();
 
   return useMutation({
     mutationFn: createProject,
-
     onSuccess: (data) => {
       setProjectName(data.title);
 
-      // 프로젝트 리스트 쿼리를 무효화하여 새로고침되도록 설정
+      queryClient.invalidateQueries({ queryKey: homeKey.list() });
+    },
+  });
+};
+
+export const useUpdateProject = () => {
+  const { updateCurrentProject } = useProjectStore();
+
+  return useMutation({
+    mutationFn: updateProject,
+    onSuccess: (data) => {
+      updateCurrentProject(data.title, data.description);
+    },
+  });
+};
+
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+  const { setProjectName } = useProjectNameStore();
+
+  return useMutation({
+    mutationFn: deleteProject,
+    onSuccess: () => {
+      setProjectName('');
       queryClient.invalidateQueries({ queryKey: homeKey.list() });
     },
   });
