@@ -1,11 +1,14 @@
-import { Handle, Position } from '@xyflow/react';
-import { useMemo } from 'react';
+import { Position } from '@xyflow/react';
+import { memo, useMemo } from 'react';
 
-import * as S from '@entities/block-node/block-node.style';
+import * as S from '@entities/block-node/ui/block-node.style';
 import Common from '@shared/styles/common';
+import { CONNECTION_LIMIT_COOUNT } from '@entities/block-node/constants/node.constant';
 import { blockColors } from '@shared/constants/block';
-import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
-import { BlockItem } from '@/features/canvas/types/block.type';
+import type { BlockItem } from '@features/canvas/types/block.type';
+import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
+
+import CustomHandle from '@entities/block-node/ui/custom-handle';
 
 interface BlockNodeProps {
   data: {
@@ -27,7 +30,7 @@ const BlockNode = ({
 
   return (
     <S.Container blockColor={blockColor} isConnected={isConnected} isSelected={isSelected}>
-      <Handle type="target" position={targetPosition} />
+      <CustomHandle type="target" position={targetPosition} connectionCount={CONNECTION_LIMIT_COOUNT} />
       <S.Label>{capitalizeFirstLetter(block?.name || 'Unknown')}</S.Label>
       <S.FieldWrapper>
         {block?.fields?.map((field) => (
@@ -45,9 +48,9 @@ const BlockNode = ({
           </S.InputWrapper>
         ))}
       </S.FieldWrapper>
-      <Handle type="source" position={sourcePosition} />
+      <CustomHandle type="source" position={sourcePosition} connectionCount={CONNECTION_LIMIT_COOUNT} />
     </S.Container>
   );
 };
 
-export default BlockNode;
+export default memo(BlockNode);
