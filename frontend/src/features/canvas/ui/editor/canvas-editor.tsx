@@ -21,8 +21,8 @@ import toast from 'react-hot-toast';
 
 import * as S from '@features/canvas/ui/editor/canvas-editor.style';
 import Common from '@shared/styles/common';
-import { DATA_BLOCK_ID } from '@features/canvas/costants/block.constant';
-import { TOAST_MESSAGES } from '@features/canvas/costants/message.constant';
+import { DATA_BLOCK_ID } from '@features/canvas/constants/block.constant';
+import { TOAST_MESSAGES } from '@features/canvas/constants/message.constant';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import type { TrainConfig, TrainRequest } from '@features/canvas/types/train.type';
@@ -31,7 +31,7 @@ import {
   transformEdgesToEdgeSchema,
   transformNodesToBlockSchema,
 } from '@features/canvas/utils/canvas-transformer.util';
-import { isValidConnection } from '@features/canvas/utils/cycle-validator.util';
+import { isValidConnection } from '@/features/canvas/utils/validators.util';
 import { useProjectNameStore } from '@entities/project/model/project.model';
 import { useFetchCanvas } from '@features/canvas/api/use-canvas.query';
 import { useSaveCanvas } from '@features/canvas/api/use-canvas.mutation';
@@ -192,39 +192,18 @@ const CanvasEditor = () => {
     );
   };
 
-  const validateConnection = useCallback(
-    (connection: Connection) => {
-      const targetNode = nodes.find((node) => node.id === connection.target);
-
-      // target이 data 블록이면 연결 불가
-      if ((targetNode?.data.block as BlockItem).type === 'data') {
-        toast.error(TOAST_MESSAGES.root);
-        return false;
-      }
-
-      // 사이클 검증
-      if (!isValidConnection(nodes, edges)(connection)) {
-        toast.error(TOAST_MESSAGES.cycle);
-        return false;
-      }
-
-      return true;
-    },
-    [nodes, edges]
-  );
-
   const handleReconnect = useCallback(
     (oldEdge: XYFlowEdge, newConnection: Connection) => {
-      if (!validateConnection(newConnection)) return;
+      if (!isValidConnection(newConnection, nodes, edges)) return;
 
       setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
     },
-    [setEdges, validateConnection]
+    [nodes, edges, setEdges]
   );
 
   // 노드를 연결할 때 호출
   const handleConnect: OnConnect = (connection) => {
-    if (!validateConnection(connection)) return;
+    if (!isValidConnection(connection, nodes, edges)) return;
 
     // 사이클이 발생하지 않으면 엣지 추가
     setEdges((eds) =>
