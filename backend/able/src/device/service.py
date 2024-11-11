@@ -9,4 +9,6 @@ def get_device_list() -> DeviceListResponse:
     for index in range(torch.cuda.device_count()):
         device_list.append(Device(index=index, name=torch.cuda.get_device_name(index)))
 
+
+
     return DeviceListResponse(devices=device_list)
