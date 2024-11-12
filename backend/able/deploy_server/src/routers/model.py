@@ -1,14 +1,12 @@
-
 import torch
-import json
 import base64
 import io
 import numpy as np
 
 from PIL import Image
 from fastapi import APIRouter, Body
+from deploy_server.src.schemas import InferenceResponse
 from src.analysis.utils import read_blocks
-from src.deploy.schemas import InferenceResponse
 from src.file.path_manager import PathManager
 from src.file.utils import get_file
 from src.response.utils import ok

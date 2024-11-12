@@ -16,6 +16,8 @@ app.include_router(infer_router)
 from deploy_server.src.routers.model import router as model_router
 app.include_router(model_router)
 
+from deploy_server.src.routers.string import router as string_router
+app.include_router(string_router)
 pass
 
 # WebSocket 클라이언트를 저장할 리스트
