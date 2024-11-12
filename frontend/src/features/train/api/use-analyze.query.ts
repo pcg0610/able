@@ -7,7 +7,7 @@ import type { EpochResponse, HeatMapResponse } from '@features/train/types/analy
 
 const fetchEpochs = async (projectName: string, resultName: string, index: number, size: number) => {
   try {
-    const response = await axiosInstance.get('/analyses', {
+    const response = await axiosInstance.get('/checkpoints', {
       params: { projectName, resultName, index, size },
     });
 
