@@ -49,9 +49,9 @@ def train(request: TrainRequest):
 
     edges_model = filter_model_edge(other_blocks_conn, edges)
 
-    transforms = create_data_preprocessor(transform_blocks)
+    transform_pipeline = create_data_preprocessor(transform_blocks)
 
-    dataset = create_dataset(data_path, transforms)
+    dataset = create_dataset(data_path, transform_pipeline)
     model = convert_block_graph_to_model([block for block in other_blocks_conn if isinstance(block, CanvasBlock)], edges_model)
 
     if model is None:
@@ -78,6 +78,8 @@ def train(request: TrainRequest):
 
     # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
     save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
+
+    save_transform_pipeline(project_name, result_name, transform_pipeline)
 
     device = 'cpu'
     if request.device.index != -1:
