@@ -78,7 +78,10 @@ const Result = () => {
         <div className="bottom-row">
           <S.GraphCard>
             <S.GraphTitle>Confusion Matrix</S.GraphTitle>
-            <ConfusionMatrix />
+            <S.ConfusionImage
+              src={graphs?.confusionMatrix}
+              alt="Confusion Matrix"
+            />
           </S.GraphCard>
           <S.GraphCard>
             <S.F1ScoreTitle>F1-Score</S.F1ScoreTitle>
