@@ -20,4 +20,5 @@ class UpdatedProject(Project):
     prev_description: str | None = None # 변경 전 설명
 
 class ProjectsResponse(ImmutableBaseModel):
+    total_project_count: int
     projects: List[str]
