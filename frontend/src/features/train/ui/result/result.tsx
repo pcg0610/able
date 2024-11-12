@@ -68,11 +68,11 @@ const Result = () => {
         <div className="top-row">
           <S.GraphCard>
             <S.GraphTitle>Training and validation loss</S.GraphTitle>
-            <LossGraph data={lossData} />
+            <LossGraph lossData={lossData} />
           </S.GraphCard>
           <S.GraphCard>
             <S.GraphTitle>Epoch Accuracy</S.GraphTitle>
-            <EpochGraph data={accuracyData} />
+            <EpochGraph epochData={accuracyData} />
           </S.GraphCard>
         </div>
         <div className="bottom-row">
