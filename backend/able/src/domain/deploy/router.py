@@ -4,7 +4,9 @@ from src.domain.deploy.schema.response import RemoveApiResponse
 from src.domain.deploy.service import DeployService
 from src.domain.deploy.repository import DeployRepository
 from src.domain.deploy.schema.request import RegisterApiRequest
-from src.response.utils import accepted, ok, no_content
+from src.response.utils import accepted, ok, no_content, bad_request
+from src.response.schemas import ResponseModel
+from src.domain.deploy.schema.dto import ApiInformation
 
 deploy_router = router = APIRouter()
 
@@ -47,10 +49,14 @@ def restart(
     service.run()
     return accepted()
 
-@router.get("/apis")
+@router.get("/apis",
+            response_model=ResponseModel[list[ApiInformation]],
+            summary="배포된 API 리스트 조회", description="")
 def get_apis(page: int, page_size: int, service: DeployService = Depends(get_deploy_service)):
     api_list = service.get_apis(page, page_size)
 
+    if api_list is None:
+        return bad_request()
     if len(api_list) == 0:
         return no_content()
 
