@@ -1,6 +1,8 @@
 import os
 import sys
 import subprocess
+from time import sleep
+
 import psutil
 
 from src.domain.deploy import repository as deploy_repository
@@ -15,7 +17,7 @@ class DeployService:
     def __init__(self, repository: deploy_repository):
         self.repository = repository
         from pathlib import Path
-        self.BASE_DIR = Path(__file__).resolve().parent.parent.parent / "deploy_server/src"
+        self.BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent / "deploy_server/src"
         self.ROUTER_DIR = self.BASE_DIR / "routers"
         self.MAIN_FILE_PATH = self.BASE_DIR / "main.py"
 
@@ -24,8 +26,7 @@ class DeployService:
         if metadata["status"] == DeployStatus.RUNNING.value:
             raise AlreadyRunException()
 
-        main_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../deploy_server/src/main.py"))
-        process = subprocess.Popen([sys.executable, main_py_path])
+        process = subprocess.Popen([sys.executable, self.MAIN_FILE_PATH])
         metadata.update({"pid": process.pid, "status": DeployStatus.RUNNING.value})
         self.repository.update_metadata(metadata)
         return True
@@ -47,19 +48,18 @@ class DeployService:
 
     def register_api(self, request: RegisterApiRequest) -> bool:
         path_name = request.uri.strip("/").replace("/", "_")
-        file_path = self.ROUTER_DIR / f"{path_name}.py"
+        router_file_path = self.ROUTER_DIR / f"{path_name}"
 
-        if file_path.exists():
+        if router_file_path.exists():
             raise AlreadyExistApiException()
 
         if not self.repository.create_router_metadata_file(path_name, request):
             raise Exception(f"Failed to create metadata file for '{path_name}'")
 
         router_content = self.generate_router_content(request)
-        if not self.repository.create_router_file(path_name, router_content):
+        if not self.repository.create_router_file(router_file_path, router_content):
             raise Exception(f"Failed to create router file for '{path_name}'")
 
-        # Update main.py to include the new router
         include_statement = f'from deploy_server.src.routers.{path_name} import router as {path_name}_router\napp.include_router({path_name}_router)\n'
         if not self.update_main_file(include_statement):
             raise Exception("Failed to update main.py with new router.")
@@ -86,7 +86,14 @@ class DeployService:
         return self.update_main_file(include_statement, add=False)
 
     def update_main_file(self, include_statement: str, add: bool = True) -> bool:
+
         try:
+            metadata = self.repository.get_metadata()
+            current_status = metadata["status"]
+
+            if current_status == DeployStatus.RUNNING.value:
+                self.stop()
+
             with self.MAIN_FILE_PATH.open("r", encoding="utf-8") as main_file:
                 content = main_file.read()
 
@@ -97,10 +104,9 @@ class DeployService:
             with self.MAIN_FILE_PATH.open("w", encoding="utf-8") as main_file:
                 main_file.write(content)
 
-            metadata = self.repository.get_metadata()
-            if metadata["status"] == DeployStatus.RUNNING.value:
-                self.stop()
+            if current_status == DeployStatus.RUNNING.value:
                 self.run()
+
             return True
         except Exception as e:
             logger.error(f"Failed to update main.py: {e}")
@@ -110,9 +116,11 @@ class DeployService:
         return self.repository.get_apis(page, page_size)
 
     def generate_router_content(self, request: RegisterApiRequest) -> str:
-        return f"""import torch
+        return f"""
+import torch
 import base64
 import io
+import json
 import numpy as np
 
 from PIL import Image
