@@ -6,15 +6,15 @@ import HomeContent from '@/features/home/ui/content/home-content';
 
 const HomePage = () => {
   return (
-    <>
+    <S.PageLayout>
       <HomeHeader />
-      <S.PageLayout>
+      <S.PageContainer>
         <HomeSideBar />
         <S.ContentContainer>
           <HomeContent />
         </S.ContentContainer>
-      </S.PageLayout>
-    </>
+      </S.PageContainer>
+    </S.PageLayout>
   );
 };
 

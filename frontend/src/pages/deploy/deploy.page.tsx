@@ -8,7 +8,7 @@ import ApiComponent from '@features/deploy/ui/api/api';
 import PageHeader from '@widgets/header/page-header';
 
 const TrainPage = () => {
-  const [selectedComponent, setSelectedComponent] = useState('result');
+  const [selectedComponent, setSelectedComponent] = useState('server');
 
   const handleSidebarSelection = (selection: string) => {
     setSelectedComponent(selection);

@@ -14,7 +14,14 @@ const fetchProjects = async () => {
   }
 };
 
-const fetchProject = async (title: string) => {
+export const useProjects = () => {
+  return useQuery({
+    queryKey: homeKey.list(),
+    queryFn: () => fetchProjects(),
+  });
+};
+
+const fetchProjectDetail = async (title: string) => {
   try {
     const response = await axiosInstance.get(`/projects/${title}`);
     const project = response.data?.data?.project;
@@ -23,6 +30,14 @@ const fetchProject = async (title: string) => {
     console.error('Failed to fetch projects:', error);
     throw error;
   }
+};
+
+export const useProjectDetail = (title: string) => {
+  return useQuery({
+    queryKey: homeKey.project(title),
+    queryFn: () => fetchProjectDetail(title),
+    enabled: !!title,
+  });
 };
 
 const fetchProjectHistory = async (title: string, page: number, pageSize: number) => {
@@ -36,21 +51,6 @@ const fetchProjectHistory = async (title: string, page: number, pageSize: number
     console.error('Failed to fetch projects:', error);
     throw error;
   }
-};
-
-export const useProjects = () => {
-  return useQuery({
-    queryKey: homeKey.list(),
-    queryFn: () => fetchProjects(),
-  });
-};
-
-export const useProject = (title: string) => {
-  return useQuery({
-    queryKey: homeKey.project(title),
-    queryFn: () => fetchProject(title),
-    enabled: !!title,
-  });
 };
 
 export const useProjectHistory = (title: string, page: number, pageSize: number) => {

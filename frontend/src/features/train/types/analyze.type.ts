@@ -6,7 +6,7 @@ export interface FeatureMapProps {
 }
 
 export interface EpochResponse {
-  epochs: string[];
+  checkpoints: string[];
   hasNext: boolean;
 }
 

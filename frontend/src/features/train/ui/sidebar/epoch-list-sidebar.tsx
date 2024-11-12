@@ -17,8 +17,8 @@ const EpochListSidebar = () => {
       "final",
    ];
 
-   const { projectName, epochName, setEpochName } = useProjectNameStore();
-   const { data: epochData, isLoading } = useEpochs(projectName, '20241108_005251', index, size);
+   const { projectName, resultName, epochName, setEpochName } = useProjectNameStore();
+   const { data: epochData, isLoading } = useEpochs(projectName, resultName, index, size);
 
    const loadMoreEpochs = useCallback(() => {
       if (epochData?.hasNext && !isLoading) {
@@ -62,10 +62,10 @@ const EpochListSidebar = () => {
    };
 
    useEffect(() => {
-      if (epochData?.epochs && epochData.epochs.length > 0 && !epochName) {
-         setEpochName(epochData.epochs[0]);
+      if (epochData?.checkpoints && epochData.checkpoints.length > 0 && !epochName) {
+         setEpochName(epochData.checkpoints[0]);
       }
-   }, [epochData?.epochs]);
+   }, [epochData?.checkpoints]);
 
    return (
       <S.SidebarContainer>
@@ -89,8 +89,8 @@ const EpochListSidebar = () => {
             onEnter={handleKeyDown}
          />
          <S.ScrollableSection onScroll={handleScroll}>
-            {epochData?.epochs ? (
-               epochData?.epochs.map((epoch, index) => (
+            {epochData?.checkpoints ? (
+               epochData?.checkpoints.map((epoch, index) => (
                   <S.EpochItem
                      key={index}
                      isSelected={epochName === epoch}
