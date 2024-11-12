@@ -8,17 +8,6 @@ from src.response.utils import *
 
 analysis_router = router = APIRouter()
 
-@router.get("", response_model=ResponseModel[CheckpointResponse],
-            summary="epoch 목록 조회", description="무한 스크롤")
-async def get_checkpoints(project_name: str, result_name: str,
-                    index: int = Query(..., description="몇 번째 스크롤인지"),
-                    size: int = Query(..., description="스크롤 한 번에 가져올 아이템 개수")):
-    response = service.get_checkpoints(project_name, result_name, index, size)
-    if response.epochs is None:
-        return bad_request()
-    if len(response.epochs) == 0:
-        return no_content()
-    return ok(data=response)
 
 @router.post("/feature-map", response_model=ResponseModel[FeatureMapResponse],
             summary="피쳐 맵 조회", description="블록의 피쳐맵 조회, 피쳐맵이 존재하지 않는 블록일 경우 null 반환")
