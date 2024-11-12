@@ -1,4 +1,4 @@
-export interface ApiListItem {
+export interface ApiSchema {
   projectName: string;
   trainResult: string;
   checkpoint: string;
