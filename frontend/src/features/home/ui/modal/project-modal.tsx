@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 
 import { useProjectStore } from '@entities/project/model/project.model';
 import { useCreateProject, useUpdateProject, useDeleteProject } from '@features/home/api/use-home.mutation';
+import type { Option } from '@shared/types/common.type';
 
 import Modal from '@shared/ui/modal/modal';
 import Input from '@shared/ui/input/input';
@@ -18,7 +19,7 @@ interface ProjectModalProps {
 const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModalProps) => {
   const isReadOnly = type === 'modify';
   const { currentProject } = useProjectStore();
-  const [selectedOption, setSelectedOption] = useState<string>(null);
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
   const [projectTitle, setProjectTitle] = useState(currentProject?.title || '');
   const [projectDescription, setProjectDescription] = useState(currentProject?.description || '');
   const [projectCudaVersion, setProjectCudaVersion] = useState(currentProject?.cudaVersion || '');
@@ -50,7 +51,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
     }
   }, [isReadOnly, currentProject]);
 
-  const handleSelect = (option: string) => {
+  const handleSelect = (option: Option) => {
     setSelectedOption(option);
   };
 
@@ -60,7 +61,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         {
           title: projectTitle,
           description: projectDescription,
-          cudaVersion: selectedOption,
+          cudaVersion: selectedOption?.label || options[0].label,
           pythonKernelPath: pythonKernelPath,
         },
         {
