@@ -9,7 +9,7 @@ interface InputProps {
   placeholder?: string;
   readOnly?: boolean;
   className?: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Input = ({ label, value, defaultValue, placeholder, readOnly = false, className, onChange }: InputProps) => {

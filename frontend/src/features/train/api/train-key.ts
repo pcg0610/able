@@ -1,5 +1,6 @@
 const trainKey = {
   default: ['train'],
+  graph: (projectName: string, resultName: string) => [...trainKey.default, 'graph', projectName, resultName],
   list: (projectName: string, resultName: string, index: number, size: number) => [
     ...trainKey.default,
     'list',

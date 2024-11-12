@@ -40,7 +40,12 @@ const createFeatureMap = async ({ projectName, resultName, epochName, deviceInde
   }
 };
 
-const fetchFeatureMap = async ({ projectName, resultName, epochName, blockIds }: FeatureMapProps): Promise<string> => {
+const fetchFeatureMap = async ({
+  projectName,
+  resultName,
+  epochName,
+  blockIds,
+}: FeatureMapProps): Promise<string | null> => {
   try {
     const response = await axiosInstance.post('/analyses/feature-map', {
       project_name: projectName,
@@ -48,6 +53,11 @@ const fetchFeatureMap = async ({ projectName, resultName, epochName, blockIds }:
       epoch_name: epochName,
       block_id: blockIds,
     });
+
+    if (response.status == 204) {
+      return null;
+    }
+
     return response.data.data.featureMap;
   } catch (error) {
     console.error('Feature map fetch error:', error);
@@ -77,8 +87,8 @@ export const useFetchFeatureMap = () => {
 
   return useMutation({
     mutationFn: fetchFeatureMap,
-    onSuccess: (featureMap: string, variables) => {
-      queryClient.setQueryData<string>(
+    onSuccess: (featureMap: string | null, variables) => {
+      queryClient.setQueryData<string | null>(
         trainKey.select(variables.projectName, variables.resultName, variables.epochName, variables.blockIds),
         () => featureMap
       );

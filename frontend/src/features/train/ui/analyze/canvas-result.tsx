@@ -8,6 +8,7 @@ import {
   ReactFlowProvider,
   Background,
   BackgroundVariant,
+  Position,
   type Node as XYFlowNode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -46,8 +47,7 @@ const CanvasResult = () => {
   const { fitView } = useReactFlow();
 
   const { projectName, resultName, epochName } = useProjectNameStore();
-  const { uploadedImage, heatMapImage, classScores, lastConv2dId, setLastConv2dId, setHeatMapImage, setAllImage } =
-    useImageStore();
+  const { uploadedImage, heatMapId, setHeatMapId, setHeatMapImage, setAllImage, resetImage } = useImageStore();
   const [autoFit, setAutoFit] = useState(false);
   const [hasSetInitialImages, setHasSetInitialImages] = useState(false);
 
@@ -77,13 +77,14 @@ const CanvasResult = () => {
       {
         onSuccess: (data) => {
           setHeatMapImage({
-            heatMapImage: data.image,
+            heatmapImage: data.image,
             classScores: data.classScores,
           });
-          toast.success('추론에 성공했습니다.');
+          toast.success("추론에 성공했습니다.");
+          handleFieldChange(heatMapId, data.image);
         },
         onError: () => {
-          toast.error('추론에 실패했습니다.');
+          toast.error("추론에 실패했습니다.");
         },
       }
     );
@@ -91,9 +92,10 @@ const CanvasResult = () => {
 
   const handleNodeClick = (blockId: string) => {
     setAutoFit(false);
-    if (blockId == '0') {
+    if (blockId === "0") {
       return;
     }
+
     fetchFeatureMap(
       {
         projectName,
@@ -103,7 +105,9 @@ const CanvasResult = () => {
       },
       {
         onSuccess: (data) => {
-          handleFieldChange(blockId, data);
+          if (data) {
+            handleFieldChange(blockId, data);
+          }
         },
       }
     );
@@ -115,12 +119,12 @@ const CanvasResult = () => {
         nds.map((node) =>
           node.id === nodeId
             ? {
-                ...node,
-                data: {
-                  ...node.data,
-                  featureMap: image,
-                },
-              }
+              ...node,
+              data: {
+                ...node.data,
+                featureMap: image,
+              },
+            }
             : node
         )
       );
@@ -128,7 +132,7 @@ const CanvasResult = () => {
     [setNodes]
   );
 
-  const handleLayoutChange = (newDirection) => {
+  const handleLayoutChange = (newDirection: LayoutOptions['direction']) => {
     setAutoFit(true);
     setDirection(newDirection);
   };
@@ -138,8 +142,8 @@ const CanvasResult = () => {
       const { blocks, edges } = canvas.canvas;
 
       const newNodes = blocks.map((block) => {
-        if (block.name === 'Conv2d') {
-          setLastConv2dId(block.id);
+        if (block.type === 'activation') {
+          setHeatMapId(block.id);
         }
         return {
           id: block.id,
@@ -159,7 +163,7 @@ const CanvasResult = () => {
       setNodes(newNodes);
       setEdges(newEdges);
     }
-  }, [canvas, setNodes, setEdges]);
+  }, [canvas, setNodes, setEdges, setHeatMapId]);
 
   useEffect(() => {
     if (heatMap && nodes.length > 0 && !hasSetInitialImages) {
@@ -167,24 +171,21 @@ const CanvasResult = () => {
 
       setAllImage({
         uploadedImage: heatMap.originalImg,
-        heatMapImage: heatMap.heatMapImg,
+        heatmapImage: heatMap.heatmapImg,
         classScores: heatMap.classScores,
       });
 
-      console.log(lastConv2dId);
       handleFieldChange(firstNodeId, heatMap.originalImg);
-      handleFieldChange(lastConv2dId, heatMap.heatMapImg);
+      handleFieldChange(heatMapId, heatMap.heatmapImg);
 
-      // 최초 설정이 완료되었음을 표시하여 재실행 방지
       setHasSetInitialImages(true);
     }
-  }, [heatMap, nodes, hasSetInitialImages, lastConv2dId, setAllImage, handleFieldChange]);
+  }, [heatMap, nodes, hasSetInitialImages, heatMapId, setAllImage, handleFieldChange]);
 
   useEffect(() => {
-    if (autoFit) {
-      fitView();
-    }
-  }, [fitView, direction, nodes, autoFit]);
+    setHasSetInitialImages(false);
+    resetImage();
+  }, [epochName, resetImage]);
 
   return (
     <ReactFlow
@@ -192,6 +193,8 @@ const CanvasResult = () => {
         ...node,
         data: {
           ...node.data,
+          forceToolbarVisible: true,
+          toolbarPosition: Position.Right,
           onFieldChange: (img: string) => handleFieldChange(node.id, img),
         },
       }))}
@@ -215,7 +218,7 @@ const CanvasResult = () => {
         <BasicButton
           text="추론하기"
           icon={<PlayIcon width={13} height={15} />}
-          width="10rem"
+          width='10rem'
           onClick={handleCreateModel}
         />
       </PositionedButton>
