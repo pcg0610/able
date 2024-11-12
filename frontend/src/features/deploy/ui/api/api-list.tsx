@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { ApiListItem } from '@features/deploy/type/deploy.type';
+import { ApiSchema } from '@features/deploy/type/deploy.type';
 import { useProjectNameStore } from '@entities/project/model/project.model';
 import { ApiListWrapper, ApiRow, ApiCell } from '@/features/deploy/ui/api/api-list.style';
 
@@ -9,7 +9,7 @@ import StopIcon from '@icons/stop.svg?react';
 
 
 interface ApiListProps {
-   apis: ApiListItem[];
+   apis: ApiSchema[];
 }
 
 const ApiList = ({ apis }: ApiListProps) => {

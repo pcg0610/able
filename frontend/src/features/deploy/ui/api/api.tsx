@@ -6,9 +6,9 @@ import Common from '@shared/styles/common';
 import InfoContainer from '@features/deploy/ui/common/deploy-info';
 import ApiList from '@features/deploy/ui/api/api-list';
 import Pagination from '@shared/ui/pagination/pagination';
-import { ApiListItem } from '../../type/deploy.type';
+import { ApiSchema } from '../../type/deploy.type';
 
-const dummyApis: ApiListItem[] = [
+const dummyApis: ApiSchema[] = [
   {
     index: 1,
     date: '2024-10-20',
