@@ -16,6 +16,7 @@ from src.analysis.router import analysis_router
 from src.exceptions import BaseCustomException
 from src.train_log.router import train_log_router
 from src.validation.router import validation_router
+from src.v2.router import v2_router
 
 app = FastAPI()
 
@@ -51,6 +52,8 @@ app.include_router(checkpoint_router, prefix="/checkpoints", tags=["체크포인
 app.include_router(deploy_router, prefix="/deploy", tags=["배포"])
 
 app.include_router(device_router, prefix="/devices", tags=["디바이스"])
+
+app.include_router(v2_router, prefix="/v2", tags=["v2"])
 
 @app.exception_handler(HTTPException)
 async def base_custom_exception_handler(request: Request, exc: BaseCustomException):
