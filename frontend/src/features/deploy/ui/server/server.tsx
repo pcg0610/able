@@ -17,7 +17,8 @@ const Server = () => {
           <BasicButton
             backgroundColor={Common.colors.gray200}
             text="START"
-            width="8.625rem"
+            width="8.125rem"
+            height='3rem'
             icon={<PlayIcon width={13} height={15} />}
             onClick={() => {
               console.log('시작 버튼 클릭됨');
@@ -26,7 +27,8 @@ const Server = () => {
           <BasicButton
             backgroundColor={Common.colors.primary}
             text="RESTART"
-            width="8.625rem"
+            width="8.125rem"
+            height='3rem'
             icon={<RestartIcon width={24} height={24} />}
             onClick={() => {
               console.log('다시시작 버튼 클릭됨');
@@ -35,7 +37,8 @@ const Server = () => {
           <BasicButton
             backgroundColor={Common.colors.red}
             text="STOP"
-            width="8.625rem"
+            width="8.125rem"
+            height='3rem'
             icon={<StopIcon width={30} height={30} />}
             onClick={() => {
               console.log('멈춤 버튼 클릭됨');
