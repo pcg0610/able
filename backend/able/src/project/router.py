@@ -24,7 +24,7 @@ async def get_project(title: str):
             summary="프로젝트 목록 조회", description="")
 async def get_projects():
     projects = service.get_projects()
-    return ok(data=ProjectsResponse(projects=projects))
+    return ok(data=ProjectsResponse(total_project_count=len(projects), projects=projects))
 
 @router.put("", response_model=ResponseModel[bool],
             summary="프로젝트 정보 수정", description="변경 전 프로젝트 이름, 설명 포함 필요")
