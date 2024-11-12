@@ -5,7 +5,6 @@ import Common from '@shared/styles/common';
 import { useGraphs } from '@features/train/api/use-result.query';
 import { useProjectNameStore } from '@entities/project/model/project.model';
 
-import ConfusionMatrix from '@features/train/ui/result/confusion-matrix';
 import EpochGraph from '@features/train/ui/result/epoch-graph';
 import F1Score from '@features/train/ui/result/f1-score';
 import LossGraph from '@features/train/ui/result/loss-graph';
