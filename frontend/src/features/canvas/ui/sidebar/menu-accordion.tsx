@@ -6,7 +6,7 @@ import { capitalizeFirstLetter } from '@/shared/utils/formatters.util';
 
 import ArrowButton from '@shared/ui/button/arrow-button';
 import MenuBlock from '@features/canvas/ui/sidebar/menu-block';
-import LoadingSpinner from '@icons/horizontal-loading.svg?react';
+import Spinner from '@shared/ui/loading/spinner';
 
 interface MenuAccordionProps {
   label: string;
@@ -40,24 +40,14 @@ const MenuAccordion = ({ label, Icon }: MenuAccordionProps) => {
         </S.LabelWrapper>
         <ArrowButton direction={isOpen ? 'up' : 'down'} />
       </S.Menu>
-      <S.MenuBlockWrapper
-        isOpen={isOpen}
-        contentHeight={contentHeight}
-        ref={contentRef}
-      >
+      <S.MenuBlockWrapper isOpen={isOpen} contentHeight={contentHeight} ref={contentRef}>
         {isFetching ? (
           <S.SummaryWrapper>
-            <LoadingSpinner />
+            <Spinner />
           </S.SummaryWrapper>
         ) : blocks.length > 0 ? (
           blocks.map((block) => (
-            <MenuBlock
-              key={block.name}
-              type={label}
-              name={block.name}
-              fields={block.args}
-              Icon={Icon}
-            />
+            <MenuBlock key={block.name} type={label} name={block.name} fields={block.args} Icon={Icon} />
           ))
         ) : (
           <S.SummaryWrapper>

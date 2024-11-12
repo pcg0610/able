@@ -1,4 +1,4 @@
-import { Container } from '@shared/ui/skeleton/skeleton.style';
+import { Container } from '@shared/ui/loading/skeleton.style';
 
 interface SekeletonProps {
   width?: number;
