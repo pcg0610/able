@@ -5,17 +5,17 @@ import { ImageStore } from '@features/train/types/analyze.type'
 
 export const useImageStore = create<ImageStore>((set) => ({
    uploadedImage: null,
-   heatMapImage: null,
+   heatmapImage: null,
    classScores: [],
 
-   lastConv2dId: '',
+   heatMapId: '',
 
    setUploadedImage: (image) => set({ uploadedImage: image }),
-   setLastConv2dId: (id) => set({ lastConv2dId: id }),
+   setHeatMapId: (id) => set({ heatMapId: id }),
 
    setHeatMapImage: (data) => {
       set({
-         heatMapImage: data.heatMapImage,
+         heatmapImage: data.heatmapImage,
          classScores: data.classScores,
       });
    },
@@ -23,8 +23,18 @@ export const useImageStore = create<ImageStore>((set) => ({
    setAllImage: (data) => {
       set({
          uploadedImage: data.uploadedImage,
-         heatMapImage: data.heatMapImage,
+         heatmapImage: data.heatmapImage,
          classScores: data.classScores,
       });
    },
+
+   resetImage: () => {
+      set({
+         uploadedImage: null,
+         heatmapImage: null,
+         classScores: [],
+         heatMapId: '',
+      });
+   },
+
 }));

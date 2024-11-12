@@ -39,7 +39,7 @@ const HomeSideBar = () => {
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // 임시로 그냥 바로 닫히게 설정
+    setIsModalOpen(false);
   };
 
   const handleAnimationEnd = () => {

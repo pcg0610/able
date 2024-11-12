@@ -53,11 +53,7 @@ const HomeContent = () => {
     if (project && project !== currentProject) {
       setCurrentProject(project);
     }
-  }, [project, currentProject, setCurrentProject]);
-
-  // useEffect(() => {
-  //   refetch(); // currentPage가 변경되면 refetch 호출
-  // }, [currentPage, refetch]);
+  }, [project, setCurrentProject]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading projects</div>;

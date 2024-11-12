@@ -24,5 +24,11 @@ export const useProjectNameStore = create<ProjectNameState>()(
 export const useProjectStore = create<ProjectState>((set) => ({
   currentProject: null,
   setCurrentProject: (project: Project) => set({ currentProject: project }),
+  updateCurrentProject: (prevTitle: string, prevDescription: string) =>
+    set((state) => ({
+      currentProject: state.currentProject
+        ? { ...state.currentProject, title: prevTitle, description: prevDescription }
+        : null,
+    })),
   resetProject: () => set({ currentProject: null }),
 }));

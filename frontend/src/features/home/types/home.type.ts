@@ -14,11 +14,16 @@ export interface Project {
   description: string;
   cudaVersion: string;
   pythonKernelPath: string;
-  thumbnail: string;
+  thumbnail?: string;
 }
 
 export interface ProjectStore {
   currentProject: Project | null;
   setCurrentProject: (project: Project) => void;
   resetProject: () => void;
+}
+
+export interface UpdateProjectSchema {
+  title: string;
+  description: string;
 }

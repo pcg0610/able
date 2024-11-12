@@ -15,6 +15,35 @@ export interface FeatureMapResponse {
   classScores: ClassScore[];
 }
 
+export interface GraphResponse {
+  confusionMatrix: string;
+  performanceMetrics: PerformanceMatrics;
+  f1Score: string;
+  epochResult: EpochResult[];
+}
+
+export interface PerformanceMatrics {
+  accuracy: number;
+  top5Accuracy: number;
+  precision: number;
+  recall: number;
+}
+
+export interface EpochResult {
+  epoch: string;
+  losses: Loss;
+  accuracies: Accuracies;
+}
+
+export interface Loss {
+  training: number;
+  validation: number;
+}
+
+export interface Accuracies {
+  accuracy: number;
+}
+
 export interface CreateFeatureMapProps {
   projectName: string;
   resultName: string;
@@ -25,7 +54,7 @@ export interface CreateFeatureMapProps {
 
 export interface HeatMapResponse {
   originalImg: string;
-  heatMapImg: string;
+  heatmapImg: string;
   classScores: ClassScore[];
 }
 
@@ -36,12 +65,14 @@ export interface ClassScore {
 
 export interface ImageStore {
   uploadedImage: string | null;
-  heatMapImage: string | null;
+  heatmapImage: string | null;
   classScores: ClassScore[];
-  lastConv2dId: string;
+  heatMapId: string;
 
   setUploadedImage: (image: string | null) => void;
-  setLastConv2dId: (id: string) => void;
-  setHeatMapImage: (data: { heatMapImage: string; classScores: ClassScore[] }) => void;
-  setAllImage: (data: { uploadedImage: string; heatMapImage: string; classScores: ClassScore[] }) => void;
+  setHeatMapId: (id: string) => void;
+  setHeatMapImage: (data: { heatmapImage: string; classScores: ClassScore[] }) => void;
+  setAllImage: (data: { uploadedImage: string; heatmapImage: string; classScores: ClassScore[] }) => void;
+
+  resetImage: () => void;
 }

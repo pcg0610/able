@@ -1,5 +1,5 @@
-import { Handle, Position } from '@xyflow/react';
-import React, { useMemo } from 'react';
+import { Handle, NodeToolbar, Position } from '@xyflow/react';
+import React, { useMemo, useState } from 'react';
 
 import * as S from '@entities/block-node/ui/block-node.style';
 import Common from '@shared/styles/common';
@@ -9,6 +9,7 @@ import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
 import { useImageStore } from '@entities/train/model/train.model';
 
 import UploadImageIcon from '@icons/uploadImage.svg?react';
+import GraphIcon from '@icons/graph.svg?react';
 
 interface BlockNodeFeatureProps {
   data: {
@@ -25,7 +26,8 @@ const BlockNodeFeature = ({
   sourcePosition = Position.Bottom,
   targetPosition = Position.Top,
 }: BlockNodeFeatureProps) => {
-  const { uploadedImage, setUploadedImage, heatMapImage, classScores, lastConv2dId } = useImageStore();
+  const { uploadedImage, setUploadedImage, heatmapImage, classScores, heatMapId } = useImageStore();
+  const [isChanged, setIsChanged] = useState(false);
 
   const blockColor = useMemo(
     () => (data?.block?.type ? BLOCK_COLORS[data.block.type] : Common.colors.gray200),
@@ -33,7 +35,7 @@ const BlockNodeFeature = ({
   );
 
   const blockImage = useMemo(
-    () => (data.featureMap ? `data:image/jpeg;base64,${data.featureMap}` : null),
+    () => (data.featureMap ? data.featureMap : null),
     [data.featureMap]
   );
 
@@ -48,14 +50,13 @@ const BlockNodeFeature = ({
     }
   };
 
-  const displayUploadedImage = useMemo(() => {
-    return uploadedImage && !uploadedImage.startsWith('data:image/jpeg;base64,')
-      ? `data:image/jpeg;base64,${uploadedImage}`
-      : uploadedImage;
-  }, [uploadedImage]);
-
   const handleClickUpload = () => {
     document.getElementById('fileUpload')?.click();
+  };
+
+  const [isGraphVisible, setIsGraphVisible] = useState(false);
+  const toggleGraphVisibility = () => {
+    setIsGraphVisible(!isGraphVisible);
   };
 
   return (
@@ -65,9 +66,9 @@ const BlockNodeFeature = ({
       <S.FieldWrapper>
         {data.block.type === 'data' ? (
           <>
-            {displayUploadedImage ? (
+            {uploadedImage ? (
               <S.Image
-                src={displayUploadedImage}
+                src={uploadedImage}
                 alt={data.block.name}
                 onClick={handleClickUpload}
                 style={{ cursor: 'pointer' }}
@@ -80,29 +81,29 @@ const BlockNodeFeature = ({
             )}
             <S.HiddenInput type="file" id="fileUpload" accept="image/jpeg" onChange={handleImageUpload} />
           </>
-        ) : data.block.id === lastConv2dId && heatMapImage ? (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <S.Image src={`data:image/jpeg;base64,${heatMapImage}`} alt={data.block.name} />
-            <div style={{ marginLeft: '1rem', display: 'flex', flexDirection: 'column' }}>
-              {classScores.map((score, index) => (
-                <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <span style={{ marginRight: '0.5rem', fontWeight: 'bold' }}>{score.class_name}</span>
-                  <div style={{ backgroundColor: '#ccc', width: '50px', height: '8px', position: 'relative' }}>
-                    <div
-                      style={{
-                        backgroundColor: '#4A90E2',
-                        width: `${score.classScore}%`,
-                        height: '100%',
-                      }}
-                    />
-                  </div>
-                  <span style={{ marginLeft: '0.5rem' }}>{score.classScore}</span>
-                </div>
-              ))}
-            </div>
+        ) : data.block.id === heatMapId && heatmapImage ? (
+          <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+            <S.Image src={heatmapImage} alt={data.block.name} />
+            <S.GraphButton onClick={toggleGraphVisibility}>
+              {isGraphVisible ? 'Hidden Graph' : 'Show Graph'}
+            </S.GraphButton>
+            {isGraphVisible && (
+              <NodeToolbar>
+                <S.BarContainer>
+                  {classScores.map((score, index) => (
+                    <S.BarWrapper key={index}>
+                      <S.Bar height={score.classScore} color={index === 0 ? '#00274d' : index === 1 ? '#5b8db8' : '#aac4e1'}>
+                        <S.BarScore>{score.classScore}</S.BarScore>
+                      </S.Bar>
+                      <S.BarLabel>{score.className}</S.BarLabel>
+                    </S.BarWrapper>
+                  ))}
+                </S.BarContainer>
+              </NodeToolbar>
+            )}
           </div>
         ) : (
-          blockImage && <S.Image src={blockImage} alt={data.block.name} />
+          uploadedImage && blockImage && <S.Image src={blockImage} alt={data.block.name} />
         )}
       </S.FieldWrapper>
       <Handle type="source" position={sourcePosition} />

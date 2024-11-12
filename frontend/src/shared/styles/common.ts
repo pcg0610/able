@@ -3,6 +3,7 @@ const Common = {
     background: '#F8F8F8',
     black: '#1D1D20',
     white: '#FFFFFF',
+    red: '#FF5050',
 
     primary: '#0051FF',
     secondary: '#DAE8FD',

@@ -2,10 +2,15 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 import Common from '@shared/styles/common';
 
-const F1Score = ({ f1score }) => {
+interface F1ScoreProps {
+  f1Score: number;
+}
+
+const F1Score = ({ f1Score }: F1ScoreProps) => {
+
   const data = [
-    { name: 'Score', value: f1score },
-    { name: 'Remaining', value: 1 - f1score },
+    { name: 'Score', value: f1Score },
+    { name: 'Remaining', value: 1 - f1Score },
   ];
 
   return (
@@ -29,7 +34,7 @@ const F1Score = ({ f1score }) => {
           fontWeight={Common.fontWeights.medium}
           fill="#000000"
         >
-          {f1score}
+          {f1Score}
         </text>
       </PieChart>
     </ResponsiveContainer>
