@@ -10,6 +10,8 @@ from watchdog.observers import Observer
 
 app = FastAPI()
 
+from deploy_server.src.routers.string import router as string_router
+app.include_router(string_router)
 pass
 
 # WebSocket 클라이언트를 저장할 리스트
