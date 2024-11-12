@@ -2,7 +2,8 @@ import src.deploy.service as service
 from fastapi import APIRouter
 from starlette.responses import Response
 from src.response.utils import accepted, ok, no_content, bad_request
-from .schemas import RegisterApiRequest
+from .schemas import RegisterApiRequest, ApiInformation
+from src.response.schemas import ResponseModel
 
 deploy_router = router = APIRouter()
 
@@ -33,6 +34,7 @@ def restart() -> Response:
     return accepted()
 
 @router.get("/api",
+            response_model=ResponseModel[list[ApiInformation]],
             summary="배포된 API 리스트 조회", description="")
 def get_api_list(page: int, page_size: int):
     api_list = service.get_api_list(page, page_size)
