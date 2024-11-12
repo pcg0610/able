@@ -1,18 +1,14 @@
 from fastapi import APIRouter, Depends, Response
 
+from src.domain.deploy.dependencies import get_deploy_service
 from src.domain.deploy.schema.response import RemoveApiResponse
 from src.domain.deploy.service import DeployService
-from src.domain.deploy.repository import DeployRepository
 from src.domain.deploy.schema.request import RegisterApiRequest
 from src.response.utils import accepted, ok, no_content, bad_request
 from src.response.schemas import ResponseModel
 from src.domain.deploy.schema.dto import ApiInformation
 
 deploy_router = router = APIRouter()
-
-def get_deploy_service() -> DeployService:
-    repository = DeployRepository()
-    return DeployService(repository=repository)
 
 @router.get("/run")
 def run(service: DeployService = Depends(get_deploy_service)) -> Response:
