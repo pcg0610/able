@@ -11,7 +11,6 @@ app = FastAPI()
 
 pass
 
-
 connected_clients = []
 log_file_path = Path(__file__).parent / "server.log"
 loop = asyncio.get_event_loop()

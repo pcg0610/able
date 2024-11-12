@@ -3,7 +3,6 @@ import sys
 import subprocess
 import psutil
 
-from src.file.constants import *
 from src.domain.deploy import repository as deploy_repository
 from src.domain.deploy.enums import DeployStatus
 from src.domain.deploy.schema.dto import ApiInformation
@@ -155,7 +154,9 @@ async def path_name_route(image: str = Body(...)):
     image = image.unsqueeze(0).to(device=device)
 
     model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / MODEL)
+
     model.to(device)
+
     model.eval()
     predicted = model(image)
 
