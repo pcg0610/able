@@ -1,14 +1,12 @@
-from sys import prefix
-
 import uvicorn
 from fastapi import FastAPI, HTTPException,Request
 from starlette.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.block.router import block_router
-from src.deploy.router import deploy_router
 from src.checkpoints.router import checkpoint_router
 from src.device.router import device_router
+from src.domain.deploy.router import deploy_router
 from src.train.router import train_router
 from src.canvas.router import canvas_router
 from src.project.router import project_router

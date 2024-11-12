@@ -23,3 +23,5 @@ FEATURE_MAPS = "feature_maps"
 TRAIN_BEST = "train_best"
 VALID_BEST = "valid_best"
 FINAL = "final"
+
+TRANSFORM_PIPELINE = "transform_pipeline.pickle"
