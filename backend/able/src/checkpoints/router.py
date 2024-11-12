@@ -12,7 +12,7 @@ checkpoint_router = router = APIRouter()
              summary="checkpoints 목록 조회", description="")
 async def create_project(project_name: str, result_name: str):
 
-    result = service.get_checkpoints(project_name, result_name)
+    result = service.get_all_checkpoints(project_name, result_name)
 
     return ok(
         data=result
