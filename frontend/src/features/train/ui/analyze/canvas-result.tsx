@@ -26,6 +26,7 @@ import { initialNodes, initialEdges } from '@features/canvas/model/initial-data'
 import { PositionedButton } from '@features/train/ui/analyze/canvas-result.style';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
+import DeviceSelectModal from '@features/train/ui/modal/device-select-modal';
 
 const proOptions = {
   account: 'paid-pro',
@@ -46,10 +47,11 @@ const CanvasResult = () => {
   const [selectedNode, setSelectedNode] = useState<XYFlowNode | null>(null);
   const { fitView } = useReactFlow();
 
+  const [autoFit, setAutoFit] = useState(false);
   const { projectName, resultName, epochName } = useProjectNameStore();
   const { uploadedImage, heatMapId, setHeatMapId, setHeatMapImage, setAllImage, resetImage } = useImageStore();
-  const [autoFit, setAutoFit] = useState(false);
   const [hasSetInitialImages, setHasSetInitialImages] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: canvas } = useModel(projectName, resultName);
   const { data: heatMap } = useHeatMap(projectName, resultName, epochName);
@@ -65,13 +67,26 @@ const CanvasResult = () => {
 
   useAutoLayout({ direction });
 
-  const handleCreateModel = () => {
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleRunButtonClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCreateModel = (deviceIndex: number) => {
+    if (deviceIndex === null) {
+      toast.error("디바이스를 선택해 주세요.");
+      return;
+    }
+    console.log(deviceIndex);
     fetchCreateModel(
       {
         projectName,
         resultName,
         epochName,
-        deviceIndex: -1,
+        deviceIndex,
         image: uploadedImage,
       },
       {
@@ -188,45 +203,48 @@ const CanvasResult = () => {
   }, [epochName, resetImage]);
 
   return (
-    <ReactFlow
-      nodes={nodes.map((node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          forceToolbarVisible: true,
-          toolbarPosition: Position.Right,
-          onFieldChange: (img: string) => handleFieldChange(node.id, img),
-        },
-      }))}
-      edges={edges}
-      onNodesChange={handleNodesChange}
-      onEdgesChange={onEdgesChange}
-      onNodeClick={(_, node) => {
-        setSelectedNode(node);
-        handleNodeClick(node.id);
-      }}
-      nodesDraggable={false}
-      nodesConnectable={false}
-      fitView
-      attributionPosition="bottom-left"
-      nodeTypes={{ custom: BlockNodeFeature }}
-      proOptions={proOptions}
-      zoomOnDoubleClick={false}
-    >
-      <Background variant={BackgroundVariant.Dots} />
-      <PositionedButton>
-        <BasicButton
-          text="추론하기"
-          icon={<PlayIcon width={13} height={15} />}
-          width='10rem'
-          onClick={handleCreateModel}
-        />
-      </PositionedButton>
-      <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
-        <button onClick={() => handleLayoutChange('TB')}>Down (TB)</button>
-        <button onClick={() => handleLayoutChange('LR')}>Right (LR)</button>
-      </div>
-    </ReactFlow>
+    <>
+      {isModalOpen && <DeviceSelectModal onClose={handleModalClose} onSubmit={handleCreateModel} />}
+      <ReactFlow
+        nodes={nodes.map((node) => ({
+          ...node,
+          data: {
+            ...node.data,
+            forceToolbarVisible: true,
+            toolbarPosition: Position.Right,
+            onFieldChange: (img: string) => handleFieldChange(node.id, img),
+          },
+        }))}
+        edges={edges}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodeClick={(_, node) => {
+          setSelectedNode(node);
+          handleNodeClick(node.id);
+        }}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        fitView
+        attributionPosition="bottom-left"
+        nodeTypes={{ custom: BlockNodeFeature }}
+        proOptions={proOptions}
+        zoomOnDoubleClick={false}
+      >
+        <Background variant={BackgroundVariant.Dots} />
+        <PositionedButton>
+          <BasicButton
+            text="추론하기"
+            icon={<PlayIcon width={13} height={15} />}
+            width='10rem'
+            onClick={handleRunButtonClick}
+          />
+        </PositionedButton>
+        <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
+          <button onClick={() => handleLayoutChange('TB')}>Down (TB)</button>
+          <button onClick={() => handleLayoutChange('LR')}>Right (LR)</button>
+        </div>
+      </ReactFlow>
+    </>
   );
 };
 

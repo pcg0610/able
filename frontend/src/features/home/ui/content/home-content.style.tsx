@@ -3,25 +3,23 @@ import styled from '@emotion/styled';
 import Common from '@shared/styles/common';
 
 export const HomeContentWrapper = styled.div`
-  padding: 0.625rem 2rem;
   border-radius: 1rem;
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   gap: 1.875rem;
 `;
 
 export const Title = styled.div`
   font-size: ${Common.fontSizes['3xl']};
-  font-weight: bold;
+  font-weight: ${Common.fontWeights.semiBold};
   display: flex;
-  align-items: end;
+  align-items: center;
   gap: 0.75rem;
 `;
 
 export const SubTitle = styled.h2`
-  font-size: ${Common.fontSizes['2xl']};
+  font-size: ${Common.fontSizes.xl};
   font-weight: ${Common.fontWeights.medium};
   display: flex;
   align-items: center;
@@ -52,9 +50,9 @@ export const CanvasWrapper = styled.div`
 `;
 
 export const CanvasImage = styled.img`
-  max-width: 21.875rem;
-  height: auto;
-  border-radius: 0.5rem;
+  width: 18rem;
+  height: 12rem;
+  border-radius: 0.4rem;
   object-fit: cover;
   cursor: pointer;
 `;

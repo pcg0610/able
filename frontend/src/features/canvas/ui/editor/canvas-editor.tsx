@@ -165,9 +165,9 @@ const CanvasEditor = () => {
   return (
     <>
       {isModalOpen && <TrainModal onClose={handleModalClose} onSubmit={handleTrain} />}
-      <S.Canvas ref={dropRef}>
+      <S.Canvas ref={canvasRef}>
         <ReactFlow
-          ref={canvasRef}
+          ref={dropRef}
           nodes={nodes.map((node) => ({
             ...node,
             data: {
@@ -190,7 +190,7 @@ const CanvasEditor = () => {
           </div>
           <Background variant={BackgroundVariant.Dots} />
         </ReactFlow>
-        <S.OverlayButton>
+        <S.OverlayButton data-html2canvas-ignore="true">
           <BasicButton
             text="실행"
             icon={<PlayIcon width={13} height={16} />}
