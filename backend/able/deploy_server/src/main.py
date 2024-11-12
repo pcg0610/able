@@ -1,28 +1,21 @@
 import asyncio
-from pathlib import Path
 
+from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, WebSocket
 import argparse
-
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 app = FastAPI()
 
-from deploy_server.src.routers.string import router as string_router
-app.include_router(string_router)
 pass
 
-# WebSocket 클라이언트를 저장할 리스트
+
 connected_clients = []
-
 log_file_path = Path(__file__).parent / "server.log"
-
-# asyncio 이벤트 루프 생성
 loop = asyncio.get_event_loop()
 
-# 파일 변경 감지 핸들러 설정
 class LogHandler(FileSystemEventHandler):
     def __init__(self):
         super().__init__()
