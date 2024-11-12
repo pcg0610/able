@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import * as S from '@/features/home/ui/content/home-content.style';
 import Common from '@shared/styles/common';
-import { useProject, useProjectHistory } from '@features/home/api/use-home.query';
+import defaultImage from '@assets/images/default-image.png';
+import { useProjectDetail, useProjectHistory } from '@features/home/api/use-home.query';
 import { useProjectStore, useProjectNameStore } from '@entities/project/model/project.model';
 
 import HistoryList from '@features/home/ui/content/history-list';
@@ -26,7 +27,7 @@ const HomeContent = () => {
   const { projectName } = useProjectNameStore();
   const { currentProject, setCurrentProject } = useProjectStore();
 
-  const { data: project, isLoading, error } = useProject(projectName);
+  const { data: project, isLoading, error } = useProjectDetail(projectName);
   const { data: historyData } = useProjectHistory(projectName, currentPage - 1, size);
 
   const handleCanvasClick = () => {
@@ -53,22 +54,18 @@ const HomeContent = () => {
     if (project && project !== currentProject) {
       setCurrentProject(project);
     }
-  }, [project, setCurrentProject]);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading projects</div>;
+  }, [project, currentProject, setCurrentProject]);
 
   return (
     <>
       <S.HomeContentWrapper>
         <div>
           <S.Title>
-            <FolderIcon width={45} height={45} />
-            {currentProject?.title || '프로젝트 이름 없음'}
-            <S.PythonTitle>python 3.9.6</S.PythonTitle>
+            <FolderIcon width={32} height={32} />
+            <S.Title>{currentProject?.title || '프로젝트 이름 없음'}</S.Title>
             <SettingIcon
-              width={22}
-              height={22}
+              width={20}
+              height={20}
               color={Common.colors.gray400}
               onClick={handleSettingClick}
               style={{ cursor: 'pointer' }}
@@ -78,21 +75,21 @@ const HomeContent = () => {
         </div>
         <div>
           <S.SubTitle>
-            <WritingIcon width={30} height={30} />
+            <WritingIcon width={24} height={24} />
             작업 중인 캔버스
           </S.SubTitle>
           <S.CanvasImage
-            src={currentProject?.thumbnail || 'src/assets/Frame 83.png'}
-            alt='Canvas Image'
+            src={currentProject?.thumbnail || defaultImage}
+            alt="Canvas Image"
             onClick={handleCanvasClick}
           />
         </div>
         <div>
           <S.SubTitle>
-            <ClockIcon width={30} height={30} />
+            <ClockIcon width={24} height={24} />
             학습 기록
           </S.SubTitle>
-          {historyData ?
+          {historyData ? (
             <S.HistoryWrapper>
               <HistoryList trainSummaries={historyData?.trainSummaries || []} />
               <Pagination
@@ -101,7 +98,9 @@ const HomeContent = () => {
                 onPageChange={setCurrentPage}
               />
             </S.HistoryWrapper>
-            : <div> 데이터가 없습니다 </div>}
+          ) : (
+            <div> 데이터가 없습니다 </div>
+          )}
         </div>
       </S.HomeContentWrapper>
       {isModalOpen && (
