@@ -68,17 +68,20 @@ const Result = () => {
         <div className="top-row">
           <S.GraphCard>
             <S.GraphTitle>Training and validation loss</S.GraphTitle>
-            <LossGraph data={lossData} />
+            <LossGraph lossData={lossData} />
           </S.GraphCard>
           <S.GraphCard>
             <S.GraphTitle>Epoch Accuracy</S.GraphTitle>
-            <EpochGraph data={accuracyData} />
+            <EpochGraph epochData={accuracyData} />
           </S.GraphCard>
         </div>
         <div className="bottom-row">
           <S.GraphCard>
             <S.GraphTitle>Confusion Matrix</S.GraphTitle>
-            <ConfusionMatrix />
+            <S.ConfusionImage
+              src={graphs?.confusionMatrix}
+              alt="Confusion Matrix"
+            />
           </S.GraphCard>
           <S.GraphCard>
             <S.F1ScoreTitle>F1-Score</S.F1ScoreTitle>
