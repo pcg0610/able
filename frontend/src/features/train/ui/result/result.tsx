@@ -85,7 +85,7 @@ const Result = () => {
           </S.GraphCard>
           <S.GraphCard>
             <S.F1ScoreTitle>F1-Score</S.F1ScoreTitle>
-            <F1Score f1Score={Number(graphs?.f1Score)} />
+            <F1Score f1Score={Number(graphs?.f1Score) || 0} />
           </S.GraphCard>
           <S.GraphCard>
             <S.GraphTitle>Performance Matrices Table</S.GraphTitle>
