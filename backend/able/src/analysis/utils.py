@@ -4,11 +4,11 @@ import numpy as np
 import cv2
 import logging
 import matplotlib.pyplot as plt
-from PIL import Image, ImageEnhance
+from PIL import Image
 from typing import List
 from pathlib import Path
 
-from src.train.utils import create_data_preprocessor, UserModel
+from src.train.utils import UserModel, load_transform_pipeline
 from src.canvas.schemas import CanvasBlock, Canvas
 from src.file.utils import get_file, create_file
 from src.utils import str_to_json, json_to_str
@@ -21,7 +21,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class FeatureMapExtractor:
-    def __init__(self, model: nn.Module,result_path: Path, checkpoint_path: Path, feature_maps_path: Path, transform_blocks: List[CanvasBlock], img_path: Path, device: str = 'cpu') -> None:
+    def __init__(self, model: nn.Module, project_name: str, result_name: str, result_path: Path, checkpoint_path: Path, feature_maps_path: Path, img_path: Path, device: str = 'cpu') -> None:
+        self.project_name = project_name
+        self.result_name = result_name
         self.result_path = result_path
         self.checkpoint_path = checkpoint_path
         self.device: str = device
@@ -32,13 +34,12 @@ class FeatureMapExtractor:
         self.output = None  
 
         self.img_path = img_path
-        self.transform_blocks = transform_blocks
 
     def analyze(self) -> ClassScores:
         self.build_model()
         self.model.eval()
 
-        input_img = preprocess_image(self.img_path, self.transform_blocks, self.device)
+        input_img = preprocess_image(self.project_name, self.result_name, self.img_path, self.device)
         input_img.requires_grad = True
 
         self.output = self.model(input_img)
@@ -137,9 +138,9 @@ def read_blocks(path: Path) -> Canvas:
     return Canvas(**str_to_json(get_file(path)))
 
 # 이미지 전처리
-def preprocess_image(img_path: str, transform_blocks: List[CanvasBlock], device: str = 'cpu') -> torch.Tensor:
+def preprocess_image(project_name: str, result_name: str, img_path: str, device: str = 'cpu') -> torch.Tensor:
     img = Image.open(img_path).convert('RGB')
-    preprocess = create_data_preprocessor(transform_blocks)
+    preprocess = load_transform_pipeline(project_name, result_name)
     return preprocess(img).unsqueeze(0).to(device)
 
 # 모델 로드

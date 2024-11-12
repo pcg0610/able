@@ -36,11 +36,6 @@ async def analyze(project_name: str, result_name: str, checkpoint_name:str, devi
     checkpoint_path = pathManager.get_checkpoint_path(project_name, result_name, checkpoint_name)
     feature_maps_path = checkpoint_path / "feature_maps"
 
-    block_graph_path = pathManager.get_train_result_path(project_name, result_name) / BLOCK_GRAPH
-    block_graph = read_blocks(block_graph_path)
-
-    _, transform_blocks, _, _, _ = split_blocks(block_graph.blocks)
-
     create_directory(feature_maps_path)
     img_path = await save_img(checkpoint_path, ORIGINAL, file)
 
@@ -51,7 +46,7 @@ async def analyze(project_name: str, result_name: str, checkpoint_name:str, devi
     model_path = checkpoint_path / MODEL
     model = load_model(model_path, device)
 
-    extractor = FeatureMapExtractor(model,result_path, checkpoint_path, feature_maps_path, transform_blocks, img_path, device)
+    extractor = FeatureMapExtractor(model, project_name, result_name, result_path, checkpoint_path, feature_maps_path, img_path, device)
     scores = extractor.analyze()
 
     heatmap_img = encode_image_to_base64(read_image_file(checkpoint_path / HEATMAP))
