@@ -18,15 +18,6 @@ logger = logging.getLogger(__name__)
 
 pathManager = PathManager()
 
-def get_checkpoints(project_name: str, result_name: str, index: int, size: int) -> CheckpointResponse:
-    checkpoints_path = pathManager.get_checkpoints_path(project_name, result_name)
-    checkpoints = get_directory(checkpoints_path)
-    items = [epoch.name for epoch in checkpoints if epoch.is_dir() and epoch.name not in {TRAIN_BEST, VALID_BEST, FINAL}]
-
-    page_item = handle_pagination(items, index, size)
-
-    return CheckpointResponse(epochs=page_item, has_next=has_next_page(len(items), index, size))
-
 
 def get_feature_map(request: FeatureMapRequest) -> str:
     feature_map_path = pathManager.get_feature_maps_path(request.project_name, request.result_name, request.epoch_name)
