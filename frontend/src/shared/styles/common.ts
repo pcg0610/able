@@ -3,10 +3,15 @@ const Common = {
     background: '#F8F8F8',
     black: '#1D1D20',
     white: '#FFFFFF',
+    red: '#FF5050',
 
+<<<<<<< HEAD
     primary: '#4C78FF',
+=======
+    primary: '#6078EA',
+>>>>>>> e8f92bae3c430384bc4edcd0140c71a1c86f0833
     secondary: '#DAE8FD',
-    graphDetail: '#0D356F',
+    graphDetail: '#073479',
 
     accuracyGraph: '#FF7A41',
 

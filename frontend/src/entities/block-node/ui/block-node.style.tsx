@@ -115,3 +115,55 @@ export const CustomUploadContainer = styled.div`
 export const HiddenInput = styled.input`
   display: none;
 `;
+
+export const BarContainer = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+`;
+
+export const BarWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 8px;
+`;
+
+export const Bar = styled.div<{ height: number; color: string }>`
+  width: 40px;
+  height: ${(props) => props.height}px;
+  background-color: ${(props) => props.color};
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+`;
+
+export const BarLabel = styled.span`
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: 12px;
+  color: #333;
+`;
+
+export const BarScore = styled.span`
+  font-size: 12px;
+  color: #ffffff;
+  margin-bottom: 4px;
+  font-weight: bold;
+`;
+
+export const GraphButton = styled.button`
+  position: absolute;
+  top: -30px;
+  right: 10px; 
+  cursor: pointer;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 3px;
+`

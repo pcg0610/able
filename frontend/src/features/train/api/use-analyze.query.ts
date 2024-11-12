@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import axiosInstance from '@shared/api/config/axios-instance';
 import trainKey from '@features/train/api/train-key';
-import type { CanvasResponse } from '@features/canvas/types/canvas.type';
+import type { CanvasSchema } from '@features/canvas/types/canvas.type';
 import type { EpochResponse, HeatMapResponse } from '@features/train/types/analyze.type';
 
 const fetchEpochs = async (projectName: string, resultName: string, index: number, size: number) => {
@@ -10,7 +10,12 @@ const fetchEpochs = async (projectName: string, resultName: string, index: numbe
     const response = await axiosInstance.get('/analyses', {
       params: { projectName, resultName, index, size },
     });
-    return response.data || [];
+
+    if (response.status == 204) {
+      return null;
+    }
+
+    return response.data;
   } catch (error) {
     console.error('Failed to fetch epochs:', error);
     throw error;
@@ -34,6 +39,11 @@ const fetchHeatMap = async (projectName: string, resultName: string, epochName: 
     const response = await axiosInstance.get('/analyses/heatmap', {
       params: { projectName, resultName, epochName },
     });
+
+    if (response.status == 204) {
+      return null;
+    }
+
     return response.data;
   } catch (error) {
     console.error('Failed to fetch heatMap:', error);
@@ -52,7 +62,7 @@ export const useEpochs = (projectName: string, resultName: string, index: number
 };
 
 export const useModel = (projectName: string, resultName: string) => {
-  return useQuery<CanvasResponse>({
+  return useQuery<CanvasSchema>({
     queryKey: trainKey.model(projectName, resultName),
     queryFn: async () => {
       const response = await fetchModel(projectName, resultName);

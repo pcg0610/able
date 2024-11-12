@@ -67,9 +67,9 @@ export const ModalFooter = styled.div`
   margin-top: 2rem;
 `;
 
-export const CancelButton = styled.button`
-  background-color: ${Common.colors.gray100};
-  color: ${Common.colors.black};
+export const CancelButton = styled.button<{ isDelete: boolean }>`
+  background-color: ${(props) => (props.isDelete ? Common.colors.red : Common.colors.gray100)};
+  color: ${(props) => (props.isDelete ? Common.colors.white : Common.colors.black)};
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
