@@ -1,7 +1,6 @@
 import os
 import subprocess
 import sys
-import json
 import logging
 from typing import Optional
 from pathlib import Path
@@ -74,20 +73,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent / "deploy_server/src"
 ROUTER_DIR = BASE_DIR / "routers"
 MAIN_FILE_PATH = BASE_DIR / "main.py"
 
+
 def register_router(request: RegisterApiRequest) -> bool:
-    
     path_name = request.uri.strip("/").replace("/", "_")
     file_path = Path(f"{ROUTER_DIR}/{path_name}.py")
-    
+
     # TODO: path_name 중복 확인
     if file_path.exists():
         raise AlreadyExistApiException()
-    
+
     # TODO: path_name.json 파일 만들어야 함 <- api 정보
-    deploy_path = path_manager.get_deploy_path() / f"{ path_name }.json"
+    deploy_path = path_manager.get_deploy_path() / f"{path_name}.json"
     if not create_file(deploy_path, json_to_str(request)):
         raise Exception()
-    
 
     content = f'''
 import torch
@@ -102,43 +100,40 @@ from src.analysis.utils import read_blocks
 from src.deploy.schemas import InferenceResponse
 from src.file.path_manager import PathManager
 from src.file.utils import get_file
+from src.file.constants import METADATA, MODEL
 from src.response.utils import ok
 from src.train.schemas import TrainResultMetadata
-from src.train.utils import create_data_preprocessor, split_blocks
 from src.utils import str_to_json
+
+from src.train.utils import load_transform_pipeline
 
 router = APIRouter()
 path_manager = PathManager()
 
 @router.post("{request.uri}")
 async def path_name_route(image: str = Body(...)):
-    
+
     project_name = "{request.project_name}"
     train_result = "{request.train_result}"
     checkpoint = "{request.checkpoint}"
-    
-    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / {METADATA}
-    metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
 
-    #block_graph.json 파일에서 블록 읽어오기
-    block_graph_path = path_manager.get_train_result_path(project_name, train_result) / {BLOCK_GRAPH}
-    block_graph = read_blocks(block_graph_path)
+    train_result_metadata_path = path_manager.get_train_result_path(project_name, train_result) / METADATA
+    metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
 
     # base64를 이미지로 변환 
     image = base64.b64decode(image)
     image = Image.open(io.BytesIO(image))
     image = np.array(image)
-    
-    # 블록 카테고리 별로 나누기
-    _, transform_blocks, _, _, _ = split_blocks(block_graph.blocks)
-    transforms = create_data_preprocessor(transform_blocks)
-   
+
+    # 전처리 파이프라인 가져오기
+    transform_pipeline = load_transform_pipeline(project_name, train_result)
+
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    
-    image: torch.Tensor = transforms(image)
+
+    image: torch.Tensor = transform_pipeline(image)
     image = image.unsqueeze(0).to(device=device)
 
-    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / {MODEL})
+    model = torch.load(path_manager.get_checkpoint_path(project_name, train_result, checkpoint) / MODEL)
 
     model.to(device)
 
@@ -148,10 +143,10 @@ async def path_name_route(image: str = Body(...)):
     top_values, top_indices = predicted.topk(1, dim=1)
     top_values = top_values[0].cpu().detach().numpy()
     top_indices = top_indices[0].cpu().detach().numpy()
-        
+
     predicted_label = metadata.classes[top_indices[0]]
     max_value = top_values[0]
-    
+
     return ok(
         data=InferenceResponse(
             label = predicted_label,
@@ -174,7 +169,7 @@ async def path_name_route(image: str = Body(...)):
 
         # `pass` 위치에 라우터 포함 코드를 삽입
         if "pass" in content:
-            
+
             metadata_path = path_manager.deploy_path / METADATA
             metadata = str_to_json(get_file(metadata_path))
             before_status = metadata["status"]
@@ -196,11 +191,11 @@ async def path_name_route(image: str = Body(...)):
     except Exception as e:
         return False
 
-def remove_router(uri: str) -> bool:
 
+def remove_router(uri: str) -> bool:
     path_name = uri.strip("/").replace("/", "_")
     file_path = ROUTER_DIR / f"{path_name}.py"
-    
+
     json_path = path_manager.get_deploy_path() / f"{path_name}.json"
     if remove_file(json_path):
         logger.info(f"파일 삭제 완료: {json_path}")
@@ -242,17 +237,18 @@ def remove_router(uri: str) -> bool:
             return False
     except Exception as e:
         return False
-    
+
+
 def get_api_list(page: int, page_size: int) -> Optional[list[ApiInformation]]:
     deploy_path = path_manager.get_deploy_path()
-    deploy_list = [file_name for file_name in get_files(deploy_path) if file_name != 'metadata.json' ]
+    deploy_list = [file_name for file_name in get_files(deploy_path) if file_name != 'metadata.json']
     api_list = handle_pagination(deploy_list, page, page_size)
     api_info_list = []
 
     if api_list is None:
         return None
 
-    for api in api_list :
+    for api in api_list:
         file_path = deploy_path / api
         api_info_list.append(ApiInformation(**str_to_json(get_file(file_path))))
 
