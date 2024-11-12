@@ -11,6 +11,7 @@ import LossGraph from '@features/train/ui/result/loss-graph';
 import PerformanceTable from '@features/train/ui/result/performance-table';
 import BasicButton from '@shared/ui/button/basic-button';
 import { EpochResult } from '@features/train/types/analyze.type';
+import DeployModal from '@features/train/ui/modal/deploy-modal';
 
 type LossData = { epoch: number; training: number; validation: number }[];
 type AccuracyData = { epoch: number; accuracy: number }[];
@@ -43,6 +44,19 @@ const Result = () => {
   const { data: graphs } = useGraphs(projectName, resultName);
   const [lossData, setLossData] = useState<LossData>([]);
   const [accuracyData, setAccuracyData] = useState<AccuracyData>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleRunButtonClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleDeployAPI = () => {
+
+  };
 
   useEffect(() => {
     setLossData(transformLossData(graphs?.epochResult || null));
@@ -51,48 +65,49 @@ const Result = () => {
 
 
   return (
-    <S.Container>
-      <S.Header>
-        <BasicButton
-          color={Common.colors.primary}
-          backgroundColor={Common.colors.secondary}
-          text="모델 배포하기"
-          width="10rem"
-          onClick={() => {
-            console.log('모델 실행 버튼 클릭됨');
-          }}
-        />
-      </S.Header>
-      <S.GridContainer>
-        <div className="top-row">
-          <S.GraphCard>
-            <S.GraphTitle>Training and validation loss</S.GraphTitle>
-            <LossGraph lossData={lossData} />
-          </S.GraphCard>
-          <S.GraphCard>
-            <S.GraphTitle>Epoch Accuracy</S.GraphTitle>
-            <EpochGraph epochData={accuracyData} />
-          </S.GraphCard>
-        </div>
-        <div className="bottom-row">
-          <S.GraphCard>
-            <S.GraphTitle>Confusion Matrix</S.GraphTitle>
-            <S.ConfusionImage
-              src={graphs?.confusionMatrix}
-              alt="Confusion Matrix"
-            />
-          </S.GraphCard>
-          <S.GraphCard>
-            <S.F1ScoreTitle>F1-Score</S.F1ScoreTitle>
-            <F1Score f1Score={Number(graphs?.f1Score) || 0} />
-          </S.GraphCard>
-          <S.GraphCard>
-            <S.GraphTitle>Performance Matrices Table</S.GraphTitle>
-            <PerformanceTable performanceMetrics={graphs?.performanceMetrics} />
-          </S.GraphCard>
-        </div>
-      </S.GridContainer>
-    </S.Container>
+    <>
+      {isModalOpen && <DeployModal onClose={handleModalClose} onSubmit={handleDeployAPI} />}
+      <S.Container>
+        <S.Header>
+          <BasicButton
+            color={Common.colors.primary}
+            backgroundColor={Common.colors.secondary}
+            text="모델 배포하기"
+            width="10rem"
+            onClick={handleRunButtonClick}
+          />
+        </S.Header>
+        <S.GridContainer>
+          <div className="top-row">
+            <S.GraphCard>
+              <S.GraphTitle>Training and validation loss</S.GraphTitle>
+              <LossGraph lossData={lossData} />
+            </S.GraphCard>
+            <S.GraphCard>
+              <S.GraphTitle>Epoch Accuracy</S.GraphTitle>
+              <EpochGraph epochData={accuracyData} />
+            </S.GraphCard>
+          </div>
+          <div className="bottom-row">
+            <S.GraphCard>
+              <S.GraphTitle>Confusion Matrix</S.GraphTitle>
+              <S.ConfusionImage
+                src={graphs?.confusionMatrix}
+                alt="Confusion Matrix"
+              />
+            </S.GraphCard>
+            <S.GraphCard>
+              <S.F1ScoreTitle>F1-Score</S.F1ScoreTitle>
+              <F1Score f1Score={Number(graphs?.f1Score) || 0} />
+            </S.GraphCard>
+            <S.GraphCard>
+              <S.GraphTitle>Performance Matrices Table</S.GraphTitle>
+              <PerformanceTable performanceMetrics={graphs?.performanceMetrics} />
+            </S.GraphCard>
+          </div>
+        </S.GridContainer>
+      </S.Container>
+    </>
   );
 };
 
