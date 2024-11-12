@@ -5,7 +5,7 @@ const Common = {
     white: '#FFFFFF',
     red: '#FF5050',
 
-    primary: '#6078EA',
+    primary: '#4C78FF',
     secondary: '#DAE8FD',
     graphDetail: '#073479',
 
