@@ -29,7 +29,7 @@ def create_directory(path: Path) -> bool:
 def get_directory(path: Path) -> List[Path]:
     if path.exists() and path.is_dir():
         return list(path.iterdir())
-    return []
+    raise FileNotFoundException("존재하지 않는 디렉터리입니다.")
 
 def delete_directory(path: Path) -> bool:
     if path.exists() and path.is_dir():
