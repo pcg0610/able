@@ -358,11 +358,11 @@ class UserModel(nn.Module):
         return self.layers(x)
 
 def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -> nn.Module | None:
-    # sorted_blocks = topological_sort(blocks, edges)
+    sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
 
-    for block in blocks:
+    for block in sorted_blocks:
         if block.type == BlockType.LAYER:
             module = convert_layer_block_to_module(block)
         elif block.type == BlockType.ACTIVATION:
@@ -401,41 +401,40 @@ def split_blocks(blocks: list[Block]) -> tuple[
     return data_block, transform_blocks, loss_blocks, optimizer_blocks, others
 
 def filter_blocks_connected_to_data(
-        data_block: Block | None,
-        transform_blocks: list[Block],
-        loss_blocks: list[Block],
-        optimizer_blocks: list[Block],
-        others: list[Block],
+        blocks: list[CanvasBlock],
         edges: list[Edge]
-) -> tuple[list[Block], list[Block], list[Block], list[Block]]:
+) -> list[CanvasBlock] | None:
     """
     그래프의 루트인 데이터 블록과 연결된 블록들만 반환하는 함수
     """
-    adj_blocks = defaultdict(list)
-    is_connected = set()
+    data_block = None
+    for block in blocks:
+        if block.type == BlockType.DATA:
+            data_block = block
+            break
+
+    if data_block is None:
+        return None
+
+    adj_dict = defaultdict(list)
 
     for edge in edges:
-        adj_blocks[edge.source].append(edge.target)
+        adj_dict[edge.source].append(edge.target)
 
-    q = deque([data_block.id])
-    is_connected.add(data_block.id)
+    q = deque()
+    q.append(data_block.id)
+
+    conn_block_id_set = set()
+    conn_block_id_set.add(data_block.id)
 
     while q:
-        block_id = q.popleft()
-        for adj_block_id in adj_blocks.get(block_id, []):
-            if adj_block_id not in is_connected:
-                is_connected.add(adj_block_id)
-                q.append(adj_block_id)
+        cur_id = q.popleft()
 
-    def filter_connected(blocks: list[Block]) -> list[Block]:
-        return [block for block in blocks if block.id in is_connected]
+        for next_id in adj_dict[cur_id]:
+            q.append(next_id)
+            conn_block_id_set.add(next_id)
 
-    return (
-        filter_connected(transform_blocks),
-        filter_connected(loss_blocks),
-        filter_connected(optimizer_blocks),
-        filter_connected(others)
-    )
+    return [block for block in blocks if block.id in conn_block_id_set]
 
 def filter_edges_from_block_connected_data(blocks: list[Block], edges: list[Edge]) -> list[Edge]:
     block_id = set(block.id for block in blocks)
@@ -445,7 +444,7 @@ def filter_edges_from_block_connected_data(blocks: list[Block], edges: list[Edge
 def save_result_block_graph(project_name: str, result: str, blocks: list[CanvasBlock], edges: list[Edge]):
 
     block_graph_path = path_manager.get_train_result_path(project_name, result) / BLOCK_GRAPH
-    if create_file(block_graph_path, json_to_str(Canvas(blocks=blocks, edges=edges))):
+    if create_file(block_graph_path, Canvas(blocks=blocks, edges=edges).model_dump_json()):
         return True
 
     raise
@@ -501,8 +500,8 @@ def find_data_path(data_block: CanvasBlock):
             return arg.value
     return None
 
-def filter_model_edge(blocks: list[Block], edges: list[Edge]) -> list[Edge]:
-    model_block_set = set(block.id for block in blocks if block.type == BlockType.LAYER or block.type == BlockType.OPERATION)
+def filter_model_edge(model_blocks: list[CanvasBlock], edges: list[Edge]) -> list[Edge]:
+    model_block_set = set(block.id for block in model_blocks)
 
     return [edge for edge in edges if edge.source in model_block_set and edge.target in model_block_set]
 
