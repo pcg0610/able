@@ -120,7 +120,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
       title="프로젝트 정보를 입력하세요"
       confirmText={isReadOnly ? '수정' : '생성'}
       cancelText={'삭제'}
-      isDelete={true}
+      isDelete={isReadOnly}
     >
       <Input
         label="프로젝트 이름"
