@@ -34,7 +34,7 @@ def register_api(
 
 
 @router.delete("/apis")
-def remove_router(
+def remove_api(
         uri: str,
         service: DeployService = Depends(get_deploy_service)
 ) -> Response:
