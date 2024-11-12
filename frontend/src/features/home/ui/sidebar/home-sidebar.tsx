@@ -10,6 +10,7 @@ import ProjectModal from '@/features/home/ui/modal/project-modal';
 import BasicButton from '@shared/ui/button/basic-button';
 import FileIcon from '@icons/file.svg?react';
 import RocketIcon from '@icons/rocket.svg?react';
+import LoadingSpinner from '@icons/horizontal-loading.svg?react';
 
 const HomeSideBar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,7 +18,7 @@ const HomeSideBar = () => {
   const navigate = useNavigate();
 
   const { projectName, setProjectName } = useProjectNameStore();
-  const { data: projects, isLoading, error } = useProjects();
+  const { data: projects, isLoading } = useProjects();
 
   useEffect(() => {
     if (projects && projects.length > 0 && !projectName) {
@@ -49,9 +50,6 @@ const HomeSideBar = () => {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading projects</div>;
-
   return (
     <S.SidebarContainer>
       <S.Title>내 프로젝트</S.Title>
@@ -67,11 +65,15 @@ const HomeSideBar = () => {
       />
 
       <S.FolderSection>
-        {projects?.map((project, index) => (
-          <S.Folder key={index} isSelected={projectName === project} onClick={() => handleClick(project)}>
-            <FileIcon width={20} height={20} /> {project}
-          </S.Folder>
-        ))}
+        {isLoading ? (
+          <LoadingSpinner height={50} />
+        ) : (
+          projects?.map((project, index) => (
+            <S.Folder key={index} isSelected={projectName === project} onClick={() => handleClick(project)}>
+              <FileIcon width={20} height={20} /> {project}
+            </S.Folder>
+          ))
+        )}
       </S.FolderSection>
 
       <S.Footer onClick={handleServer}>
