@@ -10,6 +10,7 @@ const deployKey = {
     descriptioon,
   ],
   list: (page: number, pageSize: number) => [...deployKey.default, 'list', page, pageSize],
+  stop: (uri: string) => [...deployKey.default, 'stop', uri],
 };
 
 export default deployKey;

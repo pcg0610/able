@@ -25,6 +25,19 @@ const registerAPI = async ({ projectName, trainResult, checkpoint, uri, descript
   }
 };
 
+const stopApi = async ({ uri, page }: { uri: string; page: number }): Promise<void> => {
+  try {
+    const response = await axiosInstance.put(`/deploy/apis?uri=${encodeURIComponent(uri)}`, null);
+
+    if (response.status !== 200) {
+      throw new Error('API 중지 실패');
+    }
+  } catch (error) {
+    console.error('Failed to fetch apiLists:', error);
+    throw error;
+  }
+};
+
 export const useRegisterAPI = () => {
   const queryClient = useQueryClient();
 
@@ -32,6 +45,16 @@ export const useRegisterAPI = () => {
     mutationFn: registerAPI,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: deployKey.list(0, 5) });
+    },
+  });
+};
+
+export const useStopApi = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: stopApi,
+    onSuccess: (_, { page }) => {
+      queryClient.invalidateQueries({ queryKey: deployKey.list(page, 5) });
     },
   });
 };

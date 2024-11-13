@@ -1,24 +1,28 @@
-import { useNavigate } from 'react-router-dom';
-
-import { ApiSchema } from '@features/deploy/type/deploy.type';
-import { useProjectNameStore } from '@entities/project/model/project.model';
+import { ApiResponse } from '@features/deploy/type/deploy.type';
 import { ApiListWrapper, ApiRow, ApiCell } from '@/features/deploy/ui/api/api-list.style';
+import { useStopApi } from '@features/deploy/api/use-api.mutation';
 
-import PlayIcon from '@icons/play.svg?react';
 import StopIcon from '@icons/stop.svg?react';
+import TrashCanIcon from '@icons/trashcan.svg?react';
 
 
 interface ApiListProps {
-   apis: ApiSchema[];
+   apis: ApiResponse[];
+   page: number;
 }
 
-const ApiList = ({ apis }: ApiListProps) => {
-   const navigate = useNavigate();
-   const { setResultName } = useProjectNameStore();
+const ApiList = ({ apis, page }: ApiListProps) => {
+   const { mutate: stopApi } = useStopApi();
 
-   const handleApi = (projectName: string, status: string) => {
-
+   const handleApi = (uri: string, status: string) => {
+      if (status === "running") {
+         stopApi({ uri, page });
+      } else {
+         stopApi({ uri, page });
+      }
    };
+
+   console.log(apis);
 
    return (
       <ApiListWrapper>
@@ -38,18 +42,28 @@ const ApiList = ({ apis }: ApiListProps) => {
                </ApiCell>
             </tr>
          </thead>
-         <tbody>
-            {apis.map((item, index) => (
-               <ApiRow key={item.trainResult} onClick={() => handleApi(item.projectName, item.description)}>
-                  <ApiCell width='15%'>{item.uri}</ApiCell>
-                  <ApiCell width='30%'>{item.description}</ApiCell>
-                  <ApiCell width='25%'>{item.checkpoint}</ApiCell>
-                  <ApiCell width='20%'>
-                     {item.projectName == "running" ? <PlayIcon width={15} height={15} /> : <StopIcon width={30} height={30} />}
-                  </ApiCell>
-               </ApiRow>
-            ))}
-         </tbody>
+         {apis.length > 0 ?
+            <tbody>
+               {apis.map((item, index) => (
+                  <ApiRow key={item.uri}>
+                     <ApiCell width='15%'>{item.uri}</ApiCell>
+                     <ApiCell width='30%'>{item.description}</ApiCell>
+                     <ApiCell width='25%'>{item.checkpoint}</ApiCell>
+                     <ApiCell width='20%' onClick={() => handleApi(item.uri, item.status)}>
+                        {item.status == "running" ? <StopIcon width={30} height={30} /> : <TrashCanIcon width={24} height={24} />}
+                     </ApiCell>
+                  </ApiRow>
+               ))}
+            </tbody>
+            : (
+               <tbody>
+                  <tr>
+                     <ApiCell colSpan={4} style={{ textAlign: 'center' }}>
+                        데이터 없음
+                     </ApiCell>
+                  </tr>
+               </tbody>
+            )}
       </ApiListWrapper>
    );
 };
