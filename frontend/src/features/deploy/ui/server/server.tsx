@@ -1,6 +1,7 @@
 import * as S from '@features/deploy/ui/server/server.style';
 import Common from '@shared/styles/common';
 import { useRestartServer, useStartServer, useStopServer } from '@features/deploy/api/use-server.mutation';
+import { useFetchDeployInfo } from '@features/deploy/api/use-deploy.query';
 
 import InfoContainer from '@features/deploy/ui/common/deploy-info';
 import LogViewer from '@features/deploy/ui/server/log-viewer';
@@ -13,6 +14,9 @@ const Server = () => {
   const { mutate: startServer } = useStartServer();
   const { mutate: stopServer } = useStopServer();
   const { mutate: restartServer } = useRestartServer();
+
+  const { data: deployInfo } = useFetchDeployInfo();
+  const isRunning = deployInfo?.status === 'running';
 
   const handleStart = () => {
     startServer();
@@ -32,7 +36,7 @@ const Server = () => {
         <InfoContainer title="Server" />
         <S.ButtonWrapper>
           <BasicButton
-            backgroundColor={Common.colors.gray200}
+            backgroundColor={isRunning ? Common.colors.gray200 : Common.colors.primary}
             text="START"
             width="8.125rem"
             height="3rem"
@@ -40,7 +44,7 @@ const Server = () => {
             onClick={handleStart}
           />
           <BasicButton
-            backgroundColor={Common.colors.primary}
+            backgroundColor={isRunning ? Common.colors.primary : Common.colors.gray200}
             text="RESTART"
             width="8.125rem"
             height="3rem"
@@ -48,7 +52,7 @@ const Server = () => {
             onClick={handleRestart}
           />
           <BasicButton
-            backgroundColor={Common.colors.red}
+            backgroundColor={isRunning ? Common.colors.red : Common.colors.gray200}
             text="STOP"
             width="8.125rem"
             height="3rem"
