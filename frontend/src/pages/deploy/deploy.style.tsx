@@ -12,4 +12,5 @@ export const Container = styled.div`
 
 export const Content = styled.div`
   flex: 1;
+  padding: 2.5rem 3.75rem;
 `;

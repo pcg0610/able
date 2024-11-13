@@ -8,11 +8,11 @@ from src.response.utils import created, ok, no_content, bad_request
 
 checkpoint_router = router = APIRouter()
 
-@router.post("/{project_name}/{result_name}", response_model=ResponseModel,
+@router.post("/{project_name}/{result_name}", response_model=ResponseModel[CheckpointListResponse],
              summary="checkpoints 목록 조회", description="")
 async def create_project(project_name: str, result_name: str):
 
-    result = service.get_checkpoints(project_name, result_name)
+    result = service.get_all_checkpoints(project_name, result_name)
 
     return ok(
         data=result
