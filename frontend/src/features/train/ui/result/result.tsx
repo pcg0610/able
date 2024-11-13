@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 import * as S from '@features/train/ui/result/result.style';
 import Common from '@shared/styles/common';
 import { useGraphs } from '@features/train/api/use-result.query';
 import { useProjectNameStore } from '@entities/project/model/project.model';
+import type { DeployConfig } from '@features/deploy/type/deploy.type';
+import { useRegisterAPI } from '@features/deploy/api/use-api.mutation';
+import { EpochResult } from '@features/train/types/analyze.type';
 
 import EpochGraph from '@features/train/ui/result/epoch-graph';
 import F1Score from '@features/train/ui/result/f1-score';
 import LossGraph from '@features/train/ui/result/loss-graph';
 import PerformanceTable from '@features/train/ui/result/performance-table';
 import BasicButton from '@shared/ui/button/basic-button';
-import { EpochResult } from '@features/train/types/analyze.type';
 import DeployModal from '@features/train/ui/modal/deploy-modal';
 
 type LossData = { epoch: number; training: number; validation: number }[];
@@ -46,6 +49,8 @@ const Result = () => {
   const [accuracyData, setAccuracyData] = useState<AccuracyData>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const { mutate: registerAPI } = useRegisterAPI();
+
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -54,8 +59,27 @@ const Result = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeployAPI = () => {
-
+  const handleDeployAPI = (apis: DeployConfig) => {
+    registerAPI(
+      {
+        projectName,
+        trainResult: resultName,
+        checkpoint: apis.selectedOption.label,
+        uri: apis.apiPath,
+        description: apis.apiDescription
+      },
+      {
+        onSuccess: (data) => {
+          if (data) {
+            toast.success("API 배포가 완료되었습니다.");
+            handleModalClose();
+          }
+        },
+        onError: () => {
+          toast.error("에러가 발생했습니다.");
+        }
+      }
+    );
   };
 
   useEffect(() => {
