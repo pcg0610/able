@@ -18,16 +18,11 @@ const Server = () => {
   const { data: deployInfo, isLoading } = useFetchDeployInfo();
   const isRunning = deployInfo?.status === 'running';
 
-  const handleStart = () => {
-    startServer();
-  };
-
-  const handleRestart = () => {
-    restartServer();
-  };
-
-  const handleStop = () => {
-    stopServer();
+  const getButtonColor = (type: 'start' | 'restart' | 'stop') => {
+    if (isLoading) return Common.colors.gray200;
+    if (type === 'start') return isRunning ? Common.colors.gray200 : Common.colors.primary;
+    if (type === 'restart') return isRunning ? Common.colors.primary : Common.colors.gray200;
+    if (type === 'stop') return isRunning ? Common.colors.red : Common.colors.gray200;
   };
 
   return (
@@ -36,32 +31,28 @@ const Server = () => {
         <InfoContainer title="Server" />
         <S.ButtonWrapper>
           <BasicButton
-            backgroundColor={
-              isLoading ? Common.colors.gray200 : isRunning ? Common.colors.gray200 : Common.colors.primary
-            }
+            backgroundColor={getButtonColor('start')}
             text="START"
             width="8.125rem"
             height="3rem"
             icon={<PlayIcon width={13} height={15} />}
-            onClick={handleStart}
+            onClick={startServer}
           />
           <BasicButton
-            backgroundColor={
-              isLoading ? Common.colors.gray200 : isRunning ? Common.colors.primary : Common.colors.gray200
-            }
+            backgroundColor={getButtonColor('restart')}
             text="RESTART"
             width="8.125rem"
             height="3rem"
             icon={<RestartIcon width={24} height={24} />}
-            onClick={handleRestart}
+            onClick={restartServer}
           />
           <BasicButton
-            backgroundColor={isLoading ? Common.colors.gray200 : isRunning ? Common.colors.red : Common.colors.gray200}
+            backgroundColor={getButtonColor('stop')}
             text="STOP"
             width="8.125rem"
             height="3rem"
             icon={<StopIcon width={30} height={30} />}
-            onClick={handleStop}
+            onClick={stopServer}
           />
         </S.ButtonWrapper>
       </S.TopSection>
