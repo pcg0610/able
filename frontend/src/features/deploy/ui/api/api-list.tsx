@@ -1,10 +1,9 @@
 import { ApiResponse } from '@features/deploy/type/deploy.type';
-import { ApiListWrapper, ApiRow, ApiCell } from '@/features/deploy/ui/api/api-list.style';
-import { useStopApi } from '@features/deploy/api/use-api.mutation';
+import { ApiListWrapper, ApiRow, ApiCell, CellIcon } from '@/features/deploy/ui/api/api-list.style';
+import { useStopApi, useRemoveApi } from '@features/deploy/api/use-api.mutation';
 
 import StopIcon from '@icons/stop.svg?react';
 import TrashCanIcon from '@icons/trashcan.svg?react';
-
 
 interface ApiListProps {
    apis: ApiResponse[];
@@ -13,16 +12,17 @@ interface ApiListProps {
 
 const ApiList = ({ apis, page }: ApiListProps) => {
    const { mutate: stopApi } = useStopApi();
+   const { mutate: removeApi } = useRemoveApi();
 
    const handleApi = (uri: string, status: string) => {
       if (status === "running") {
          stopApi({ uri, page });
       } else {
-         stopApi({ uri, page });
+         removeApi({ uri, page });
       }
    };
 
-   console.log(apis);
+   const rows = apis.length < 5 ? [...apis, ...Array(5 - apis.length).fill(null)] : apis;
 
    return (
       <ApiListWrapper>
@@ -42,28 +42,29 @@ const ApiList = ({ apis, page }: ApiListProps) => {
                </ApiCell>
             </tr>
          </thead>
-         {apis.length > 0 ?
-            <tbody>
-               {apis.map((item, index) => (
+         <tbody>
+            {rows.map((item, index) => (
+               item ? (
                   <ApiRow key={item.uri}>
-                     <ApiCell width='15%'>{item.uri}</ApiCell>
-                     <ApiCell width='30%'>{item.description}</ApiCell>
-                     <ApiCell width='25%'>{item.checkpoint}</ApiCell>
-                     <ApiCell width='20%' onClick={() => handleApi(item.uri, item.status)}>
-                        {item.status == "running" ? <StopIcon width={30} height={30} /> : <TrashCanIcon width={24} height={24} />}
+                     <ApiCell width="15%">{item.uri}</ApiCell>
+                     <ApiCell width="30%">{item.description}</ApiCell>
+                     <ApiCell width="25%">{item.checkpoint}</ApiCell>
+                     <ApiCell width="20%" onClick={() => handleApi(item.uri, item.status)}>
+                        <CellIcon>
+                           {item.status === "running" ? <StopIcon width={30} height={30} /> : <TrashCanIcon width={24} height={24} />}
+                        </CellIcon>
                      </ApiCell>
                   </ApiRow>
-               ))}
-            </tbody>
-            : (
-               <tbody>
-                  <tr>
-                     <ApiCell colSpan={4} style={{ textAlign: 'center' }}>
-                        데이터 없음
-                     </ApiCell>
-                  </tr>
-               </tbody>
-            )}
+               ) : (
+                  <ApiRow key={`empty-${index}`} style={{ height: '3.125rem' }}>
+                     <ApiCell width="15%"></ApiCell>
+                     <ApiCell width="30%"></ApiCell>
+                     <ApiCell width="25%"></ApiCell>
+                     <ApiCell width="20%"></ApiCell>
+                  </ApiRow>
+               )
+            ))}
+         </tbody>
       </ApiListWrapper>
    );
 };

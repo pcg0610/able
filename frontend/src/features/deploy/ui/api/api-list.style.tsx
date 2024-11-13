@@ -9,6 +9,7 @@ export const ApiListWrapper = styled.table`
   font-size: 14px;
   color: ${Common.colors.gray400};
   table-layout: fixed;
+  height: 100%;
 `;
 
 export const ApiRow = styled.tr`
@@ -26,4 +27,11 @@ export const ApiCell = styled.td`
   text-align: center;
   width: ${({ width }) => width || 'auto'};
   min-height: 3.125rem;
+  align-items: center; 
+`;
+
+export const CellIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

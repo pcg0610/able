@@ -5,7 +5,7 @@ export const Container = styled.div`
   height: 100%;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 6.25rem;
   font-family: Arial, sans-serif;
 `;
 
