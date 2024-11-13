@@ -2,6 +2,8 @@ import logging
 import inspect
 import importlib
 from typing import Iterator, Any, Dict, Tuple, List, Callable, Union
+
+import torchvision.models.resnet
 from torch import nn, optim
 from torch.fx import GraphModule
 from torch.utils.data import DataLoader
@@ -38,7 +40,9 @@ MODULE_MAP = {
     "sgd": optim.SGD,
     "resize": transforms.Resize,
     "totensor": transforms.ToTensor,
-    "centercrop": transforms.CenterCrop
+    "centercrop": transforms.CenterCrop,
+    "basicblock": torchvision.models.resnet.BasicBlock,
+    "bottleneck": torchvision.models.resnet.Bottleneck
 }
 
 def dynamic_class_loader(module_path: str, class_name: str):
