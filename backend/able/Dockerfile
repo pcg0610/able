@@ -18,6 +18,8 @@ COPY setup ./setup
 RUN python3 setup/install.py
 
 COPY src ./src
+COPY deploy_server ./deploy_server
+
 
 EXPOSE $PORT
 

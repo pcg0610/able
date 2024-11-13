@@ -2,12 +2,15 @@ import logging
 import inspect
 import importlib
 from typing import Iterator, Any, Dict, Tuple, List, Callable, Union
+
+import torchvision.models.resnet
 from torch import nn, optim
 from torch.fx import GraphModule
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from src.block.enums import BlockType
 from src.block.schemas import Block
+from src.canvas.schemas import CanvasBlock
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +23,26 @@ MODULE_MAP = {
     BlockType.OPTIMIZER: "torch.optim",
     BlockType.MODULE: "torch.nn",
     BlockType.DATA: "torch.utils.data",
-    BlockType.INTERPRETER: "torch.fx"
+    BlockType.INTERPRETER: "torch.fx",
+    "relu": nn.ReLU,
+    "softmax": nn.Softmax,
+    "avgpool2d": nn.AvgPool2d,
+    "batchnorm2d": nn.BatchNorm2d,
+    "conv2d": nn.Conv2d,
+    "dropout": nn.Dropout,
+    "flatten": nn.Flatten,
+    "linear": nn.Linear,
+    "localresponsenorm": nn.LocalResponseNorm,
+    "maxpool2d": nn.MaxPool2d,
+    "crossentropyloss": nn.CrossEntropyLoss,
+    "mseloss": nn.MSELoss,
+    "adam": optim.Adam,
+    "sgd": optim.SGD,
+    "resize": transforms.Resize,
+    "totensor": transforms.ToTensor,
+    "centercrop": transforms.CenterCrop,
+    "basicblock": torchvision.models.resnet.BasicBlock,
+    "bottleneck": torchvision.models.resnet.Bottleneck
 }
 
 def dynamic_class_loader(module_path: str, class_name: str):
@@ -60,6 +82,19 @@ def convert_block_to_module(block: Block, parameters: Iterator[nn.Parameter] = N
 
     # 각 블록 타입에 따른 객체 생성 처리 함수로 리팩터링
     return create_instance(block, cls, valid_args, parameters)
+
+def convert_block_to_obj(block: CanvasBlock) -> Any:
+    # 유효한 파라미터만 사용하도록 필터링
+    args_dict = {arg.name: arg.value for arg in block.args}
+    valid_args, ignored_args, missing_args = validate_params(MODULE_MAP[block.name], args_dict)
+
+    if ignored_args:
+        logger.warning(f"Ignored invalid arguments for {block.name}: {ignored_args}")
+
+    if missing_args:
+        raise ValueError(f"Missing required arguments for {block.name}: {missing_args}")
+
+    return MODULE_MAP[block.name.lower()](**args_dict)
 
 def create_instance(block: Block, cls, valid_args: Dict[str, Any], parameters: Iterator[nn.Parameter] = None):
     """ 블록 타입에 따라 적절한 객체를 생성합니다. """

@@ -1,3 +1,4 @@
+from src.domain.deploy.enums import ApiStatus
 from src.response.schemas import ImmutableBaseModel
 
 class ApiInformation(ImmutableBaseModel):
@@ -6,3 +7,8 @@ class ApiInformation(ImmutableBaseModel):
     checkpoint: str
     uri: str
     description: str
+    status: ApiStatus
+
+class ApiInformationList(ImmutableBaseModel):
+    api_list: list[ApiInformation]
+    total_size: int

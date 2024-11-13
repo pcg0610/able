@@ -1,0 +1,36 @@
+{
+    "name": "bottleneck",
+    "type": "module",
+    "args": [
+        {
+            "name": "inplanes",
+            "value": null,
+            "is_required": true
+        },
+        {
+          "name": "planes",
+          "value": null,
+          "is_required": true
+        },
+        {
+          "name": "stride",
+          "value": 1,
+          "is_required": false
+        },
+        {
+          "name": "groups",
+          "value": 1,
+          "is_required": false
+        },
+        {
+          "name": "base_width",
+          "value": 64,
+          "is_required": false
+        },
+        {
+          "name": "dilation",
+          "value": 1,
+          "is_required": false
+        }
+    ]
+}

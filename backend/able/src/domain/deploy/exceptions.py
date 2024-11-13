@@ -15,7 +15,7 @@ class AlreadyStopException(BaseCustomException):
             detail=f"실행중이 아닙니다.."
         )
 
-class AlreadyExistApiException(BaseCustomException):
+class AlreadyExistsApiException(BaseCustomException):
     def __init__(self):
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
