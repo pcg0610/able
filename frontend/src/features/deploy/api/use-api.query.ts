@@ -10,6 +10,8 @@ const fetchApiLists = async (page: number, pageSize: number) => {
       params: { page, pageSize },
     });
 
+    console.log('호출됨' + response.status);
+
     if (response.status == 204) {
       return null;
     }

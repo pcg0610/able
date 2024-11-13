@@ -38,6 +38,19 @@ const stopApi = async ({ uri, page }: { uri: string; page: number }): Promise<vo
   }
 };
 
+const removeApi = async ({ uri, page }: { uri: string; page: number }): Promise<void> => {
+  try {
+    const response = await axiosInstance.delete(`/deploy/apis?uri=${encodeURIComponent(uri)}`);
+
+    if (response.status !== 200) {
+      throw new Error('API 삭제 실패');
+    }
+  } catch (error) {
+    console.error('Failed to fetch apiLists:', error);
+    throw error;
+  }
+};
+
 export const useRegisterAPI = () => {
   const queryClient = useQueryClient();
 
@@ -53,6 +66,16 @@ export const useStopApi = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: stopApi,
+    onSuccess: (_, { page }) => {
+      queryClient.invalidateQueries({ queryKey: deployKey.list(page, 5) });
+    },
+  });
+};
+
+export const useRemoveApi = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: removeApi,
     onSuccess: (_, { page }) => {
       queryClient.invalidateQueries({ queryKey: deployKey.list(page, 5) });
     },
