@@ -1,16 +1,16 @@
 import styled from '@emotion/styled';
 
+import Common from '@/shared/styles/common';
+
 export const LogContainer = styled.div`
-  background-color: #f8f9fa;
+  background-color: ${Common.colors.background};
   padding: 1rem;
-  border-radius: 8px;
-  height: 300px;
+  border-radius: 0.5rem;
+  /* height: ; */
   overflow-y: auto;
-  font-family: monospace;
 `;
 
 export const LogText = styled.pre`
-  font-size: 0.85rem;
-  color: #333;
+  font-size: ${Common.fontSizes.xs};
   white-space: pre-wrap;
 `;
