@@ -6,7 +6,17 @@ from pathlib import Path
 from src.domain.deploy import repository as deploy_repository
 from src.domain.deploy.enums import DeployStatus, ApiStatus
 from src.domain.deploy.schema.response import GetApisResponse
-from src.domain.deploy.exceptions import AlreadyRunException, AlreadyStopException, AlreadyExistsApiException
+from src.domain.deploy.exceptions import (
+    AlreadyRunException,
+    AlreadyStopException,
+    AlreadyExistsApiException,
+    MetadataCreationException,
+    RouterCreationException,
+    MainFileUpdateException,
+    ServerStopException,
+    ProcessTerminationException,
+    FileDeletionException
+)
 from src.domain.deploy.utils import *
 from src.utils import logger
 
@@ -43,11 +53,9 @@ class DeployService:
             logger.info("Server successfully stopped.")
             return True
         except psutil.NoSuchProcess:
-            logger.warning(f"No process with PID {pid} found.")
-            return False
+            raise ProcessTerminationException(pid)
         except Exception as e:
-            logger.error(f"Error stopping server: {e}")
-            return False
+            raise ServerStopException(str(e))
 
     def _terminate_process_tree(self, pid: int):
         parent_process = psutil.Process(pid)
@@ -67,16 +75,17 @@ class DeployService:
 
         api_metadata = request.model_dump()
         api_metadata["status"] = ApiStatus.RUNNING.value
-        if not self.repository.create_router_metadata(path_name, api_metadata):
-            raise Exception(f"Failed to create metadata file for '{path_name}'")
 
         router_content = generate_router_content(request)
         if not self.repository.create_router(path_name, router_content):
-            raise Exception(f"Failed to create router file for '{path_name}'")
+            raise RouterCreationException(path_name)
 
         include_statement = generate_include_statement(path_name)
         if not self._update_main_file(include_statement):
-            raise Exception("Failed to update main.py with new router.")
+            raise MainFileUpdateException()
+
+        if not self.repository.create_router_metadata(path_name, api_metadata):
+            raise MetadataCreationException(path_name)
 
         return True
 
@@ -84,15 +93,20 @@ class DeployService:
         path_name = format_path_name(uri)
 
         if not self.repository.delete_router(path_name):
-            logger.error(f"Failed to delete router file for '{path_name}'")
-            return False
-
-        self.repository.update_router_metadata(path_name, ApiStatus.STOP)
+            raise FileDeletionException(f"{path_name}.py")
 
         include_statement = generate_include_statement(path_name)
         if not self._update_main_file(include_statement, add=False):
-            raise Exception("Failed to update main.py to remove router.")
+            raise MainFileUpdateException()
 
+        self.repository.update_router_metadata(path_name, ApiStatus.STOP)
+
+        return True
+
+    def remove_api(self, uri: str) -> bool:
+        path_name = format_path_name(uri)
+        if not self.repository.delete_router_metadata(path_name):
+            raise FileDeletionException(f"{path_name}.json")
         return True
 
     def _update_main_file(self, include_statement: str, add: bool = True) -> bool:
@@ -120,12 +134,7 @@ class DeployService:
 
             return True
         except Exception as e:
-            logger.error(f"Failed to update main.py: {e}")
-            return False
-
-    def remove_api(self, uri: str) -> bool:
-        path_name = format_path_name(uri)
-        return self.repository.delete_router_metadata(path_name)
+            raise MainFileUpdateException() from e
 
     def get_apis(self, page: int, page_size: int) -> GetApisResponse:
         total_pages, apis = self.repository.get_apis(page, page_size)

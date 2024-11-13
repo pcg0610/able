@@ -28,34 +28,41 @@ def restart(
     service.run()
     return accepted()
 
-@router.post("/apis")
+@router.post(
+    path="/apis",
+    response_model=ResponseModel[RegisterApiResponse],
+)
 def register_api(
     request: RegisterApiRequest,
     service: DeployService = Depends(get_deploy_service)
 ) -> Response:
-    result=RegisterApiResponse(is_success=service.register_api(request))
-    return ok(data=result)
+    return ok(data=RegisterApiResponse(is_success=service.register_api(request)))
 
-@router.put("/apis")
+@router.put(
+    path="/apis",
+    response_model=ResponseModel[StopApiResponse],
+)
 def stop_api(
         uri: str,
         service: DeployService = Depends(get_deploy_service)
 ) -> Response:
-    result=StopApiResponse(is_success=service.stop_api(uri))
-    return ok(data=result)
+    return ok(data=StopApiResponse(is_success=service.stop_api(uri)))
 
 
-@router.delete("/apis")
+@router.delete(
+    path="/apis",
+    response_model=ResponseModel[RemoveApiResponse],
+)
 def remove_api(
         uri: str,
         service: DeployService = Depends(get_deploy_service)
 ) -> Response:
-    result=RemoveApiResponse(is_success=service.remove_api(uri))
-    return ok(data=result)
+    return ok(data=RemoveApiResponse(is_success=service.remove_api(uri)))
 
-@router.get("/apis",
-            response_model=ResponseModel[GetApisResponse],
-            summary="배포된 API 리스트 조회", description="")
+@router.get(
+    path="/apis",
+    response_model=ResponseModel[GetApisResponse],
+    summary="배포된 API 리스트 조회")
 def get_apis(
         page: int = 0,
         page_size: int = 10,
