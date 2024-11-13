@@ -5,7 +5,7 @@ import psutil
 from pathlib import Path
 from src.domain.deploy import repository as deploy_repository
 from src.domain.deploy.enums import DeployStatus, ApiStatus
-from src.domain.deploy.schema.dto import ApiInformationList
+from src.domain.deploy.schema.response import GetApisResponse
 from src.domain.deploy.exceptions import AlreadyRunException, AlreadyStopException, AlreadyExistsApiException
 from src.domain.deploy.utils import *
 from src.utils import logger
@@ -107,7 +107,7 @@ class DeployService:
                 content = main_file.read()
 
             if add:
-                content = content.replace("pass", include_statement + "pass")
+                content = content.replace("pass", include_statement + "\npass")
             else:
                 if include_statement in content:
                     content = content.replace(include_statement, "")
@@ -127,5 +127,6 @@ class DeployService:
         path_name = format_path_name(uri)
         return self.repository.delete_router_metadata(path_name)
 
-    def get_apis(self, page: int, page_size: int) -> ApiInformationList:
-        return self.repository.get_apis(page, page_size)
+    def get_apis(self, page: int, page_size: int) -> GetApisResponse:
+        total_pages, apis = self.repository.get_apis(page, page_size)
+        return GetApisResponse(total_pages=total_pages, apis=apis)

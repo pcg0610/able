@@ -1,12 +1,9 @@
 import json
 from pathlib import Path
-from typing import Optional, List, Union
 
-from multipart import file_path
-
+from math import ceil
 from src.domain.deploy.enums import ApiStatus
-from src.domain.deploy.schema.dto import ApiInformation, ApiInformationList
-from src.domain.deploy.schema.request import RegisterApiRequest
+from src.domain.deploy.schema.dto import ApiInformation
 from src.file.utils import get_file, create_file, remove_file, get_files
 from src.file.path_manager import PathManager
 from src.utils import str_to_json, json_to_str, handle_pagination
@@ -70,15 +67,16 @@ class DeployRepository:
         return False
 
     # ------ API List Retrieval ------
-
-    def get_apis(self, page: int, page_size: int) -> ApiInformationList:
+    def get_apis(self, page: int, page_size: int) -> tuple[int, list[ApiInformation]]:
         api_files = [f for f in get_files(self.path_manager.deploy_path) if f != 'metadata.json']
-        paginated_files = handle_pagination(api_files, page, page_size)
+        total_size = len(api_files)
 
-        return ApiInformationList(
-            api_list=[ApiInformation(**str_to_json(get_file(self.path_manager.deploy_path / api)))for api in paginated_files],
-            total_size=len(api_files)
-        )
+        if total_size == 0:
+            return 0, []
+
+        total_pages = ceil(total_size / page_size)
+        paginated_files = handle_pagination(api_files, page, page_size)
+        return total_pages, [ApiInformation(**str_to_json(get_file(self.path_manager.deploy_path / api))) for api in paginated_files]
 
     # ------ Helper Methods ------
     def _get_router_metadata_path(self, path_name: str) -> Path:

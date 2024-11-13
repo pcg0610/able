@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, Response
 
 from src.domain.deploy.dependencies import get_deploy_service
-from src.domain.deploy.schema.response import StopApiResponse, RegisterApiResponse, RemoveApiResponse
+from src.domain.deploy.schema.response import StopApiResponse, RegisterApiResponse, RemoveApiResponse, \
+    GetApisResponse
 from src.domain.deploy.service import DeployService
 from src.domain.deploy.schema.request import RegisterApiRequest
 from src.response.utils import accepted, ok, no_content, bad_request
 from src.response.schemas import ResponseModel
-from src.domain.deploy.schema.dto import ApiInformationList
 
 deploy_router = router = APIRouter()
 
@@ -54,7 +54,7 @@ def remove_api(
     return ok(data=result)
 
 @router.get("/apis",
-            response_model=ResponseModel[ApiInformationList],
+            response_model=ResponseModel[GetApisResponse],
             summary="배포된 API 리스트 조회", description="")
 def get_apis(
         page: int = 0,
@@ -62,8 +62,8 @@ def get_apis(
         service: DeployService = Depends(get_deploy_service)
 ) -> Response:
     result = service.get_apis(page, page_size)
-    if result.api_list is None:
-        return bad_request()
-    if len(result.api_list) == 0:
+
+    if len(result.apis) == 0:
         return no_content()
+
     return ok(data=result)
