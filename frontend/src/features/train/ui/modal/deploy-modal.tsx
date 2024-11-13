@@ -2,48 +2,49 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useProjectNameStore } from '@entities/project/model/project.model';
+import { useFetchCheckpointList } from '@features/train/api/use-result.query';
 import type { Option } from '@shared/types/common.type';
 
 import Modal from '@shared/ui/modal/modal';
 import Input from '@shared/ui/input/input';
 import DropDown from '@shared/ui/dropdown/dropdown';
 
-interface DeviceSelectModalProps {
+interface DeployModalProps {
    onClose: () => void;
-   onSubmit: (deviceIndex: number) => void;
+   onSubmit: () => void;
 }
 
-const DeployModal = ({ onClose, onSubmit }: DeviceSelectModalProps) => {
-   const { projectName, resultName, epochName, setEpochName } = useProjectNameStore();
+const DeployModal = ({ onClose, onSubmit }: DeployModalProps) => {
+   const { projectName, resultName } = useProjectNameStore();
    const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+   const [apiPath, setApiPath] = useState('');
+   const [apiDescription, setApiDescription] = useState('');
+   const { data: checkpointData } = useFetchCheckpointList(projectName, resultName);
 
-   const options: Option[] = [
-      { value: '10.0', label: 'CUDA 10.0', canSelect: true },
-      { value: '10.1', label: 'CUDA 10.1', canSelect: true },
-      { value: '10.2', label: 'CUDA 10.2', canSelect: false }, // 선택 불가 예시
-      { value: '11.0', label: 'CUDA 11.0', canSelect: true },
-      { value: '11.1', label: 'CUDA 11.1', canSelect: true },
-      { value: '11.2', label: 'CUDA 11.2', canSelect: true },
-      { value: '12.0', label: 'CUDA 12.0', canSelect: true }
-   ];
+   const checkpoints = checkpointData?.checkpoints ?? [];
 
-   const [device, setDevice] = useState<{ index: number; name: string }>({
-      index: -1,
-      name: '',
-   });
+   const options = checkpoints.map((checkpoint) => ({
+      value: checkpoint,
+      label: checkpoint,
+   }));
 
    const handleSelect = (option: Option) => {
       setSelectedOption(option);
    };
 
 
-   const handleConfigChange = (newDevice: { index: number; name: string }) => {
-      setDevice(newDevice);
+   const handleApiPath = (apiPath: string) => {
+      setApiPath(apiPath);
    };
 
+   const handleApiDescription = (apiDescription: string) => {
+      setApiDescription(apiDescription);
+   };
+
+
    const handleSubmit = () => {
-      if (device.name) {
-         onSubmit(device.index);
+      if (apiPath && apiDescription && selectedOption) {
+         onSubmit();
          onClose();
          return;
       }
@@ -62,13 +63,13 @@ const DeployModal = ({ onClose, onSubmit }: DeviceSelectModalProps) => {
             label="API 경로"
             placeholder="ex) /api/v1/model"
             value={''}
-            onChange={(e) => handleConfigChange('epoch', 123)}
+            onChange={(e) => handleApiPath(e.target.value)}
          />
          <Input
             label="설명"
             placeholder="API에 대한 설명을 입력하세요"
             value={''}
-            onChange={(e) => handleConfigChange('epoch', 123)}
+            onChange={(e) => handleApiDescription(e.target.value)}
          />
       </Modal>
    );
