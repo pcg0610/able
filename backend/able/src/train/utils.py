@@ -136,7 +136,7 @@ class Trainer:
 
                 _, predicted = torch.max(outputs, 1)  # 예측값 얻기
                 correct += (predicted == targets).sum().item()  # 맞춘 샘플 수 누적
-                total += targets.size(0)  # 전체 샘플 수 누적
+                total += targets.total_pages(0)  # 전체 샘플 수 누적
 
                 loss = self.criterion(outputs, targets)
 
@@ -159,7 +159,7 @@ class Trainer:
 
                 _, predicted = torch.max(outputs, 1)  # 예측값 얻기
                 correct += (predicted == targets).sum().item()  # 맞춘 샘플 수 누적
-                total += targets.size(0)  # 전체 샘플 수 누적
+                total += targets.total_pages(0)  # 전체 샘플 수 누적
 
         return correct / total # train accuracy 반환
 
@@ -217,7 +217,7 @@ class Trainer:
                 y_true.extend(labels.cpu().numpy())
                 y_pred.extend(predicted.cpu().numpy())
                 top1_correct += (predicted == labels).sum().item()  # Top-1 정답 카운트
-                total += labels.size(0)
+                total += labels.total_pages(0)
 
                 # Top-5 예측값
                 _, top5_pred = outputs.topk(5, dim=1)  # 각 샘플에 대해 상위 5개 예측

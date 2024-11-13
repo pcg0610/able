@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from pathlib import Path
@@ -7,8 +8,8 @@ from fastapi import FastAPI, WebSocket
 import argparse
 
 from starlette.websockets import WebSocketDisconnect, WebSocketState
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
+from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers.polling import PollingObserver
 
 def read_log_file():
     with open(log_file_path, "r") as file:
@@ -21,24 +22,30 @@ async def send_updates(message):
         if client.client_state == WebSocketState.CONNECTED:
             await client.send_text(message)
 
-class LogHandler(FileSystemEventHandler):
-    def __init__(self):
-        super().__init__()
+class LogFileHandler(PatternMatchingEventHandler):
+    def __init__(self, loop: asyncio.AbstractEventLoop):
+        super().__init__(patterns=[str(log_file_path)], ignore_directories=True)
+        self.loop = loop
 
     def on_modified(self, event):
-        # 로그 파일이 변경될 때 이벤트가 발생
         if event.src_path == str(log_file_path):
-            logs = read_log_file()
-            asyncio.run(send_updates(logs))
+            with open(log_file_path, "r") as file:
+                new_logs = file.read()
+                # 연결된 모든 클라이언트로 전송
+                asyncio.run_coroutine_threadsafe(send_updates(new_logs), self.loop)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    log_handler = LogHandler()
-    observer = Observer()
+    loop = asyncio.get_running_loop()
+    log_handler = LogFileHandler(loop)
+    observer = PollingObserver(timeout=3.0)
     observer.schedule(log_handler, path=str(log_file_path.parent), recursive=False)
     observer.start()
 
     yield
+
+    observer.stop()
+    observer.join()
 
 connected_clients: list[WebSocket] = []
 log_file_path = Path(__file__).parent / "server.log"
@@ -50,7 +57,6 @@ if log_file_path.exists():
 app = FastAPI(lifespan=lifespan)
 
 pass
-
 
 @app.websocket("/ws/logs")
 async def websocket_endpoint(websocket: WebSocket):
@@ -109,4 +115,4 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    uvicorn.run(app=app, host="127.0.0.1", port=args.port, log_config=args.log_config)
+    uvicorn.run(app=app, host="0.0.0.0", port=args.port, log_config=args.log_config)
