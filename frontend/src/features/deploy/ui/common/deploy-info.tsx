@@ -1,12 +1,15 @@
 import * as S from '@features/deploy/ui/common/deploy-into.style';
 
 import RocketIcon from '@icons/rocket.svg?react';
+import { useFetchDeployInfo } from '../../api/use-deploy.query';
 
 interface InfoContainerProps {
   title: string;
 }
 
 const InfoContainer = ({ title }: InfoContainerProps) => {
+  const { data: deployInfo } = useFetchDeployInfo();
+
   return (
     <S.InfoWrapper>
       <S.TitleSection>
@@ -16,16 +19,16 @@ const InfoContainer = ({ title }: InfoContainerProps) => {
       <S.InfoSection>
         <S.InfoText>
           <S.Label>FastAPI</S.Label>
-          <S.Value>0.33.1</S.Value>
+          <S.Value>{deployInfo?.apiVersion}</S.Value>
         </S.InfoText>
         <S.InfoText>
           <S.Label>Port</S.Label>
-          <S.Value>8080</S.Value>
+          <S.Value>{deployInfo?.port}</S.Value>
         </S.InfoText>
         <S.InfoText>
           <S.Label>Status</S.Label>
           <S.Value>
-            <S.Status>running</S.Status>
+            <S.Status>{deployInfo?.status}</S.Status>
           </S.Value>
         </S.InfoText>
       </S.InfoSection>
