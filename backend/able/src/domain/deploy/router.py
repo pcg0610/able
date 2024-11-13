@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response
 
 from src.domain.deploy.dependencies import get_deploy_service
 from src.domain.deploy.schema.response import StopApiResponse, RegisterApiResponse, RemoveApiResponse, \
-    GetApisResponse
+    GetApisResponse, DeployInfoResponse
 from src.domain.deploy.service import DeployService
 from src.domain.deploy.schema.request import RegisterApiRequest
 from src.response.utils import accepted, ok, no_content, bad_request
@@ -66,4 +66,11 @@ def get_apis(
     if len(result.apis) == 0:
         return no_content()
 
+    return ok(data=result)
+
+@router.get("/info",
+            response_model=ResponseModel[DeployInfoResponse],
+            summary="정보")
+def get_info(service: DeployService = Depends(get_deploy_service)) -> Response:
+    result = service.get_info()
     return ok(data=result)

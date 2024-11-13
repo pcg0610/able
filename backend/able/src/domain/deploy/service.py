@@ -5,7 +5,7 @@ import psutil
 from pathlib import Path
 from src.domain.deploy import repository as deploy_repository
 from src.domain.deploy.enums import DeployStatus, ApiStatus
-from src.domain.deploy.schema.response import GetApisResponse
+from src.domain.deploy.schema.response import GetApisResponse, DeployInfoResponse
 from src.domain.deploy.exceptions import AlreadyRunException, AlreadyStopException, AlreadyExistsApiException
 from src.domain.deploy.utils import *
 from src.utils import logger
@@ -130,3 +130,11 @@ class DeployService:
     def get_apis(self, page: int, page_size: int) -> GetApisResponse:
         total_pages, apis = self.repository.get_apis(page, page_size)
         return GetApisResponse(total_pages=total_pages, apis=apis)
+    
+    def get_info(self):
+        metadata = self.repository.get_metadata()
+        return DeployInfoResponse(
+            api_version=metadata["api_version"],
+            port=metadata["port"],
+            status=metadata["status"]
+        )
