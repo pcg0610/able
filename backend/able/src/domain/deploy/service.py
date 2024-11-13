@@ -1,12 +1,10 @@
-import os
 import sys
 import subprocess
-from time import sleep
-
 import psutil
 
+from pathlib import Path
 from src.domain.deploy import repository as deploy_repository
-from src.domain.deploy.enums import DeployStatus
+from src.domain.deploy.enums import DeployStatus, ApiStatus
 from src.domain.deploy.schema.dto import ApiInformation
 from src.domain.deploy.schema.request import RegisterApiRequest
 from src.domain.deploy.exceptions import AlreadyRunException, AlreadyStopException, AlreadyExistApiException
@@ -16,14 +14,14 @@ class DeployService:
 
     def __init__(self, repository: deploy_repository):
         self.repository = repository
-        from pathlib import Path
         self.BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent / "deploy_server/src"
         self.ROUTER_DIR = self.BASE_DIR / "routers"
         self.MAIN_FILE_PATH = self.BASE_DIR / "main.py"
 
     def run(self) -> bool:
         metadata = self.repository.get_metadata()
-        if metadata["status"] == DeployStatus.RUNNING.value:
+
+        if metadata["pid"] is not None:
             raise AlreadyRunException()
 
         process = subprocess.Popen([sys.executable, self.MAIN_FILE_PATH])
@@ -33,18 +31,35 @@ class DeployService:
 
     def stop(self) -> bool:
         metadata = self.repository.get_metadata()
-        if metadata["status"] == DeployStatus.STOP.value:
+        pid = metadata.get("pid")
+
+        if pid is None:
             raise AlreadyStopException()
 
-        pid = metadata.get("pid")
         if pid:
-            process = psutil.Process(pid)
-            process.terminate()
-            process.wait()
+            try:
+                parent_process = psutil.Process(pid)
 
-        metadata.update({"status": DeployStatus.STOP.value, "pid": None})
-        self.repository.update_metadata(metadata)
-        return True
+                for child in parent_process.children(recursive=True):
+                    child.terminate()
+                psutil.wait_procs(parent_process.children(), timeout=5)
+
+                parent_process.terminate()
+                parent_process.wait(timeout=5)
+
+                metadata.update({"status": DeployStatus.STOP.value, "pid": None})
+                self.repository.update_metadata(metadata)
+                print("Server successfully stopped.")
+                return True
+            except psutil.NoSuchProcess:
+                print(f"No process with PID {pid} found.")
+                return False
+            except Exception as e:
+                print(f"Error stopping server: {e}")
+                return False
+        else:
+            print("No PID found in metadata.")
+            return False
 
     def register_api(self, request: RegisterApiRequest) -> bool:
         path_name = request.uri.strip("/").replace("/", "_")
@@ -53,11 +68,13 @@ class DeployService:
         if router_file_path.exists():
             raise AlreadyExistApiException()
 
-        if not self.repository.create_router_metadata_file(path_name, request):
+        router_metadata_content = request.model_dump()
+        router_metadata_content.update({"status": ApiStatus.RUNNING.value})
+        if not self.repository.create_router_metadata(path_name, router_metadata_content):
             raise Exception(f"Failed to create metadata file for '{path_name}'")
 
         router_content = self.generate_router_content(request)
-        if not self.repository.create_router_file(router_file_path, router_content):
+        if not self.repository.create_router(router_file_path, router_content):
             raise Exception(f"Failed to create router file for '{path_name}'")
 
         include_statement = f'from deploy_server.src.routers.{path_name} import router as {path_name}_router\napp.include_router({path_name}_router)\n'
@@ -66,24 +83,28 @@ class DeployService:
 
         return True
 
-    def remove_api(self, uri: str) -> bool:
+    def stop_api(self, uri: str) -> bool:
         path_name = uri.strip("/").replace("/", "_")
         file_path = self.ROUTER_DIR / f"{path_name}.py"
-        json_path = self.repository.path_manager.get_deploy_path() / f"{path_name}.json"
-
-        if not self.repository.delete_metadata_file(json_path):
-            raise Exception(f"Failed to delete metadata file '{json_path}'")
 
         if file_path.exists():
             try:
                 file_path.unlink()
                 logger.info(f"Deleted router file: {file_path}")
+                self.repository.update_router_metadata(path_name, ApiStatus.STOP)
             except Exception as e:
                 logger.error(f"Error deleting router file '{file_path}': {e}")
                 return False
 
         include_statement = f'from deploy_server.src.routers.{path_name} import router as {path_name}_router\napp.include_router({path_name}_router)\n'
-        return self.update_main_file(include_statement, add=False)
+        if not self.update_main_file(include_statement, add=False):
+            raise Exception("Failed to update main.py")
+
+        return True
+
+    def remove_api(self, uri: str) -> bool:
+        path_name = uri.strip("/").replace("/", "_")
+        return self.repository.delete_router_metadata(path_name)
 
     def update_main_file(self, include_statement: str, add: bool = True) -> bool:
 
@@ -100,7 +121,9 @@ class DeployService:
             if add:
                 content = content.replace("pass", include_statement + "pass")
             else:
-                content = content.replace(include_statement, "")
+                if include_statement in content:
+                    content = content.replace(include_statement, "")
+
             with self.MAIN_FILE_PATH.open("w", encoding="utf-8") as main_file:
                 main_file.write(content)
 

@@ -1,6 +1,9 @@
 import json
+from importlib.metadata import metadata
 
 from pathlib import Path
+
+from src.domain.deploy.enums import ApiStatus
 from src.file.utils import get_file, create_file, remove_file, get_files
 from src.file.path_manager import PathManager
 from src.domain.deploy.schema.dto import ApiInformation
@@ -28,15 +31,30 @@ class DeployRepository:
     def update_metadata(self, data: dict):
         create_file(self.METADATA_PATH, json_to_str(data))
 
-    def create_router_metadata_file(self, path_name: str, request: RegisterApiRequest) -> bool:
+    def get_router_metadata(self, path_name: str) -> dict:
         metadata_path = self.path_manager.get_deploy_path() / f"{path_name}.json"
-        return create_file(metadata_path, json_to_str(request))
+        return str_to_json(get_file(metadata_path))
 
-    def create_router_file(self, path_name: str, content: str) -> bool:
+    def create_router_metadata(self, path_name: str, data: dict) -> bool:
+        metadata_path = self.path_manager.get_deploy_path() / f"{path_name}.json"
+        return create_file(metadata_path, json_to_str(data))
+
+    def update_router_metadata(self, path_name: str, status: ApiStatus) -> bool:
+        metadata_path = self.path_manager.get_deploy_path() / f"{path_name}.json"
+        metadata = self.get_router_metadata(path_name)
+        metadata.update({"status": status.value})
+        return create_file(metadata_path, json_to_str(metadata))
+
+
+    def delete_router_metadata(self, path_name: str) -> bool:
+        file_path = self.path_manager.get_deploy_path() / f"{path_name}.json"
+        return remove_file(file_path)
+
+    def create_router(self, path_name: str, content: str) -> bool:
         file_path = self.ROUTER_DIR_PATH / f"{path_name}.py"
         return create_file(file_path, content)
 
-    def delete_router_file(self, path_name: str) -> bool:
+    def delete_router(self, path_name: str) -> bool:
         file_path = self.path_manager.deploy_path / f"{path_name}.py"
         return remove_file(file_path)
 
