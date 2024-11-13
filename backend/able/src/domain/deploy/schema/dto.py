@@ -8,3 +8,7 @@ class ApiInformation(ImmutableBaseModel):
     uri: str
     description: str
     status: ApiStatus
+
+class ApiInformationList(ImmutableBaseModel):
+    api_list: list[ApiInformation]
+    total_size: int

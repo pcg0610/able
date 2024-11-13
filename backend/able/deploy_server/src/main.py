@@ -97,6 +97,6 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     # uvicorn 서버를 asyncio 이벤트 루프에서 실행
-    config = uvicorn.Config(app=app, host="127.0.0.1", port=args.port, log_config=args.log_config)
+    config = uvicorn.Config(app=app, host="0.0.0.0", port=args.port, log_config=args.log_config)
     server = uvicorn.Server(config)
     loop.run_until_complete(server.serve())
