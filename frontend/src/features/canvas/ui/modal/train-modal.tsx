@@ -16,7 +16,7 @@ const TrainModal = ({ onClose, onSubmit }: TrainModalProps) => {
   const [trainConfig, setTrainConfig] = useState<TrainConfig>({
     epoch: null,
     batchSize: null,
-    device: { index: -1, name: '' },
+    device: { index: -1, name: '', status: 'not_in_use' },
   });
 
   const handleConfigChange = <T extends keyof TrainConfig>(label: T, value: TrainConfig[T]) => {

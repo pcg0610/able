@@ -31,18 +31,18 @@ export const InfoSection = styled.div`
 
 export const InfoText = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  width: 10rem;
 `;
 
 export const Label = styled.span`
   color: ${Common.colors.gray300};
+  width: 6rem;
 `;
 
 export const Value = styled.span`
-  color: ${Common.colors.black};
+  color: ${Common.colors.gray400};
 `;
 
 export const Status = styled.span`
-  color: green;
+  color: ${Common.colors.primary};
 `;
