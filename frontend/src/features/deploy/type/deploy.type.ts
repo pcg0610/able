@@ -8,6 +8,20 @@ export interface ApiSchema {
   description: string;
 }
 
+export interface ApiResponse {
+  projectName: string;
+  trainResult: string;
+  checkpoint: string;
+  uri: string;
+  description: string;
+  status: string;
+}
+
+export interface ApiListResponse {
+  apis: ApiResponse[];
+  totalPages: number;
+}
+
 export interface DeployConfig {
   apiPath: string;
   apiDescription: string;
