@@ -34,4 +34,5 @@ export const CellIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 1.875rem;
 `;

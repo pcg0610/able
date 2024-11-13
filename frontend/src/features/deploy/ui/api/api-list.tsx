@@ -1,3 +1,5 @@
+import toast from 'react-hot-toast';
+
 import { ApiResponse } from '@features/deploy/type/deploy.type';
 import { ApiListWrapper, ApiRow, ApiCell, CellIcon } from '@/features/deploy/ui/api/api-list.style';
 import { useStopApi, useRemoveApi } from '@features/deploy/api/use-api.mutation';
@@ -16,9 +18,23 @@ const ApiList = ({ apis, page }: ApiListProps) => {
 
    const handleApi = (uri: string, status: string) => {
       if (status === "running") {
-         stopApi({ uri, page });
+         stopApi({ uri, page }, {
+            onSuccess: () => {
+               toast.success("API가 중지되었습니다.");
+            },
+            onError: () => {
+               toast.error("에러가 발생했습니다.");
+            }
+         });
       } else {
-         removeApi({ uri, page });
+         removeApi({ uri, page }, {
+            onSuccess: () => {
+               toast.success("API가 삭제되었습니다.");
+            },
+            onError: () => {
+               toast.error("에러가 발생했습니다.");
+            }
+         });
       }
    };
 

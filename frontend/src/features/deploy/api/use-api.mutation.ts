@@ -67,7 +67,7 @@ export const useStopApi = () => {
   return useMutation({
     mutationFn: stopApi,
     onSuccess: (_, { page }) => {
-      queryClient.invalidateQueries({ queryKey: deployKey.list(page, 5) });
+      queryClient.invalidateQueries({ queryKey: deployKey.list(page - 1, 5) });
     },
   });
 };
@@ -77,7 +77,7 @@ export const useRemoveApi = () => {
   return useMutation({
     mutationFn: removeApi,
     onSuccess: (_, { page }) => {
-      queryClient.invalidateQueries({ queryKey: deployKey.list(page, 5) });
+      queryClient.invalidateQueries({ queryKey: deployKey.list(page - 1, 5) });
     },
   });
 };
