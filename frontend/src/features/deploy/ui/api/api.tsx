@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import * as S from '@features/deploy/ui/api/api.style';
-import type { ApiListItem } from '@features/deploy/type/deploy.type';
+import type { ApiListItem } from '@features/deploy/types/deploy.type';
 
 import InfoContainer from '@features/deploy/ui/common/deploy-info';
 import ApiList from '@features/deploy/ui/api/api-list';
