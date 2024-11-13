@@ -8,7 +8,6 @@ export const SidebarContainer = styled.div`
   padding: 0.625rem 0rem;
   background-color: ${Common.colors.white};
   width: 3.75rem;
-  box-shadow: 0.125rem 0 0.3125rem rgba(73, 73, 73, 0.1);
   border-right: 0.0625rem solid rgba(0, 0, 0, 0.1);
 `;
 

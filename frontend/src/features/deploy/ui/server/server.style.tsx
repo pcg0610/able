@@ -3,8 +3,8 @@ import styled from '@emotion/styled';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
+  height: 100%;
   gap: 1rem;
-  font-family: Arial, sans-serif;
 `;
 
 export const TopSection = styled.div`
