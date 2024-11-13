@@ -15,7 +15,7 @@ const Server = () => {
   const { mutate: stopServer } = useStopServer();
   const { mutate: restartServer } = useRestartServer();
 
-  const { data: deployInfo } = useFetchDeployInfo();
+  const { data: deployInfo, isLoading } = useFetchDeployInfo();
   const isRunning = deployInfo?.status === 'running';
 
   const handleStart = () => {
@@ -36,7 +36,9 @@ const Server = () => {
         <InfoContainer title="Server" />
         <S.ButtonWrapper>
           <BasicButton
-            backgroundColor={isRunning ? Common.colors.gray200 : Common.colors.primary}
+            backgroundColor={
+              isLoading ? Common.colors.gray200 : isRunning ? Common.colors.gray200 : Common.colors.primary
+            }
             text="START"
             width="8.125rem"
             height="3rem"
@@ -44,7 +46,9 @@ const Server = () => {
             onClick={handleStart}
           />
           <BasicButton
-            backgroundColor={isRunning ? Common.colors.primary : Common.colors.gray200}
+            backgroundColor={
+              isLoading ? Common.colors.gray200 : isRunning ? Common.colors.primary : Common.colors.gray200
+            }
             text="RESTART"
             width="8.125rem"
             height="3rem"
@@ -52,7 +56,7 @@ const Server = () => {
             onClick={handleRestart}
           />
           <BasicButton
-            backgroundColor={isRunning ? Common.colors.red : Common.colors.gray200}
+            backgroundColor={isLoading ? Common.colors.gray200 : isRunning ? Common.colors.red : Common.colors.gray200}
             text="STOP"
             width="8.125rem"
             height="3rem"
