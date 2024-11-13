@@ -77,7 +77,7 @@ const CanvasResult = () => {
 
   const handleCreateModel = (deviceIndex: number) => {
     if (deviceIndex === null) {
-      toast.error("디바이스를 선택해 주세요.");
+      toast.error('디바이스를 선택해 주세요.');
       return;
     }
     console.log(deviceIndex);
@@ -95,11 +95,11 @@ const CanvasResult = () => {
             heatmapImage: data.image,
             classScores: data.classScores,
           });
-          toast.success("추론에 성공했습니다.");
+          toast.success('추론에 성공했어요.');
           handleFieldChange(heatMapId, data.image);
         },
         onError: () => {
-          toast.error("추론에 실패했습니다.");
+          toast.error('추론에 실패했어요.');
         },
       }
     );
@@ -107,7 +107,7 @@ const CanvasResult = () => {
 
   const handleNodeClick = (blockId: string) => {
     setAutoFit(false);
-    if (blockId === "0") {
+    if (blockId === '0') {
       return;
     }
 
@@ -134,12 +134,12 @@ const CanvasResult = () => {
         nds.map((node) =>
           node.id === nodeId
             ? {
-              ...node,
-              data: {
-                ...node.data,
-                featureMap: image,
-              },
-            }
+                ...node,
+                data: {
+                  ...node.data,
+                  featureMap: image,
+                },
+              }
             : node
         )
       );
@@ -235,7 +235,7 @@ const CanvasResult = () => {
           <BasicButton
             text="추론하기"
             icon={<PlayIcon width={13} height={15} />}
-            width='10rem'
+            width="10rem"
             onClick={handleRunButtonClick}
           />
         </PositionedButton>

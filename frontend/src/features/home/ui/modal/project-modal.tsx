@@ -67,7 +67,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         {
           onSuccess: (data) => {
             if (data) {
-              toast.success("프로젝트가 생성되었습니다.");
+              toast.success('프로젝트를 만들었어요.');
               onClose();
             }
           },
@@ -84,7 +84,7 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         {
           onSuccess: (data) => {
             if (data) {
-              toast.success("프로젝트 정보가 수정되었습니다.");
+              toast.success('프로젝트 정보를 수정했어요.');
               onClose();
             }
           },
@@ -99,16 +99,16 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
       {
         onSuccess: (data) => {
           if (data) {
-            toast.success("프로젝트가 삭제되었습니다.");
+            toast.success('프로젝트를 삭제했어요.');
             onClose();
           } else {
-            toast.error("오류가 발생했습니다.");
+            toast.error('오류가 발생했어요.');
             onClose();
           }
         },
       }
     );
-  }
+  };
 
   return (
     <Modal
@@ -142,18 +142,16 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         placeholder=".exe"
         onChange={(e) => setPythonKernelPath(e.target.value)}
       />
-      {isReadOnly ? <Input
-        label="쿠다 버전"
-        defaultValue={currentProject?.cudaVersion}
-        readOnly={isReadOnly}
-        className={'readonly'}
-      /> :
-        <DropDown
+      {isReadOnly ? (
+        <Input
           label="쿠다 버전"
-          options={options}
-          onSelect={handleSelect}
+          defaultValue={currentProject?.cudaVersion}
+          readOnly={isReadOnly}
+          className={'readonly'}
         />
-      }
+      ) : (
+        <DropDown label="쿠다 버전" options={options} onSelect={handleSelect} />
+      )}
     </Modal>
   );
 };
