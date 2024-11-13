@@ -8,12 +8,14 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
 from typing import Iterator, Any
 
+from torchvision.models.resnet import Bottleneck
+
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
 from src.block.schemas import Block, Arg
-from src.block.utils import convert_block_to_module
+from src.block.utils import convert_block_to_obj
 from src.canvas.schemas import Edge, CanvasBlock, Canvas
 from src.train.enums import TrainStatus
 
@@ -134,7 +136,7 @@ class Trainer:
 
                 _, predicted = torch.max(outputs, 1)  # 예측값 얻기
                 correct += (predicted == targets).sum().item()  # 맞춘 샘플 수 누적
-                total += targets.size(0)  # 전체 샘플 수 누적
+                total += targets.total_pages(0)  # 전체 샘플 수 누적
 
                 loss = self.criterion(outputs, targets)
 
@@ -157,7 +159,7 @@ class Trainer:
 
                 _, predicted = torch.max(outputs, 1)  # 예측값 얻기
                 correct += (predicted == targets).sum().item()  # 맞춘 샘플 수 누적
-                total += targets.size(0)  # 전체 샘플 수 누적
+                total += targets.total_pages(0)  # 전체 샘플 수 누적
 
         return correct / total # train accuracy 반환
 
@@ -215,7 +217,7 @@ class Trainer:
                 y_true.extend(labels.cpu().numpy())
                 y_pred.extend(predicted.cpu().numpy())
                 top1_correct += (predicted == labels).sum().item()  # Top-1 정답 카운트
-                total += labels.size(0)
+                total += labels.total_pages(0)
 
                 # Top-5 예측값
                 _, top5_pred = outputs.topk(5, dim=1)  # 각 샘플에 대해 상위 5개 예측
@@ -284,45 +286,45 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def create_data_preprocessor(transform_blocks: list[Block]) -> Compose:
-    return Compose([convert_block_to_module(transform_block) for transform_block in transform_blocks])
+def create_data_preprocessor(transform_blocks: list[CanvasBlock]) -> Compose:
+    return Compose([convert_block_to_obj(transform_block) for transform_block in transform_blocks])
 
-def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
+def convert_layer_block_to_module(layer_block: CanvasBlock) -> nn.Module | None:
 
     if layer_block.type != BlockType.LAYER:
         return None
 
-    return convert_block_to_module(layer_block)
+    return convert_block_to_obj(layer_block)
 
-def convert_activation_block_to_module(layer_block: Block) -> nn.Module | None:
+def convert_activation_block_to_module(activation_block: CanvasBlock) -> nn.Module | None:
 
-    if layer_block.type != BlockType.ACTIVATION:
+    if activation_block.type != BlockType.ACTIVATION:
         return None
 
-    return convert_block_to_module(layer_block)
+    return convert_block_to_obj(activation_block)
 
-def convert_criterion_block_to_module(loss_block: Block) -> nn.Module | None:
+def convert_criterion_block_to_module(loss_block: CanvasBlock) -> nn.Module | None:
 
     if loss_block.type != BlockType.LOSS:
         return None
 
-    return convert_block_to_module(loss_block)
+    return convert_block_to_obj(loss_block)
 
-def convert_optimizer_block_to_optimizer(optimizer_block: Block, parameters: Iterator[nn.Parameter]) -> optim.Optimizer | None:
+def convert_optimizer_block_to_optimizer(optimizer_block: CanvasBlock, parameters: Iterator[nn.Parameter]) -> optim.Optimizer | None:
 
     if optimizer_block.type != BlockType.OPTIMIZER:
         return None
 
     optimizer_block.args.append(Arg(name="params", value=parameters, is_required=True))
 
-    return convert_block_to_module(optimizer_block)
+    return convert_block_to_obj(optimizer_block)
 
-def convert_operation_block_to_module(operation_block: Block) -> nn.Module | None:
+def convert_operation_block_to_module(operation_block: CanvasBlock) -> nn.Module | None:
 
     if operation_block.type != BlockType.OPERATION:
         return None
 
-    return convert_block_to_module(operation_block)
+    return convert_block_to_obj(operation_block)
 
 def topological_sort(blocks: list[CanvasBlock], edges: list[Edge]) -> list[CanvasBlock]:
     graph = defaultdict(list)
@@ -350,19 +352,22 @@ def topological_sort(blocks: list[CanvasBlock], edges: list[Edge]) -> list[Canva
     return list(sorted_blocks)
 
 class UserModel(nn.Module):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(UserModel, self).__init__()
         self.layers = nn.Sequential()
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     def forward(self, x):
         return self.layers(x)
 
 def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -> nn.Module | None:
-    # sorted_blocks = topological_sort(blocks, edges)
+    sorted_blocks = topological_sort(blocks, edges)
 
     model = UserModel()
 
-    for block in blocks:
+    for block in sorted_blocks:
         if block.type == BlockType.LAYER:
             module = convert_layer_block_to_module(block)
         elif block.type == BlockType.ACTIVATION:
@@ -401,41 +406,40 @@ def split_blocks(blocks: list[Block]) -> tuple[
     return data_block, transform_blocks, loss_blocks, optimizer_blocks, others
 
 def filter_blocks_connected_to_data(
-        data_block: Block | None,
-        transform_blocks: list[Block],
-        loss_blocks: list[Block],
-        optimizer_blocks: list[Block],
-        others: list[Block],
+        blocks: list[CanvasBlock],
         edges: list[Edge]
-) -> tuple[list[Block], list[Block], list[Block], list[Block]]:
+) -> list[CanvasBlock] | None:
     """
     그래프의 루트인 데이터 블록과 연결된 블록들만 반환하는 함수
     """
-    adj_blocks = defaultdict(list)
-    is_connected = set()
+    data_block = None
+    for block in blocks:
+        if block.type == BlockType.DATA:
+            data_block = block
+            break
+
+    if data_block is None:
+        return None
+
+    adj_dict = defaultdict(list)
 
     for edge in edges:
-        adj_blocks[edge.source].append(edge.target)
+        adj_dict[edge.source].append(edge.target)
 
-    q = deque([data_block.id])
-    is_connected.add(data_block.id)
+    q = deque()
+    q.append(data_block.id)
+
+    conn_block_id_set = set()
+    conn_block_id_set.add(data_block.id)
 
     while q:
-        block_id = q.popleft()
-        for adj_block_id in adj_blocks.get(block_id, []):
-            if adj_block_id not in is_connected:
-                is_connected.add(adj_block_id)
-                q.append(adj_block_id)
+        cur_id = q.popleft()
 
-    def filter_connected(blocks: list[Block]) -> list[Block]:
-        return [block for block in blocks if block.id in is_connected]
+        for next_id in adj_dict[cur_id]:
+            q.append(next_id)
+            conn_block_id_set.add(next_id)
 
-    return (
-        filter_connected(transform_blocks),
-        filter_connected(loss_blocks),
-        filter_connected(optimizer_blocks),
-        filter_connected(others)
-    )
+    return [block for block in blocks if block.id in conn_block_id_set]
 
 def filter_edges_from_block_connected_data(blocks: list[Block], edges: list[Edge]) -> list[Edge]:
     block_id = set(block.id for block in blocks)
@@ -445,7 +449,7 @@ def filter_edges_from_block_connected_data(blocks: list[Block], edges: list[Edge
 def save_result_block_graph(project_name: str, result: str, blocks: list[CanvasBlock], edges: list[Edge]):
 
     block_graph_path = path_manager.get_train_result_path(project_name, result) / BLOCK_GRAPH
-    if create_file(block_graph_path, json_to_str(Canvas(blocks=blocks, edges=edges))):
+    if create_file(block_graph_path, Canvas(blocks=blocks, edges=edges).model_dump_json()):
         return True
 
     raise
@@ -501,8 +505,8 @@ def find_data_path(data_block: CanvasBlock):
             return arg.value
     return None
 
-def filter_model_edge(blocks: list[Block], edges: list[Edge]) -> list[Edge]:
-    model_block_set = set(block.id for block in blocks if block.type == BlockType.LAYER or block.type == BlockType.OPERATION)
+def filter_model_edge(model_blocks: list[CanvasBlock], edges: list[Edge]) -> list[Edge]:
+    model_block_set = set(block.id for block in model_blocks)
 
     return [edge for edge in edges if edge.source in model_block_set and edge.target in model_block_set]
 

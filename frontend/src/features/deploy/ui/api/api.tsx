@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import * as S from '@features/deploy/ui/api/api.style'
+import * as S from '@features/deploy/ui/api/api.style';
 
 import InfoContainer from '@features/deploy/ui/common/deploy-info';
 import ApiList from '@features/deploy/ui/api/api-list';
@@ -15,7 +15,7 @@ const Api = () => {
   return (
     <S.Container>
       <S.TopSection>
-        <InfoContainer />
+        <InfoContainer title="API Routes" />
       </S.TopSection>
       <S.List>
         <ApiList apis={apiData?.apis || []} page={currentPage} />
@@ -26,7 +26,7 @@ const Api = () => {
         />
       </S.List>
     </S.Container>
-  )
+  );
 };
 
 export default Api;

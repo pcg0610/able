@@ -6,7 +6,6 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: space-between;
   gap: 4.375rem;
-  font-family: Arial, sans-serif;
 `;
 
 export const TopSection = styled.div`

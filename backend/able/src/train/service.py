@@ -3,7 +3,7 @@ from . import TrainRequest
 from src.train.schemas import TrainResultResponse, EpochResult, Loss, Accuracy
 from .utils import *
 from src.file.path_manager import PathManager
-from src.file.utils import validate_file_format, get_file, create_directory
+from src.file.utils import get_file, create_directory
 from src.utils import encode_image_to_base64
 from src.file.utils import read_image_file
 from typing import List
@@ -25,40 +25,43 @@ async def train_in_background(request: TrainRequest):
 
 def train(request: TrainRequest):
 
-    data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks = split_blocks(request.canvas.blocks)
+    blocks_connected_to_data = filter_blocks_connected_to_data(request.canvas.blocks, request.canvas.edges)
 
-    if isinstance(data_block, CanvasBlock):
-        data_block: CanvasBlock = data_block
+    if blocks_connected_to_data is None:
+        raise Exception("유효하지 않은 그래프")
+
+    data_block, transform_blocks, loss_blocks, optimizer_blocks, model_blocks = split_blocks(blocks_connected_to_data)
 
     if data_block is None:
         raise ValueError("Data block is required but was not found.")
 
+    if isinstance(data_block, CanvasBlock):
+        data_block: CanvasBlock = data_block
+
     data_path = find_data_path(data_block)
 
-    # if not validate_file_format(data_path, "json"):
-    #     raise Exception()
-
-    transform_blocks_conn, loss_blocks_conn, optimizer_blocks_conn, other_blocks_conn = filter_blocks_connected_to_data(
-        data_block, transform_blocks, loss_blocks, optimizer_blocks, other_blocks, request.canvas.edges
-    )
-
     # 학습에서 사용하는 간선 추출
-    blocks_connected_to_data: list[Block] = [data_block, *transform_blocks_conn, *loss_blocks_conn, *optimizer_blocks_conn, *other_blocks_conn]
-    canvas_blocks = convert_canvas_blocks(blocks_connected_to_data)
-    edges = filter_edges_from_block_connected_data(canvas_blocks, request.canvas.edges)
+    edges = filter_edges_from_block_connected_data(blocks_connected_to_data, request.canvas.edges)
 
-    edges_model = filter_model_edge(other_blocks_conn, edges)
+    model_blocks = [block for block in model_blocks if isinstance(block, CanvasBlock)]
+    edges_model = filter_model_edge(model_blocks, edges)
 
-    transform_pipeline = create_data_preprocessor(transform_blocks)
-
-    dataset = create_dataset(data_path, transform_pipeline)
-    model = convert_block_graph_to_model([block for block in other_blocks_conn if isinstance(block, CanvasBlock)], edges_model)
+    model = convert_block_graph_to_model(model_blocks, edges_model)
 
     if model is None:
         raise Exception()
 
+    # 손실함수 블록 변환
     criterion = convert_criterion_block_to_module(loss_blocks[0])
+
+    if criterion is None:
+        raise Exception("손실함수가 없습니다.")
+
+    # 최적화 블록 변환
     optimizer = convert_optimizer_block_to_optimizer(optimizer_blocks[0], model.parameters())
+
+    if optimizer is None:
+        raise Exception("최적화 모듈이 없습니다.")
 
     # TrainLogger 초기화 전 디렉터리 생성
     project_name = request.project_name
@@ -70,16 +73,23 @@ def train(request: TrainRequest):
     create_directory(result_path)
     create_directory(epochs_path)
 
+    # 전처리 파이프라인 블록 변환
+    transform_pipeline = create_data_preprocessor(transform_blocks)
+
+    # 전처리 파이프라인 저장
+    save_transform_pipeline(project_name, result_name, transform_pipeline)
+
+    # 데이터셋 가져오기
+    dataset = create_dataset(data_path, transform_pipeline)
+
     # 데이터셋 메타데이터 저장
     save_metadata(project_name, result_name, data_block, dataset.classes)
 
     # 학습 모델 그래프 저장
-    save_result_block_graph(request.project_name, result_name, canvas_blocks, edges)
+    save_result_block_graph(request.project_name, result_name, blocks_connected_to_data, edges)
 
     # 하이퍼 파라미터 정보 저장 (hyper_parameters.json)
     save_result_hyper_parameter(request.project_name, result_name, request.batch_size, request.epoch)
-
-    save_transform_pipeline(project_name, result_name, transform_pipeline)
 
     device = 'cpu'
     if request.device.index != -1:

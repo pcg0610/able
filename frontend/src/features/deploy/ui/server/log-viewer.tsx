@@ -1,15 +1,51 @@
+import { useEffect, useRef, useState } from 'react';
 import { LogContainer, LogText } from '@features/deploy/ui/server/log-viewer.style';
+import Spinner from '@/shared/ui/loading/spinner';
 
 const LogViewer = () => {
-   return (
-      <LogContainer>
-         <LogText>
-            {/* 여기에 로그 내용을 추가하세요 */}
-            2024-10-23 09:49:22 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:11.5.2...
-            {/* ... */}
-         </LogText>
-      </LogContainer>
-   );
+  const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL;
+  const ws = useRef<WebSocket | null>(null);
+  const logRef = useRef<HTMLDivElement | null>(null);
+  const [logs, setLogs] = useState<string>('');
+
+  useEffect(() => {
+    const connectWebSocket = () => {
+      ws.current = new WebSocket(websocketUrl);
+
+      ws.current.onopen = () => {
+        setLogs('');
+      };
+
+      ws.current.onmessage = (event) => {
+        setLogs(event.data);
+      };
+
+      ws.current.onclose = () => {
+        setLogs('WebSocket Disconnected');
+        setTimeout(connectWebSocket, 5000);
+      };
+
+      ws.current.onerror = () => {
+        setLogs('WebSocket connection error occurred.');
+      };
+    };
+
+    connectWebSocket();
+
+    return () => {
+      if (ws.current && ws.current.readyState === 1) {
+        ws.current.close();
+      }
+    };
+  }, [websocketUrl]);
+
+  useEffect(() => {
+    if (logRef.current) {
+      logRef.current.scrollTop = logRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+  return <LogContainer ref={logRef}>{logs ? <LogText>{logs}</LogText> : <Spinner height={5} />}</LogContainer>;
 };
 
 export default LogViewer;
