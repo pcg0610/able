@@ -5,7 +5,7 @@ import psutil
 from pathlib import Path
 from src.domain.deploy import repository as deploy_repository
 from src.domain.deploy.enums import DeployStatus, ApiStatus
-from src.domain.deploy.schema.dto import ApiInformation
+from src.domain.deploy.schema.dto import ApiInformationList
 from src.domain.deploy.exceptions import AlreadyRunException, AlreadyStopException, AlreadyExistsApiException
 from src.domain.deploy.utils import *
 from src.utils import logger
@@ -127,5 +127,5 @@ class DeployService:
         path_name = format_path_name(uri)
         return self.repository.delete_router_metadata(path_name)
 
-    def get_apis(self, page: int, page_size: int) -> list[ApiInformation]:
+    def get_apis(self, page: int, page_size: int) -> ApiInformationList:
         return self.repository.get_apis(page, page_size)
