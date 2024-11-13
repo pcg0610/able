@@ -1,5 +1,6 @@
 import * as S from '@features/deploy/ui/server/server.style';
 import Common from '@shared/styles/common';
+import { useRestartServer, useStartServer, useStopServer } from '@features/deploy/api/use-server.mutation';
 
 import InfoContainer from '@features/deploy/ui/common/deploy-info';
 import LogViewer from '@features/deploy/ui/server/log-viewer';
@@ -9,6 +10,22 @@ import RestartIcon from '@icons/restart.svg?react';
 import StopIcon from '@icons/stop.svg?react';
 
 const Server = () => {
+  const { mutate: startServer } = useStartServer();
+  const { mutate: stopServer } = useStopServer();
+  const { mutate: restartServer } = useRestartServer();
+
+  const handleStart = () => {
+    startServer();
+  };
+
+  const handleRestart = () => {
+    restartServer();
+  };
+
+  const handleStop = () => {
+    stopServer();
+  };
+
   return (
     <S.Container>
       <S.TopSection>
@@ -20,9 +37,7 @@ const Server = () => {
             width="8.125rem"
             height="3rem"
             icon={<PlayIcon width={13} height={15} />}
-            onClick={() => {
-              console.log('시작 버튼 클릭됨');
-            }}
+            onClick={handleStart}
           />
           <BasicButton
             backgroundColor={Common.colors.primary}
@@ -30,9 +45,7 @@ const Server = () => {
             width="8.125rem"
             height="3rem"
             icon={<RestartIcon width={24} height={24} />}
-            onClick={() => {
-              console.log('다시시작 버튼 클릭됨');
-            }}
+            onClick={handleRestart}
           />
           <BasicButton
             backgroundColor={Common.colors.red}
@@ -40,9 +53,7 @@ const Server = () => {
             width="8.125rem"
             height="3rem"
             icon={<StopIcon width={30} height={30} />}
-            onClick={() => {
-              console.log('멈춤 버튼 클릭됨');
-            }}
+            onClick={handleStop}
           />
         </S.ButtonWrapper>
       </S.TopSection>
