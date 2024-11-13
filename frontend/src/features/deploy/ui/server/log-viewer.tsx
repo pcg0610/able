@@ -4,7 +4,7 @@ import { LogContainer, LogText } from '@features/deploy/ui/server/log-viewer.sty
 const LogViewer = () => {
   const ws = useRef<WebSocket | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
-  const [logs, setLogs] = useState<string>();
+  const [logs, setLogs] = useState<string>('...');
 
   useEffect(() => {
     const connectWebSocket = () => {

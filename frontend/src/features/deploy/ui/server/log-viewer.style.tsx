@@ -6,7 +6,7 @@ export const LogContainer = styled.div`
   background-color: ${Common.colors.background};
   padding: 1rem;
   border-radius: 0.5rem;
-  /* height: ; */
+  height: 100%;
   overflow-y: auto;
 `;
 
