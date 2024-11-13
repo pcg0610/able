@@ -9,6 +9,7 @@ const deployKey = {
     uri,
     descriptioon,
   ],
+  list: (page: number, pageSize: number) => [...deployKey.default, 'list', page, pageSize],
 };
 
 export default deployKey;

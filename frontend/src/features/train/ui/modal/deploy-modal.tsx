@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useProjectNameStore } from '@entities/project/model/project.model';
 import { useFetchCheckpointList } from '@features/train/api/use-result.query';
 import type { Option } from '@shared/types/common.type';
+import type { DeployConfig } from '@features/deploy/type/deploy.type';
 
 import Modal from '@shared/ui/modal/modal';
 import Input from '@shared/ui/input/input';
@@ -11,7 +12,7 @@ import DropDown from '@shared/ui/dropdown/dropdown';
 
 interface DeployModalProps {
    onClose: () => void;
-   onSubmit: () => void;
+   onSubmit: (data: DeployConfig) => void;
 }
 
 const DeployModal = ({ onClose, onSubmit }: DeployModalProps) => {
@@ -44,7 +45,7 @@ const DeployModal = ({ onClose, onSubmit }: DeployModalProps) => {
 
    const handleSubmit = () => {
       if (apiPath && apiDescription && selectedOption) {
-         onSubmit();
+         onSubmit({ apiPath, apiDescription, selectedOption });
          onClose();
          return;
       }
@@ -62,13 +63,13 @@ const DeployModal = ({ onClose, onSubmit }: DeployModalProps) => {
          <Input
             label="API 경로"
             placeholder="ex) /api/v1/model"
-            value={''}
+            value={apiPath}
             onChange={(e) => handleApiPath(e.target.value)}
          />
          <Input
             label="설명"
             placeholder="API에 대한 설명을 입력하세요"
-            value={''}
+            value={apiDescription}
             onChange={(e) => handleApiDescription(e.target.value)}
          />
       </Modal>

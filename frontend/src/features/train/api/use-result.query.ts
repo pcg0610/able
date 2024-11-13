@@ -39,7 +39,6 @@ export const useFetchCheckpointList = (projectName: string, resultName: string) 
     queryKey: trainKey.checkpoint(projectName, resultName),
     queryFn: async () => {
       const response = await fetchCheckpointList(projectName, resultName);
-      console.log('dsdas', response.data);
       return response.data;
     },
   });
