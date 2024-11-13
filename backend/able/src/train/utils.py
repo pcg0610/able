@@ -8,12 +8,14 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
 from typing import Iterator, Any
 
+from torchvision.models.resnet import Bottleneck
+
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
 from src.block.schemas import Block, Arg
-from src.block.utils import convert_block_to_module
+from src.block.utils import convert_block_to_obj
 from src.canvas.schemas import Edge, CanvasBlock, Canvas
 from src.train.enums import TrainStatus
 
@@ -284,45 +286,45 @@ def create_data_loader(dataset: Dataset, batch_size: int) -> DataLoader:
 def split_dataset(dataset: Dataset) -> list[Subset[Any]]:
     return random_split(dataset, [0.6, 0.2, 0.2])
 
-def create_data_preprocessor(transform_blocks: list[Block]) -> Compose:
-    return Compose([convert_block_to_module(transform_block) for transform_block in transform_blocks])
+def create_data_preprocessor(transform_blocks: list[CanvasBlock]) -> Compose:
+    return Compose([convert_block_to_obj(transform_block) for transform_block in transform_blocks])
 
-def convert_layer_block_to_module(layer_block: Block) -> nn.Module | None:
+def convert_layer_block_to_module(layer_block: CanvasBlock) -> nn.Module | None:
 
     if layer_block.type != BlockType.LAYER:
         return None
 
-    return convert_block_to_module(layer_block)
+    return convert_block_to_obj(layer_block)
 
-def convert_activation_block_to_module(layer_block: Block) -> nn.Module | None:
+def convert_activation_block_to_module(activation_block: CanvasBlock) -> nn.Module | None:
 
-    if layer_block.type != BlockType.ACTIVATION:
+    if activation_block.type != BlockType.ACTIVATION:
         return None
 
-    return convert_block_to_module(layer_block)
+    return convert_block_to_obj(activation_block)
 
-def convert_criterion_block_to_module(loss_block: Block) -> nn.Module | None:
+def convert_criterion_block_to_module(loss_block: CanvasBlock) -> nn.Module | None:
 
     if loss_block.type != BlockType.LOSS:
         return None
 
-    return convert_block_to_module(loss_block)
+    return convert_block_to_obj(loss_block)
 
-def convert_optimizer_block_to_optimizer(optimizer_block: Block, parameters: Iterator[nn.Parameter]) -> optim.Optimizer | None:
+def convert_optimizer_block_to_optimizer(optimizer_block: CanvasBlock, parameters: Iterator[nn.Parameter]) -> optim.Optimizer | None:
 
     if optimizer_block.type != BlockType.OPTIMIZER:
         return None
 
     optimizer_block.args.append(Arg(name="params", value=parameters, is_required=True))
 
-    return convert_block_to_module(optimizer_block)
+    return convert_block_to_obj(optimizer_block)
 
-def convert_operation_block_to_module(operation_block: Block) -> nn.Module | None:
+def convert_operation_block_to_module(operation_block: CanvasBlock) -> nn.Module | None:
 
     if operation_block.type != BlockType.OPERATION:
         return None
 
-    return convert_block_to_module(operation_block)
+    return convert_block_to_obj(operation_block)
 
 def topological_sort(blocks: list[CanvasBlock], edges: list[Edge]) -> list[CanvasBlock]:
     graph = defaultdict(list)
@@ -350,9 +352,12 @@ def topological_sort(blocks: list[CanvasBlock], edges: list[Edge]) -> list[Canva
     return list(sorted_blocks)
 
 class UserModel(nn.Module):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(UserModel, self).__init__()
         self.layers = nn.Sequential()
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     def forward(self, x):
         return self.layers(x)
