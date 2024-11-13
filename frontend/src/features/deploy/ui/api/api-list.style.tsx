@@ -9,11 +9,11 @@ export const ApiListWrapper = styled.table`
   font-size: 14px;
   color: ${Common.colors.gray400};
   table-layout: fixed;
+  height: 100%;
 `;
 
 export const ApiRow = styled.tr`
   border-top: 1px solid ${Common.colors.gray100};
-  cursor: pointer;
   color: ${Common.colors.gray500};
 
   &:last-of-type {
@@ -25,5 +25,14 @@ export const ApiCell = styled.td`
   padding: 12px;
   text-align: center;
   width: ${({ width }) => width || 'auto'};
-  min-height: 3.125rem;
+  height: 3.4375rem;
+  align-items: center; 
+`;
+
+export const CellIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.875rem;
+  cursor: pointer;
 `;
