@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { LogContainer, LogText } from '@features/deploy/ui/server/log-viewer.style';
+import Spinner from '@/shared/ui/loading/spinner';
 
 const LogViewer = () => {
+  const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL;
   const ws = useRef<WebSocket | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
-  const [logs, setLogs] = useState<string>('...');
+  const [logs, setLogs] = useState<string>('');
 
   useEffect(() => {
     const connectWebSocket = () => {
-      ws.current = new WebSocket('ws://localhost:8088/ws/logs');
+      ws.current = new WebSocket(websocketUrl);
 
       ws.current.onopen = () => {
-        console.log('WebSocket Connected');
+        setLogs('');
       };
 
       ws.current.onmessage = (event) => {
@@ -19,12 +21,12 @@ const LogViewer = () => {
       };
 
       ws.current.onclose = () => {
-        console.log('WebSocket Disconnected');
+        setLogs('WebSocket Disconnected');
         setTimeout(connectWebSocket, 5000);
       };
 
-      ws.current.onerror = (error) => {
-        console.error('WebSocket Error:', error);
+      ws.current.onerror = () => {
+        setLogs('WebSocket connection error occurred.');
       };
     };
 
@@ -35,7 +37,7 @@ const LogViewer = () => {
         ws.current.close();
       }
     };
-  }, []);
+  }, [websocketUrl]);
 
   useEffect(() => {
     if (logRef.current) {
@@ -43,11 +45,7 @@ const LogViewer = () => {
     }
   }, [logs]);
 
-  return (
-    <LogContainer ref={logRef}>
-      <LogText>{logs}</LogText>
-    </LogContainer>
-  );
+  return <LogContainer ref={logRef}>{logs ? <LogText>{logs}</LogText> : <Spinner height={5} />}</LogContainer>;
 };
 
 export default LogViewer;
