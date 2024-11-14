@@ -1,26 +1,5 @@
 {
     "name": "crossentropy",
     "type": "loss",
-    "args": [
-        {
-            "name": "weight",
-            "value": null,
-            "is_required": false
-        },
-        {
-            "name": "size_average",
-            "value": true,
-            "is_required": false
-        },
-        {
-            "name": "ignore_index",
-            "value": -100,
-            "is_required": false
-        },
-        {
-            "name": "reduce",
-            "value": true,
-            "is_required": false
-        }
-    ]
+    "args": []
 }

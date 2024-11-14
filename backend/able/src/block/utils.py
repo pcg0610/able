@@ -8,7 +8,7 @@ from torch import nn, optim
 from torch.fx import GraphModule
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from src.block.enums import BlockType
+from src.block.enums import BlockType, ArgType
 from src.block.schemas import Block
 from src.canvas.schemas import CanvasBlock
 
@@ -87,7 +87,7 @@ def convert_block_to_module(block: Block, parameters: Iterator[nn.Parameter] = N
 def convert_block_to_obj(block: CanvasBlock) -> Any:
     # 유효한 파라미터만 사용하도록 필터링
     block_name = block.name.lower()
-    args_dict = {arg.name: arg.value for arg in block.args}
+    args_dict = {arg.name: convert_arg_type(arg.value, arg.type) for arg in block.args}
     valid_args, ignored_args, missing_args = validate_params(MODULE_MAP[block_name], args_dict)
 
     if ignored_args:
@@ -155,3 +155,13 @@ def validate_params(cls, args: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str
             missing_args.append(param_name)
 
     return valid_args, ignored_args, missing_args
+
+def convert_arg_type(arg, arg_type):
+    if arg_type == ArgType.INT:
+        return int(arg)
+    elif arg_type == ArgType.FLOAT:
+        return float(arg)
+    elif arg_type == ArgType.BOOL:
+        return bool(arg)
+    else:
+        return None

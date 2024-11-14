@@ -5,6 +5,7 @@
         {
             "name": "size",
             "value": null,
+            "type": "int",
             "is_required": true
         }
     ]
