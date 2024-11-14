@@ -3,11 +3,9 @@ import toast from 'react-hot-toast';
 
 import { useProjectStore } from '@entities/project/model/project.model';
 import { useCreateProject, useUpdateProject, useDeleteProject } from '@features/home/api/use-home.mutation';
-import type { Option } from '@shared/types/common.type';
 
 import Modal from '@shared/ui/modal/modal';
 import Input from '@shared/ui/input/input';
-import DropDown from '@shared/ui/dropdown/dropdown';
 
 interface ProjectModalProps {
   onClose: () => void;
@@ -19,41 +17,21 @@ interface ProjectModalProps {
 const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModalProps) => {
   const isReadOnly = type === 'modify';
   const { currentProject } = useProjectStore();
-  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
   const [projectTitle, setProjectTitle] = useState(currentProject?.title || '');
   const [projectDescription, setProjectDescription] = useState(currentProject?.description || '');
-  const [projectCudaVersion, setProjectCudaVersion] = useState(currentProject?.cudaVersion || '');
-  const [pythonKernelPath, setPythonKernelPath] = useState(currentProject?.pythonKernelPath || '');
   const { mutate: createProject } = useCreateProject();
   const { mutate: updateProject } = useUpdateProject();
   const { mutate: deleteProject } = useDeleteProject();
-
-  const options = [
-    { value: 'option0', label: 'Option 0' },
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' },
-    { value: 'option3', label: 'Option 3' },
-    { value: 'option4', label: 'Option 4' },
-    { value: 'option5', label: 'Option 5' },
-  ];
 
   useEffect(() => {
     if (isReadOnly && currentProject) {
       setProjectTitle(currentProject.title || '');
       setProjectDescription(currentProject.description || '');
-      setProjectCudaVersion(currentProject.cudaVersion || '');
-      setPythonKernelPath(currentProject.pythonKernelPath || '');
     } else {
       setProjectTitle('');
       setProjectDescription('');
-      setProjectCudaVersion('');
-      setPythonKernelPath('');
     }
   }, [isReadOnly, currentProject]);
-
-  const handleSelect = (option: Option) => {
-    setSelectedOption(option);
-  };
 
   const handleCreateProject = () => {
     if (!isReadOnly) {
@@ -61,8 +39,6 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         {
           title: projectTitle,
           description: projectDescription,
-          cudaVersion: selectedOption?.label || options[0].label,
-          pythonKernelPath: pythonKernelPath,
         },
         {
           onSuccess: (data) => {
@@ -134,24 +110,6 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
         placeholder={isReadOnly ? '' : '2-50자 이내로 입력해주세요.'}
         onChange={(e) => setProjectDescription(e.target.value)}
       />
-      <Input
-        label="파이썬 커널 경로"
-        defaultValue={isReadOnly ? currentProject?.pythonKernelPath : ''}
-        readOnly={isReadOnly}
-        className={isReadOnly ? 'readonly' : ''}
-        placeholder=".exe"
-        onChange={(e) => setPythonKernelPath(e.target.value)}
-      />
-      {isReadOnly ? (
-        <Input
-          label="쿠다 버전"
-          defaultValue={currentProject?.cudaVersion}
-          readOnly={isReadOnly}
-          className={'readonly'}
-        />
-      ) : (
-        <DropDown label="쿠다 버전" options={options} onSelect={handleSelect} />
-      )}
     </Modal>
   );
 };

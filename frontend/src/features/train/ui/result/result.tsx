@@ -5,7 +5,7 @@ import * as S from '@features/train/ui/result/result.style';
 import Common from '@shared/styles/common';
 import { useGraphs } from '@features/train/api/use-result.query';
 import { useProjectNameStore } from '@entities/project/model/project.model';
-import type { DeployConfig } from '@features/deploy/type/deploy.type';
+import type { DeployConfig } from '@features/deploy/types/deploy.type';
 import { useRegisterAPI } from '@features/deploy/api/use-api.mutation';
 import { EpochResult } from '@features/train/types/analyze.type';
 
@@ -66,18 +66,18 @@ const Result = () => {
         trainResult: resultName,
         checkpoint: apis.selectedOption.label,
         uri: apis.apiPath,
-        description: apis.apiDescription
+        description: apis.apiDescription,
       },
       {
         onSuccess: (data) => {
           if (data) {
-            toast.success("API 배포가 완료되었습니다.");
+            toast.success('API 배포가 완료되었습니다.');
             handleModalClose();
           }
         },
         onError: () => {
-          toast.error("에러가 발생했습니다.");
-        }
+          toast.error('에러가 발생했습니다.');
+        },
       }
     );
   };
@@ -86,7 +86,6 @@ const Result = () => {
     setLossData(transformLossData(graphs?.epochResult || null));
     setAccuracyData(transformAccuracyData(graphs?.epochResult || null));
   }, [graphs]);
-
 
   return (
     <>
@@ -115,10 +114,7 @@ const Result = () => {
           <div className="bottom-row">
             <S.GraphCard>
               <S.GraphTitle>Confusion Matrix</S.GraphTitle>
-              <S.ConfusionImage
-                src={graphs?.confusionMatrix}
-                alt="Confusion Matrix"
-              />
+              <S.ConfusionImage src={graphs?.confusionMatrix} alt="Confusion Matrix" />
             </S.GraphCard>
             <S.GraphCard>
               <S.F1ScoreTitle>F1-Score</S.F1ScoreTitle>

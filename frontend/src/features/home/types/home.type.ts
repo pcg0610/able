@@ -12,8 +12,6 @@ export interface HistoryResponse {
 export interface Project {
   title: string;
   description: string;
-  cudaVersion: string;
-  pythonKernelPath: string;
   thumbnail?: string;
 }
 

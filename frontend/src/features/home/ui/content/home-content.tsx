@@ -27,7 +27,7 @@ const HomeContent = () => {
   const { projectName } = useProjectNameStore();
   const { currentProject, setCurrentProject } = useProjectStore();
 
-  const { data: project, isLoading, error } = useProjectDetail(projectName);
+  const { data: project } = useProjectDetail(projectName);
   const { data: historyData } = useProjectHistory(projectName, currentPage - 1, size);
 
   const handleCanvasClick = () => {
