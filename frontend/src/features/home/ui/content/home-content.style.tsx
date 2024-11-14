@@ -36,6 +36,7 @@ export const PythonTitle = styled.span`
 
 export const Description = styled.p`
   margin-top: 1rem;
+  min-height: 1.25rem;
   color: ${Common.colors.gray400};
 `;
 

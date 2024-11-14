@@ -31,7 +31,7 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
       <tbody>
         {trainSummaries.length === 0 ? (
           <HistoryRow>
-            <HistoryCell colSpan={4} style={{ height: '17.1875rem', textAlign: 'center', verticalAlign: 'middle' }}>
+            <HistoryCell colSpan={4} style={{ height: '15.6rem', textAlign: 'center', verticalAlign: 'middle' }}>
               데이터가 없습니다
             </HistoryCell>
           </HistoryRow>
