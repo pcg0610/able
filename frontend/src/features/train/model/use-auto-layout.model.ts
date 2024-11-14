@@ -5,7 +5,7 @@ import { getSourceHandlePosition, getTargetHandlePosition } from '@/features/tra
 import layoutAlgorithms from '@features/train/types/algorithm.type';
 
 export type LayoutOptions = {
-  direction: 'TB' | 'LR';
+  direction: 'TB' | 'LR' | 'NOT';
 };
 
 function useAutoLayout(options: LayoutOptions) {
@@ -47,7 +47,10 @@ function useAutoLayout(options: LayoutOptions) {
       setEdges(nextEdges);
     };
 
-    runLayout();
+    if (options.direction !== 'NOT') {
+      runLayout();
+    }
+    return;
   }, [nodesInitialized, elements, options.direction, setNodes, setEdges]);
 }
 

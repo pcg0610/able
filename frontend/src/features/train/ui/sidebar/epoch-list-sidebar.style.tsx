@@ -54,3 +54,12 @@ export const EpochItem = styled.div<{ isSelected: boolean }>`
     background-color: ${Common.colors.gray100};
   }
 `;
+
+export const EmptyMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 1rem;
+  color: #999; /* 원하는 색상으로 설정 */
+`;

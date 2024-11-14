@@ -38,48 +38,46 @@ const ApiList = ({ apis, page }: ApiListProps) => {
       }
    };
 
-   const rows = apis.length < 5 ? [...apis, ...Array(5 - apis.length).fill(null)] : apis;
-
    return (
       <ApiListWrapper>
          <thead>
             <tr>
-               <ApiCell as="th" width="15%">
-                  API경로
-               </ApiCell>
-               <ApiCell as="th" width="30%">
-                  설명
-               </ApiCell>
-               <ApiCell as="th" width="25%">
-                  파라미터
-               </ApiCell>
-               <ApiCell as="th" width="20%">
-                  액션
-               </ApiCell>
+               <ApiCell as="th" width="15%">API경로</ApiCell>
+               <ApiCell as="th" width="30%">설명</ApiCell>
+               <ApiCell as="th" width="25%">파라미터</ApiCell>
+               <ApiCell as="th" width="20%">액션</ApiCell>
             </tr>
          </thead>
          <tbody>
-            {rows.map((item, index) => (
-               item ? (
-                  <ApiRow key={item.uri}>
-                     <ApiCell width="15%">{item.uri}</ApiCell>
-                     <ApiCell width="30%">{item.description}</ApiCell>
-                     <ApiCell width="25%">{item.checkpoint}</ApiCell>
-                     <ApiCell width="20%" onClick={() => handleApi(item.uri, item.status)}>
-                        <CellIcon>
-                           {item.status === "running" ? <StopIcon width={30} height={30} /> : <TrashCanIcon width={24} height={24} />}
-                        </CellIcon>
-                     </ApiCell>
-                  </ApiRow>
-               ) : (
-                  <ApiRow key={`empty-${index}`} style={{ height: '3.125rem' }}>
-                     <ApiCell width="15%"></ApiCell>
-                     <ApiCell width="30%"></ApiCell>
-                     <ApiCell width="25%"></ApiCell>
-                     <ApiCell width="20%"></ApiCell>
-                  </ApiRow>
-               )
-            ))}
+            {apis.length === 0 ? (
+               <ApiRow>
+                  <ApiCell colSpan={4} style={{ height: '17.1875rem', textAlign: 'center', verticalAlign: 'middle' }}>
+                     데이터가 없습니다
+                  </ApiCell>
+               </ApiRow>
+            ) : (
+               Array.from({ length: 5 }).map((_, index) => (
+                  apis[index] ? (
+                     <ApiRow key={apis[index].uri}>
+                        <ApiCell width="15%">{apis[index].uri}</ApiCell>
+                        <ApiCell width="30%">{apis[index].description}</ApiCell>
+                        <ApiCell width="25%">{apis[index].checkpoint}</ApiCell>
+                        <ApiCell width="20%" onClick={() => handleApi(apis[index].uri, apis[index].status)}>
+                           <CellIcon>
+                              {apis[index].status === "running" ? <StopIcon width={30} height={30} /> : <TrashCanIcon width={24} height={24} />}
+                           </CellIcon>
+                        </ApiCell>
+                     </ApiRow>
+                  ) : (
+                     <ApiRow key={`empty-${index}`} style={{ height: '3.125rem' }}>
+                        <ApiCell width="15%"></ApiCell>
+                        <ApiCell width="30%"></ApiCell>
+                        <ApiCell width="25%"></ApiCell>
+                        <ApiCell width="20%"></ApiCell>
+                     </ApiRow>
+                  )
+               ))
+            )}
          </tbody>
       </ApiListWrapper>
    );
