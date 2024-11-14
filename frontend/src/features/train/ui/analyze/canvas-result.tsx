@@ -42,7 +42,7 @@ const defaultEdgeOptions = {
 const CanvasResult = () => {
   const [nodes, setNodes] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [direction, setDirection] = useState<LayoutOptions['direction']>('TB');
+  const [direction, setDirection] = useState<LayoutOptions['direction']>('NOT');
   const [selectedNode, setSelectedNode] = useState<XYFlowNode | null>(null);
 
   const { projectName, resultName, epochName } = useProjectNameStore();
@@ -161,7 +161,7 @@ const CanvasResult = () => {
         return {
           id: block.id,
           type: 'custom',
-          position: { x: 0, y: 0 },
+          position: JSON.parse(block.position),
           data: { block, featureMap: '' },
         };
       });
