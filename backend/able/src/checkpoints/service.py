@@ -24,6 +24,6 @@ def get_paginated_checkpoints(project_name: str, result_name: str, index: int, s
     return CheckpointsPaginatedResponse(checkpoints=page_item, has_next=has_next_page(len(checkpoints), index, size))
 
 def search_checkpoint(project_name: str, result_name:str, keyword: str, index: int, size: int) -> CheckpointsPaginatedResponse:
-    checkpoints = sort_checkpoints(get_checkpoints(project_name, result_name))
+    checkpoints = sort_checkpoints(get_checkpoints(project_name=project_name, result_name=result_name, keyword=keyword))
     page_item = handle_pagination(checkpoints, index, size)
     return CheckpointsPaginatedResponse(checkpoints=page_item, has_next=has_next_page(len(checkpoints), index, size))
