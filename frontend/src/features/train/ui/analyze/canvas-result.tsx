@@ -22,7 +22,7 @@ import { useFetchFeatureMap, useCreateFeatureMap } from '@features/train/api/use
 import { useFeatureNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
 
-import { PositionedButton } from '@features/train/ui/analyze/canvas-result.style';
+import { PositionedButton, LayoutPosition, Divider, Button, LayoutIcon } from '@features/train/ui/analyze/canvas-result.style';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import DeviceSelectModal from '@features/train/ui/modal/device-select-modal';
@@ -81,7 +81,6 @@ const CanvasResult = () => {
       toast.error('디바이스를 선택해 주세요.');
       return;
     }
-    console.log(deviceIndex);
     fetchCreateModel(
       {
         projectName,
@@ -156,7 +155,7 @@ const CanvasResult = () => {
       const { blocks, edges } = canvas.canvas;
 
       const newNodes = blocks.map((block) => {
-        if (block.type === 'activation') {
+        if (block.type === 'activation' && !heatMapId) {
           setHeatMapId(block.id);
         }
         return {
@@ -238,10 +237,15 @@ const CanvasResult = () => {
             onClick={handleRunButtonClick}
           />
         </PositionedButton>
-        <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
-          <button onClick={() => handleLayoutChange('TB')}>Down (TB)</button>
-          <button onClick={() => handleLayoutChange('LR')}>Right (LR)</button>
-        </div>
+        <LayoutPosition>
+          <Button onClick={() => handleLayoutChange('TB')}>
+            <LayoutIcon rotate={0} width={22} height={22} />
+          </Button>
+          <Divider />
+          <Button onClick={() => handleLayoutChange('LR')}>
+            <LayoutIcon rotate={-90} width={22} height={22} />
+          </Button>
+        </LayoutPosition>
       </ReactFlow>
     </>
   );
