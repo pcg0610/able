@@ -50,8 +50,8 @@ export const CanvasWrapper = styled.div`
 `;
 
 export const CanvasImage = styled.img`
-  width: 18rem;
-  height: 12rem;
+  width: 16rem;
+  height: 10rem;
   border-radius: 0.4rem;
   object-fit: cover;
   cursor: pointer;
@@ -61,4 +61,9 @@ export const HistoryWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+`;
+
+export const Text = styled.div`
+  color: ${Common.colors.gray300};
+  font-size: ${Common.fontSizes.sm};
 `;

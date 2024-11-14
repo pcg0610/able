@@ -40,7 +40,7 @@ const HomeContent = () => {
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // 임시로 그냥 바로 닫히게 설정
+    setIsModalOpen(false);
   };
 
   const handleAnimationEnd = () => {
@@ -99,7 +99,7 @@ const HomeContent = () => {
               />
             </S.HistoryWrapper>
           ) : (
-            <div> 데이터가 없습니다 </div>
+            <S.Text>학습한 기록이 없어요</S.Text>
           )}
         </div>
       </S.HomeContentWrapper>
