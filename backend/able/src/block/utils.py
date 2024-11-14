@@ -95,8 +95,7 @@ def convert_block_to_obj(block: CanvasBlock) -> Any:
 
     if missing_args:
         raise ValueError(f"Missing required arguments for {block.name}: {missing_args}")
-
-    return MODULE_MAP[block.name.lower()](**args_dict)
+    return MODULE_MAP[block.name.lower()](**valid_args)
 
 def create_instance(block: Block, cls, valid_args: Dict[str, Any], parameters: Iterator[nn.Parameter] = None):
     """ 블록 타입에 따라 적절한 객체를 생성합니다. """
