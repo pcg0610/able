@@ -6,16 +6,6 @@
             "name": "data_path",
             "value": null,
             "is_required": true
-        },
-        {
-            "name": "input_shape",
-            "value": null,
-            "is_required": true
-        },
-        {
-            "name": "classes",
-            "value": null,
-            "is_required": true
         }
     ]
 }

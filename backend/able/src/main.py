@@ -1,7 +1,11 @@
+from pathlib import Path
+
 import uvicorn
 from fastapi import FastAPI, HTTPException,Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
 from src.block.router import block_router
 from src.checkpoints.router import checkpoint_router
@@ -49,6 +53,19 @@ app.include_router(checkpoint_router, prefix="/checkpoints", tags=["체크포인
 app.include_router(deploy_router, prefix="/deploy", tags=["배포"])
 
 app.include_router(device_router, prefix="/devices", tags=["디바이스"])
+
+base_dir = Path(__file__).parent.parent
+
+# assets 폴더를 정적 파일 경로로 설정
+app.mount("/assets", StaticFiles(directory=base_dir / "static/assets"), name="assets")
+
+# static 폴더를 템플릿 경로로 설정
+templates = Jinja2Templates(directory=base_dir / "static")
+
+# React index.html로 라우팅
+@app.get("/", response_class=HTMLResponse)
+async def serve_react_app(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.exception_handler(HTTPException)
 async def base_custom_exception_handler(request: Request, exc: BaseCustomException):

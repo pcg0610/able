@@ -1,7 +1,8 @@
 import type { Node as XYFlowNode } from '@xyflow/react';
 import { Dispatch, SetStateAction, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-import { BlockItem } from '@features/canvas/types/block.type';
+import type { BlockItem } from '@features/canvas/types/block.type';
 
 interface ClientOffset {
   x: number;
@@ -55,7 +56,7 @@ export const useAddCenteredNode = ({ setNodes, screenToFlowPosition }: AddNodePr
 
       // 추가할 새 노드 정의
       const newNode: XYFlowNode = {
-        id: `${Math.random()}`,
+        id: uuidv4(),
         type: 'custom',
         position: initialPosition,
         data: {

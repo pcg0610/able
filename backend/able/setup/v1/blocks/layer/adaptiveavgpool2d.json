@@ -1,0 +1,11 @@
+{
+  "name": "adaptiveavgpool2d",
+  "type": "layer",
+  "args": [
+    {
+      "name": "output_size",
+      "value": null,
+      "is_required": true
+    }
+  ]
+}

@@ -3,11 +3,6 @@
     "type": "optimizer",
     "args": [
         {
-            "name": "params",
-            "value": "[]",
-            "is_required": true
-        },
-        {
             "name": "lr",
             "value": 0.01,
             "is_required": true
