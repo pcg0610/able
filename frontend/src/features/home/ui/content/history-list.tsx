@@ -37,12 +37,12 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
         </tr>
       </thead>
       <tbody>
-        {trainSummaries.map((item, index) => (
+        {trainSummaries.map((item) => (
           <HistoryRow key={item.index} onClick={() => handleHistoryClick(item.originDirName)}>
-            <HistoryCell width='10%'>{item.index}</HistoryCell>
-            <HistoryCell width='40%'>{item.date}</HistoryCell>
-            <HistoryCell width='20%'>{item.accuracy}</HistoryCell>
-            <HistoryCell width='20%'>
+            <HistoryCell width="10%">{item.index}</HistoryCell>
+            <HistoryCell width="40%">{item.date}</HistoryCell>
+            <HistoryCell width="20%">{item.accuracy}</HistoryCell>
+            <HistoryCell width="20%">
               <StatusText status={item.status}>{item.status}</StatusText>
             </HistoryCell>
           </HistoryRow>

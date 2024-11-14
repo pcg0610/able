@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   ReactFlow,
   MarkerType,
-  useReactFlow,
   useNodesState,
   useEdgesState,
   ReactFlowProvider,
@@ -45,9 +44,7 @@ const CanvasResult = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [direction, setDirection] = useState<LayoutOptions['direction']>('TB');
   const [selectedNode, setSelectedNode] = useState<XYFlowNode | null>(null);
-  const { fitView } = useReactFlow();
 
-  const [autoFit, setAutoFit] = useState(false);
   const { projectName, resultName, epochName } = useProjectNameStore();
   const { uploadedImage, heatMapId, setHeatMapId, setHeatMapImage, setAllImage, resetImage } = useImageStore();
   const [hasSetInitialImages, setHasSetInitialImages] = useState(false);
@@ -106,7 +103,6 @@ const CanvasResult = () => {
   };
 
   const handleNodeClick = (blockId: string) => {
-    setAutoFit(false);
     if (blockId === '0') {
       return;
     }
@@ -148,7 +144,6 @@ const CanvasResult = () => {
   );
 
   const handleLayoutChange = (newDirection: LayoutOptions['direction']) => {
-    setAutoFit(true);
     setDirection(newDirection);
   };
 

@@ -7,7 +7,6 @@ interface F1ScoreProps {
 }
 
 const F1Score = ({ f1Score }: F1ScoreProps) => {
-
   const data = [
     { name: 'Score', value: f1Score },
     { name: 'Remaining', value: 1 - f1Score },
@@ -17,7 +16,7 @@ const F1Score = ({ f1Score }: F1ScoreProps) => {
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie data={data} innerRadius="50%" outerRadius="95%" startAngle={90} endAngle={-270} dataKey="value">
-          {data.map((entry, index) => (
+          {data.map((_, index) => (
             <Cell
               key={`cell-${index}`}
               fill={index == 0 ? Common.colors.graphDetail : Common.colors.gray500}
