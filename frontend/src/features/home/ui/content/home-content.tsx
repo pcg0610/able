@@ -18,7 +18,6 @@ import Skeleton from '@/shared/ui/loading/skeleton';
 
 const HomeContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
 
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,18 +36,10 @@ const HomeContent = () => {
 
   const handleSettingClick = () => {
     setIsModalOpen(true);
-    setIsClosing(false);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-  };
-
-  const handleAnimationEnd = () => {
-    if (isClosing) {
-      setIsModalOpen(false);
-      setIsClosing(false);
-    }
   };
 
   useEffect(() => {
@@ -105,9 +96,7 @@ const HomeContent = () => {
           </S.HistoryWrapper>
         </div>
       </S.HomeContentWrapper>
-      {isModalOpen && (
-        <ProjectModal onClose={closeModal} isClosing={isClosing} onAnimationEnd={handleAnimationEnd} type={'modify'} />
-      )}
+      {isModalOpen && <ProjectModal onClose={closeModal} type={'modify'} />}
     </>
   );
 };
