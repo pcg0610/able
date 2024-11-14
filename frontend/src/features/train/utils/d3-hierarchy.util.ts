@@ -67,8 +67,8 @@ const d3HierarchyLayout: LayoutAlgorithm = async (nodes, edges, options) => {
     const { x, y } = layoutNodes.get(node.id)!;
     const position = getPosition(x, y, options.direction);
     const offsetPosition = {
-      x: position.x - (node.measured?.width ?? 0) / 2,
-      y: position.y - (node.measured?.height ?? 0) / 2,
+      x: (position?.x ?? 0) - (node.measured?.width ?? 0) / 2,
+      y: (position?.y ?? 0) - (node.measured?.height ?? 0) / 2,
     };
 
     return { ...node, position: offsetPosition };
