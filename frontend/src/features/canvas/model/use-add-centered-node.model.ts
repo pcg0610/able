@@ -1,7 +1,8 @@
 import type { Node as XYFlowNode } from '@xyflow/react';
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 
-import { BlockItem } from '@features/canvas/types/block.type';
+import type { BlockItem } from '@features/canvas/types/block.type';
+import { DATA_BLOCK_ID } from '@features/canvas/constants/block.constant';
 
 interface ClientOffset {
   x: number;
@@ -18,6 +19,8 @@ interface AddNodeProps {
 
 // 노드가 마우스 커서 중앙에 위치하도록 새 노드 추가
 export const useAddCenteredNode = ({ setNodes, screenToFlowPosition }: AddNodeProps) => {
+  const idCounter = useRef(Number(DATA_BLOCK_ID) + 1);
+
   // 주어진 노드의 위치를 중앙으로 이동시키는 작업 수행
   // useCallback으로 캐싱
   const adjustNodePosition = useCallback(
@@ -55,7 +58,7 @@ export const useAddCenteredNode = ({ setNodes, screenToFlowPosition }: AddNodePr
 
       // 추가할 새 노드 정의
       const newNode: XYFlowNode = {
-        id: `${Math.random()}`,
+        id: `${idCounter.current++}`,
         type: 'custom',
         position: initialPosition,
         data: {
