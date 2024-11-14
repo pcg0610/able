@@ -71,12 +71,12 @@ const Result = () => {
       {
         onSuccess: (data) => {
           if (data) {
-            toast.success('API 배포가 완료되었습니다.');
+            toast.success('API 배포가 완료되었어요.');
             handleModalClose();
           }
         },
         onError: () => {
-          toast.error('에러가 발생했습니다.');
+          toast.error('에러가 발생했어요');
         },
       }
     );

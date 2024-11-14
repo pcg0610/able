@@ -22,7 +22,13 @@ import { useFetchFeatureMap, useCreateFeatureMap } from '@features/train/api/use
 import { useFeatureNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
 import { initialNodes, initialEdges } from '@features/canvas/model/initial-data';
 
-import { PositionedButton, LayoutPosition, Divider, Button, LayoutIcon } from '@features/train/ui/analyze/canvas-result.style';
+import {
+  PositionedButton,
+  LayoutPosition,
+  Divider,
+  Button,
+  LayoutIcon,
+} from '@features/train/ui/analyze/canvas-result.style';
 import BasicButton from '@shared/ui/button/basic-button';
 import PlayIcon from '@icons/play.svg?react';
 import DeviceSelectModal from '@features/train/ui/modal/device-select-modal';
@@ -70,7 +76,7 @@ const CanvasResult = () => {
 
   const handleRunButtonClick = () => {
     if (!epochName) {
-      toast.error("추론할 에포크를 선택해주세요.");
+      toast.error('추론할 epoch를 선택해 주세요.');
       return;
     }
     setIsModalOpen(true);
@@ -78,7 +84,7 @@ const CanvasResult = () => {
 
   const handleCreateModel = (deviceIndex: number) => {
     if (deviceIndex === null) {
-      toast.error('디바이스를 선택해 주세요.');
+      toast.error('학습 장치를 선택해 주세요.');
       return;
     }
     fetchCreateModel(
@@ -133,12 +139,12 @@ const CanvasResult = () => {
         nds.map((node) =>
           node.id === nodeId
             ? {
-              ...node,
-              data: {
-                ...node.data,
-                featureMap: image,
-              },
-            }
+                ...node,
+                data: {
+                  ...node.data,
+                  featureMap: image,
+                },
+              }
             : node
         )
       );
