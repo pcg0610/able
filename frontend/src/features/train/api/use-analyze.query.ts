@@ -22,6 +22,23 @@ const fetchEpochs = async (projectName: string, resultName: string, index: numbe
   }
 };
 
+const searchEpochs = async (projectName: string, resultName: string, keyword: string, index: number, size: number) => {
+  try {
+    const response = await axiosInstance.get('/checkpoints/search', {
+      params: { projectName, resultName, keyword, index, size },
+    });
+
+    if (response.status == 204) {
+      return null;
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch epochs:', error);
+    throw error;
+  }
+};
+
 const fetchModel = async (projectName: string, resultName: string) => {
   try {
     const response = await axiosInstance.get('/analyses/model', {
@@ -56,6 +73,22 @@ export const useEpochs = (projectName: string, resultName: string, index: number
     queryKey: trainKey.list(projectName, resultName, index, size),
     queryFn: async () => {
       const response = await fetchEpochs(projectName, resultName, index, size);
+      return response.data;
+    },
+  });
+};
+
+export const useSearchEpochs = (
+  projectName: string,
+  resultName: string,
+  keyword: string,
+  index: number,
+  size: number
+) => {
+  return useQuery<EpochResponse>({
+    queryKey: trainKey.search(projectName, resultName, keyword, index, size),
+    queryFn: async () => {
+      const response = await searchEpochs(projectName, resultName, keyword, index, size);
       return response.data;
     },
   });
