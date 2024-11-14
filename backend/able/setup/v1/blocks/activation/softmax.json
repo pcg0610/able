@@ -5,6 +5,7 @@
         {
             "name": "dim",
             "value": 1,
+            "type": "int",
             "is_required": false
         }
     ]

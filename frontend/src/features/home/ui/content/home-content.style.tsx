@@ -36,6 +36,7 @@ export const PythonTitle = styled.span`
 
 export const Description = styled.p`
   margin-top: 1rem;
+  min-height: 1.25rem;
   color: ${Common.colors.gray400};
 `;
 
@@ -58,7 +59,7 @@ export const CanvasImage = styled.img`
 `;
 
 export const HistoryWrapper = styled.div`
-  display: flex;
+  height: 100%;
   flex-direction: column;
   gap: 1rem;
 `;

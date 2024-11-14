@@ -5,31 +5,37 @@
         {
             "name": "inplanes",
             "value": null,
+          "type": "int",
             "is_required": true
         },
         {
           "name": "planes",
           "value": null,
+          "type": "int",
           "is_required": true
         },
         {
           "name": "stride",
           "value": 1,
+          "type": "int",
           "is_required": false
         },
         {
           "name": "groups",
           "value": 1,
+          "type": "int",
           "is_required": false
         },
         {
           "name": "base_width",
           "value": 64,
+          "type": "int",
           "is_required": false
         },
         {
           "name": "dilation",
           "value": 1,
+          "type": "int",
           "is_required": false
         }
     ]

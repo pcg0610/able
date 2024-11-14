@@ -42,12 +42,22 @@ const DeployModal = ({ onClose, onSubmit }: DeployModalProps) => {
   };
 
   const handleSubmit = () => {
-    if (apiPath && apiDescription && selectedOption) {
-      onSubmit({ apiPath, apiDescription, selectedOption });
-      onClose();
+    if (!apiPath || !apiDescription || !selectedOption) {
+      toast.error('모든 칸을 채워주세요.');
       return;
     }
-    toast.error('모든 칸을 채워주세요.');
+
+    const apiPathPattern = /^\/[a-z]*$/;
+    if (!apiPath.match(apiPathPattern)) {
+      toast.error("API 경로는 '/'로 시작해야 하며, \n소문자만 포함할 수 있습니다.");
+      return;
+    }
+
+
+    onSubmit({ apiPath, apiDescription, selectedOption });
+    onClose();
+    return;
+
   };
 
   return (

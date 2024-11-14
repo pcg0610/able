@@ -5,11 +5,13 @@
         {
             "name": "p",
             "value": 0.5,
+            "type": "float",
             "is_required": false
         },
         {
             "name": "inplace",
             "value": false,
+            "type": "bool",
             "is_required": false
         }
     ]

@@ -1,5 +1,5 @@
 {
-    "name": "mseloss",
+    "name": "crossentropyloss",
     "type": "loss",
     "args": []
 }

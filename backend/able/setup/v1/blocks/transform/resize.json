@@ -4,13 +4,9 @@
     "args": [
         {
             "name": "size",
-            "value": "[224, 224]",
+            "value": null,
+            "type": "int",
             "is_required": true
-        },
-        {
-            "name": "interpolation",
-            "value": "bilinear",
-            "is_required": false
         }
     ]
 }

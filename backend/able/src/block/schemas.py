@@ -1,10 +1,11 @@
 from typing import Any
-from src.block.enums import BlockType
+from src.block.enums import BlockType, ArgType
 from src.response.schemas import ImmutableBaseModel
 
 class Arg(ImmutableBaseModel):
     name: str
     value: Any
+    type: ArgType
     is_required: bool
 
 class Block(ImmutableBaseModel):

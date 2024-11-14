@@ -8,7 +8,7 @@ from torch import nn, optim
 from torch.fx import GraphModule
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from src.block.enums import BlockType
+from src.block.enums import BlockType, ArgType
 from src.block.schemas import Block
 from src.canvas.schemas import CanvasBlock
 
@@ -42,7 +42,8 @@ MODULE_MAP = {
     "totensor": transforms.ToTensor,
     "centercrop": transforms.CenterCrop,
     "basicblock": torchvision.models.resnet.BasicBlock,
-    "bottleneck": torchvision.models.resnet.Bottleneck
+    "bottleneck": torchvision.models.resnet.Bottleneck,
+    "adaptiveavgpool2d": nn.AdaptiveAvgPool2d
 }
 
 def dynamic_class_loader(module_path: str, class_name: str):
@@ -85,16 +86,16 @@ def convert_block_to_module(block: Block, parameters: Iterator[nn.Parameter] = N
 
 def convert_block_to_obj(block: CanvasBlock) -> Any:
     # 유효한 파라미터만 사용하도록 필터링
-    args_dict = {arg.name: arg.value for arg in block.args}
-    valid_args, ignored_args, missing_args = validate_params(MODULE_MAP[block.name], args_dict)
+    block_name = block.name.lower()
+    args_dict = {arg.name: convert_arg_type(arg.value, arg.type) for arg in block.args}
+    valid_args, ignored_args, missing_args = validate_params(MODULE_MAP[block_name], args_dict)
 
     if ignored_args:
         logger.warning(f"Ignored invalid arguments for {block.name}: {ignored_args}")
 
     if missing_args:
         raise ValueError(f"Missing required arguments for {block.name}: {missing_args}")
-
-    return MODULE_MAP[block.name.lower()](**args_dict)
+    return MODULE_MAP[block.name.lower()](**valid_args)
 
 def create_instance(block: Block, cls, valid_args: Dict[str, Any], parameters: Iterator[nn.Parameter] = None):
     """ 블록 타입에 따라 적절한 객체를 생성합니다. """
@@ -154,3 +155,13 @@ def validate_params(cls, args: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str
             missing_args.append(param_name)
 
     return valid_args, ignored_args, missing_args
+
+def convert_arg_type(arg, arg_type):
+    if arg_type == ArgType.INT:
+        return int(arg)
+    elif arg_type == ArgType.FLOAT:
+        return float(arg)
+    elif arg_type == ArgType.BOOL:
+        return bool(arg)
+    else:
+        return None

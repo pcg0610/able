@@ -6,7 +6,7 @@ export interface HistoryItem {
   status: string;
 }
 export interface HistoryResponse {
-  totalTrainLogs: number;
+  totalPages: number;
   trainSummaries: HistoryItem[];
 }
 export interface Project {

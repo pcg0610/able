@@ -98,18 +98,14 @@ const HomeContent = () => {
             <ClockIcon width={24} height={24} />
             학습 기록
           </S.SubTitle>
-          {historyData ? (
-            <S.HistoryWrapper>
-              <HistoryList trainSummaries={historyData?.trainSummaries || []} />
-              <Pagination
-                currentPage={currentPage}
-                totalPages={historyData?.totalTrainLogs || 0}
-                onPageChange={setCurrentPage}
-              />
-            </S.HistoryWrapper>
-          ) : (
-            <S.Text>학습한 기록이 없어요</S.Text>
-          )}
+          <S.HistoryWrapper>
+            <HistoryList trainSummaries={historyData?.trainSummaries || []} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={historyData?.totalPages || 0}
+              onPageChange={setCurrentPage}
+            />
+          </S.HistoryWrapper>
         </div>
       </S.HomeContentWrapper>
       {isModalOpen && (
