@@ -42,7 +42,8 @@ MODULE_MAP = {
     "totensor": transforms.ToTensor,
     "centercrop": transforms.CenterCrop,
     "basicblock": torchvision.models.resnet.BasicBlock,
-    "bottleneck": torchvision.models.resnet.Bottleneck
+    "bottleneck": torchvision.models.resnet.Bottleneck,
+    "adaptiveavgpool2d": nn.AdaptiveAvgPool2d
 }
 
 def dynamic_class_loader(module_path: str, class_name: str):

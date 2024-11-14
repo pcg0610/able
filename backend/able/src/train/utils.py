@@ -8,8 +8,6 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
 from typing import Iterator, Any
 
-from torchvision.models.resnet import Bottleneck
-
 from src.block.enums import BlockType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
@@ -368,14 +366,7 @@ def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -
     model = UserModel()
 
     for block in sorted_blocks:
-        if block.type == BlockType.LAYER:
-            module = convert_layer_block_to_module(block)
-        elif block.type == BlockType.ACTIVATION:
-            module = convert_activation_block_to_module(block)
-        elif block.type == BlockType.OPERATION:
-            module = convert_operation_block_to_module(block)
-        else:
-            return None
+        module = convert_block_to_obj(block)
 
         model.layers.add_module(block.id, module)
 
@@ -384,7 +375,7 @@ def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -
 def split_blocks(blocks: list[Block]) -> tuple[
     Block | None, list[Block], list[Block], list[Block], list[Block]
 ]:
-    nn.CrossEntropyLoss
+
     data_block = None
     transform_blocks, loss_blocks, optimizer_blocks, others = [], [], [], []
 
@@ -521,7 +512,6 @@ def load_transform_pipeline(project_name: str, result_name:str) -> torchvision.t
     result_path = path_manager.get_train_result_path(project_name, result_name)
 
     transform_pipeline_path = result_path / TRANSFORM_PIPELINE
-    nn.Conv2d
     if not transform_pipeline_path.exists():
         return None
 
