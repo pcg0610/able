@@ -57,7 +57,7 @@ const BlockNode = ({
               <S.Input
                 type="text"
                 required={field.isRequired}
-                value={field.value || ''}
+                value={field.value ?? ''}
                 onChange={(e) => handleFieldChange(field.name, e.target.value)}
               />
             )}
