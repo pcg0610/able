@@ -52,7 +52,7 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
                 </HistoryCell>
               </HistoryRow>
             ) : (
-              <HistoryRow key={`empty-${index}`} style={{ height: '3.125rem' }}>
+              <HistoryRow key={`empty-${index}`} style={{ height: '2.6rem', borderTop: 'none' }}>
                 <HistoryCell width="10%"></HistoryCell>
                 <HistoryCell width="40%"></HistoryCell>
                 <HistoryCell width="20%"></HistoryCell>
