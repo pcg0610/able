@@ -54,12 +54,9 @@ const HomeContent = () => {
   useEffect(() => {
     if (project && project !== currentProject) {
       setCurrentProject(project);
+      setHasThumbnail(Boolean(project.thumbnail));
     }
   }, [project, currentProject, setCurrentProject]);
-
-  useEffect(() => {
-    setHasThumbnail(Boolean(currentProject?.thumbnail));
-  }, [currentProject]);
 
   return (
     <>
@@ -84,13 +81,13 @@ const HomeContent = () => {
             작업 중인 캔버스
           </S.SubTitle>
           {hasThumbnail ? (
-            <S.CanvasImage
-              src={currentProject?.thumbnail || defaultImage}
-              alt="Canvas Image"
-              onClick={handleCanvasClick}
-            />
+            currentProject?.thumbnail ? (
+              <S.CanvasImage src={currentProject?.thumbnail} alt="Canvas Image" onClick={handleCanvasClick} />
+            ) : (
+              <Skeleton width={16} height={10} />
+            )
           ) : (
-            <Skeleton width={16} height={10} />
+            <S.CanvasImage src={defaultImage} alt="Canvas Image" onClick={handleCanvasClick} />
           )}
         </div>
         <div>
