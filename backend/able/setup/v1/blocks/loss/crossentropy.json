@@ -21,11 +21,6 @@
             "name": "reduce",
             "value": true,
             "is_required": false
-        },
-        {
-            "name": "reduction",
-            "value": "mean",
-            "is_required": false
         }
     ]
 }

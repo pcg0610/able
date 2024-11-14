@@ -384,6 +384,7 @@ def convert_block_graph_to_model(blocks: list[CanvasBlock], edges: list[Edge]) -
 def split_blocks(blocks: list[Block]) -> tuple[
     Block | None, list[Block], list[Block], list[Block], list[Block]
 ]:
+    nn.CrossEntropyLoss
     data_block = None
     transform_blocks, loss_blocks, optimizer_blocks, others = [], [], [], []
 
@@ -520,7 +521,7 @@ def load_transform_pipeline(project_name: str, result_name:str) -> torchvision.t
     result_path = path_manager.get_train_result_path(project_name, result_name)
 
     transform_pipeline_path = result_path / TRANSFORM_PIPELINE
-
+    nn.Conv2d
     if not transform_pipeline_path.exists():
         return None
 

@@ -85,8 +85,9 @@ def convert_block_to_module(block: Block, parameters: Iterator[nn.Parameter] = N
 
 def convert_block_to_obj(block: CanvasBlock) -> Any:
     # 유효한 파라미터만 사용하도록 필터링
+    block_name = block.name.lower()
     args_dict = {arg.name: arg.value for arg in block.args}
-    valid_args, ignored_args, missing_args = validate_params(MODULE_MAP[block.name], args_dict)
+    valid_args, ignored_args, missing_args = validate_params(MODULE_MAP[block_name], args_dict)
 
     if ignored_args:
         logger.warning(f"Ignored invalid arguments for {block.name}: {ignored_args}")
