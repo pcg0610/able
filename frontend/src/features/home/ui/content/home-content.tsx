@@ -14,18 +14,19 @@ import WritingIcon from '@icons/writing.svg?react';
 import ClockIcon from '@icons/clock.svg?react';
 import FolderIcon from '@icons/folder.svg?react';
 import SettingIcon from '@icons/setting.svg?react';
+import Skeleton from '@/shared/ui/loading/skeleton';
 
 const HomeContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  const [size] = useState(5);
-
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [size] = useState(5);
 
   const { projectName } = useProjectNameStore();
   const { currentProject, setCurrentProject } = useProjectStore();
+  const [hasThumbnail, setHasThumbnail] = useState(true);
 
   const { data: project } = useProjectDetail(projectName);
   const { data: historyData } = useProjectHistory(projectName, currentPage - 1, size);
@@ -56,13 +57,17 @@ const HomeContent = () => {
     }
   }, [project, currentProject, setCurrentProject]);
 
+  useEffect(() => {
+    setHasThumbnail(Boolean(currentProject?.thumbnail));
+  }, [currentProject]);
+
   return (
     <>
       <S.HomeContentWrapper>
         <div>
           <S.Title>
             <FolderIcon width={32} height={32} />
-            <S.Title>{currentProject?.title || '프로젝트 이름 없음'}</S.Title>
+            {currentProject?.title ? <S.Title>{currentProject?.title}</S.Title> : <Skeleton width={8} height={1.95} />}
             <SettingIcon
               width={20}
               height={20}
@@ -78,11 +83,15 @@ const HomeContent = () => {
             <WritingIcon width={24} height={24} />
             작업 중인 캔버스
           </S.SubTitle>
-          <S.CanvasImage
-            src={currentProject?.thumbnail || defaultImage}
-            alt="Canvas Image"
-            onClick={handleCanvasClick}
-          />
+          {hasThumbnail ? (
+            <S.CanvasImage
+              src={currentProject?.thumbnail || defaultImage}
+              alt="Canvas Image"
+              onClick={handleCanvasClick}
+            />
+          ) : (
+            <Skeleton width={16} height={10} />
+          )}
         </div>
         <div>
           <S.SubTitle>
