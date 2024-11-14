@@ -69,6 +69,10 @@ const CanvasResult = () => {
   };
 
   const handleRunButtonClick = () => {
+    if (!epochName) {
+      toast.error("추론할 에포크를 선택해주세요.");
+      return;
+    }
     setIsModalOpen(true);
   };
 
@@ -130,12 +134,12 @@ const CanvasResult = () => {
         nds.map((node) =>
           node.id === nodeId
             ? {
-                ...node,
-                data: {
-                  ...node.data,
-                  featureMap: image,
-                },
-              }
+              ...node,
+              data: {
+                ...node.data,
+                featureMap: image,
+              },
+            }
             : node
         )
       );
