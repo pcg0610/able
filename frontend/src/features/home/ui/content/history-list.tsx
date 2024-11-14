@@ -22,31 +22,40 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
     <HistoryListWrapper>
       <thead>
         <tr>
-          <HistoryCell as="th" width="10%">
-            번호
-          </HistoryCell>
-          <HistoryCell as="th" width="40%">
-            학습일
-          </HistoryCell>
-          <HistoryCell as="th" width="20%">
-            정확도
-          </HistoryCell>
-          <HistoryCell as="th" width="20%">
-            상태
-          </HistoryCell>
+          <HistoryCell as="th" width="10%">번호</HistoryCell>
+          <HistoryCell as="th" width="40%">학습일</HistoryCell>
+          <HistoryCell as="th" width="20%">정확도</HistoryCell>
+          <HistoryCell as="th" width="20%">상태</HistoryCell>
         </tr>
       </thead>
       <tbody>
-        {trainSummaries.map((item) => (
-          <HistoryRow key={item.index} onClick={() => handleHistoryClick(item.originDirName)}>
-            <HistoryCell width="10%">{item.index}</HistoryCell>
-            <HistoryCell width="40%">{item.date}</HistoryCell>
-            <HistoryCell width="20%">{item.accuracy}</HistoryCell>
-            <HistoryCell width="20%">
-              <StatusText status={item.status}>{item.status}</StatusText>
+        {trainSummaries.length === 0 ? (
+          <HistoryRow>
+            <HistoryCell colSpan={4} style={{ height: '15.6rem', textAlign: 'center', verticalAlign: 'middle' }}>
+              데이터가 없습니다
             </HistoryCell>
           </HistoryRow>
-        ))}
+        ) : (
+          Array.from({ length: 5 }).map((_, index) => (
+            trainSummaries[index] ? (
+              <HistoryRow key={trainSummaries[index].index} onClick={() => handleHistoryClick(trainSummaries[index].originDirName)}>
+                <HistoryCell width="10%">{trainSummaries[index].index}</HistoryCell>
+                <HistoryCell width="40%">{trainSummaries[index].date}</HistoryCell>
+                <HistoryCell width="20%">{trainSummaries[index].accuracy}</HistoryCell>
+                <HistoryCell width="20%">
+                  <StatusText status={trainSummaries[index].status}>{trainSummaries[index].status}</StatusText>
+                </HistoryCell>
+              </HistoryRow>
+            ) : (
+              <HistoryRow key={`empty-${index}`} style={{ height: '3.125rem' }}>
+                <HistoryCell width="10%"></HistoryCell>
+                <HistoryCell width="40%"></HistoryCell>
+                <HistoryCell width="20%"></HistoryCell>
+                <HistoryCell width="20%"></HistoryCell>
+              </HistoryRow>
+            )
+          ))
+        )}
       </tbody>
     </HistoryListWrapper>
   );
