@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axiosInstance from '@/shared/api/config/axios-instance';
 import deployKey from '@features/deploy/api/deploy-key';
-import { ApiSchema } from '@features/deploy/type/deploy.type';
+import { ApiSchema } from '@features/deploy/types/deploy.type';
 
 const registerAPI = async ({ projectName, trainResult, checkpoint, uri, description }: ApiSchema): Promise<boolean> => {
   try {
@@ -25,7 +25,7 @@ const registerAPI = async ({ projectName, trainResult, checkpoint, uri, descript
   }
 };
 
-const stopApi = async ({ uri, page }: { uri: string; page: number }): Promise<void> => {
+const stopApi = async ({ uri }: { uri: string }): Promise<void> => {
   try {
     const response = await axiosInstance.put(`/deploy/apis?uri=${encodeURIComponent(uri)}`, null);
 
@@ -38,7 +38,7 @@ const stopApi = async ({ uri, page }: { uri: string; page: number }): Promise<vo
   }
 };
 
-const removeApi = async ({ uri, page }: { uri: string; page: number }): Promise<void> => {
+const removeApi = async ({ uri }: { uri: string }): Promise<void> => {
   try {
     const response = await axiosInstance.delete(`/deploy/apis?uri=${encodeURIComponent(uri)}`);
 
@@ -66,7 +66,8 @@ export const useStopApi = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: stopApi,
-    onSuccess: (_, { page }) => {
+    onSuccess: (_, variables: { uri: string; page: number }) => {
+      const { page } = variables;
       queryClient.invalidateQueries({ queryKey: deployKey.list(page - 1, 5) });
     },
   });
@@ -76,7 +77,8 @@ export const useRemoveApi = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: removeApi,
-    onSuccess: (_, { page }) => {
+    onSuccess: (_, variables: { uri: string; page: number }) => {
+      const { page } = variables;
       queryClient.invalidateQueries({ queryKey: deployKey.list(page - 1, 5) });
     },
   });

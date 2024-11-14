@@ -9,8 +9,6 @@ const createProject = async (projectData: Project): Promise<Project> => {
   const response = await axiosInstance.post('/projects', {
     title: projectData.title,
     description: projectData.description,
-    cudaVersion: projectData.cudaVersion,
-    pythonKernelPath: projectData.pythonKernelPath,
   });
 
   if (response.status == 201) {

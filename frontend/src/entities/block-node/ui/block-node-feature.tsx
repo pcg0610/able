@@ -9,7 +9,6 @@ import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
 import { useImageStore } from '@entities/train/model/train.model';
 
 import UploadImageIcon from '@icons/uploadImage.svg?react';
-import GraphIcon from '@icons/graph.svg?react';
 
 interface BlockNodeFeatureProps {
   data: {
@@ -27,17 +26,13 @@ const BlockNodeFeature = ({
   targetPosition = Position.Top,
 }: BlockNodeFeatureProps) => {
   const { uploadedImage, setUploadedImage, heatmapImage, classScores, heatMapId } = useImageStore();
-  const [isChanged, setIsChanged] = useState(false);
 
   const blockColor = useMemo(
     () => (data?.block?.type ? BLOCK_COLORS[data.block.type] : Common.colors.gray200),
     [data?.block?.type]
   );
 
-  const blockImage = useMemo(
-    () => (data.featureMap ? data.featureMap : null),
-    [data.featureMap]
-  );
+  const blockImage = useMemo(() => (data.featureMap ? data.featureMap : null), [data.featureMap]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -92,7 +87,10 @@ const BlockNodeFeature = ({
                 <S.BarContainer>
                   {classScores.map((score, index) => (
                     <S.BarWrapper key={index}>
-                      <S.Bar height={score.classScore} color={index === 0 ? '#00274d' : index === 1 ? '#5b8db8' : '#aac4e1'}>
+                      <S.Bar
+                        height={score.classScore}
+                        color={index === 0 ? '#00274d' : index === 1 ? '#5b8db8' : '#aac4e1'}
+                      >
                         <S.BarScore>{score.classScore}</S.BarScore>
                       </S.Bar>
                       <S.BarLabel>{score.className}</S.BarLabel>

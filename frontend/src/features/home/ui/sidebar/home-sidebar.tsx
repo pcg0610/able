@@ -68,7 +68,7 @@ const HomeSideBar = () => {
         {isLoading ? (
           <LoadingSpinner height={50} />
         ) : (
-          projects?.map((project, index) => (
+          projects?.map((project: string, index: number) => (
             <S.Folder key={index} isSelected={projectName === project} onClick={() => handleClick(project)}>
               <FileIcon width={20} height={20} /> {project}
             </S.Folder>
