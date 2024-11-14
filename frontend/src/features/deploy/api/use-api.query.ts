@@ -11,7 +11,7 @@ const fetchApiLists = async (page: number, pageSize: number) => {
     });
 
     if (response.status == 204) {
-      return { apis: [], totalPages: 0 };
+      return { data: { apis: [], totalPages: 0 } };
     }
 
     return response.data;
