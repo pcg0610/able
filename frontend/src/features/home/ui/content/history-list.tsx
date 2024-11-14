@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 import { HistoryItem } from '@features/home/types/home.type';
 import { useProjectNameStore } from '@entities/project/model/project.model';
@@ -13,9 +14,13 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
   const navigate = useNavigate();
   const { setResultName } = useProjectNameStore();
 
-  const handleHistoryClick = (result: string) => {
-    setResultName(result);
-    navigate('/train');
+  const handleHistoryClick = (result: string, status: string) => {
+    if (status === "완료") {
+      setResultName(result);
+      navigate('/train');
+    } else {
+      toast.error("빌드에 실패한 모델입니다.");
+    }
   };
 
   return (
@@ -38,7 +43,7 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
         ) : (
           Array.from({ length: 5 }).map((_, index) => (
             trainSummaries[index] ? (
-              <HistoryRow key={trainSummaries[index].index} onClick={() => handleHistoryClick(trainSummaries[index].originDirName)}>
+              <HistoryRow key={trainSummaries[index].index} onClick={() => handleHistoryClick(trainSummaries[index].originDirName, trainSummaries[index].status)}>
                 <HistoryCell width="10%">{trainSummaries[index].index}</HistoryCell>
                 <HistoryCell width="40%">{trainSummaries[index].date}</HistoryCell>
                 <HistoryCell width="20%">{trainSummaries[index].accuracy}</HistoryCell>
