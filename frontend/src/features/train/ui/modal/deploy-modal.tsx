@@ -47,9 +47,9 @@ const DeployModal = ({ onClose, onSubmit }: DeployModalProps) => {
       return;
     }
 
-    const apiPathPattern = /^\/[a-z0-9\-_]*$/;
+    const apiPathPattern = /^\/[a-z]*$/;
     if (!apiPath.match(apiPathPattern)) {
-      toast.error("API 경로는 '/'로 시작해야 하며, \n소문자, 숫자, '-', '_'만 포함할 수 있습니다.");
+      toast.error("API 경로는 '/'로 시작해야 하며, \n소문자만 포함할 수 있습니다.");
       return;
     }
 
