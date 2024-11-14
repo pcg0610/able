@@ -8,5 +8,5 @@ class TrainSummary(ImmutableBaseModel):
     status: str
 
 class TrainLogResponse(ImmutableBaseModel):
-    total_train_logs: int
+    total_pages: int
     train_summaries: list[TrainSummary]
