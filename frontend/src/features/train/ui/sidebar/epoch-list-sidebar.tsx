@@ -78,7 +78,7 @@ const EpochListSidebar = () => {
       <S.Divider />
       <SearchBar
         value={value}
-        placeholder="블록 검색"
+        placeholder="에포크 검색"
         onChange={handleInputChange}
         onClick={handleBlockSearch}
         onEnter={handleKeyDown}
@@ -91,7 +91,7 @@ const EpochListSidebar = () => {
             </S.EpochItem>
           ))
         ) : (
-          <div>에포크 없음</div>
+          <S.EmptyMessage>에포크 없음</S.EmptyMessage>
         )}
         {isLoading && <div>로딩 중...</div>}
       </S.ScrollableSection>
