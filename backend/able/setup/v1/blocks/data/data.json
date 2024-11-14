@@ -5,6 +5,7 @@
         {
             "name": "data_path",
             "value": null,
+            "type": "str",
             "is_required": true
         }
     ]

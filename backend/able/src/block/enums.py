@@ -15,3 +15,4 @@ class ArgType(str, Enum):
     INT = "int"
     FLOAT = "float"
     BOOL = "bool"
+    STR = "str"
