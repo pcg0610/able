@@ -50,5 +50,5 @@ def get_train_logs(title:str, page:int, page_size:int) -> TrainLogResponse :
     if paginated_train_results is None:
         return None
 
-    result = TrainLogResponse(total_train_logs=len(train_results), train_summaries=paginated_train_results)
+    result = TrainLogResponse(total_pages=ceil(len(train_results)/page_size), train_summaries=paginated_train_results)
     return result
