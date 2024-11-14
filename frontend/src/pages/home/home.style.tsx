@@ -13,7 +13,7 @@ export const PageContainer = styled.div`
 
 export const ContentContainer = styled.div`
   flex: 1;
-  padding: 1.875rem;
+  padding: 2.5rem 3rem;
   overflow-y: auto;
   box-sizing: border-box;
 `;
