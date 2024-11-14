@@ -91,7 +91,7 @@ const ProjectModal = ({ onClose, type }: ProjectModalProps) => {
       onConfirm={handleCreateProject}
       title="프로젝트 정보를 입력하세요"
       confirmText={isReadOnly ? '수정' : '생성'}
-      cancelText={'삭제'}
+      cancelText={isReadOnly ? '삭제' : '취소'}
       isDelete={isReadOnly}
     >
       <Input
