@@ -11,10 +11,7 @@ export const initialNodes: XYFlowNode[] = [
       block: {
         type: 'data',
         name: 'data',
-        fields: [
-          { name: 'data_path', isRequired: true },
-          { name: 'input_shape', isRequired: true },
-        ],
+        fields: [{ name: 'data_path', isRequired: true }],
       },
     },
   },

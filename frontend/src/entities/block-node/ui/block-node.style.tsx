@@ -14,6 +14,8 @@ export const Container = styled.div<{ blockColor: string; isConnected: boolean; 
 export const Label = styled.div`
   width: 100%;
   padding: 0.625rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
 
   font-size: ${Common.fontSizes.sm};
   font-weight: ${Common.fontWeights.semiBold};
@@ -160,10 +162,10 @@ export const BarScore = styled.span`
 export const GraphButton = styled.button`
   position: absolute;
   top: -30px;
-  right: 10px; 
+  right: 10px;
   cursor: pointer;
   background: white;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 4px 3px;
-`
+`;
