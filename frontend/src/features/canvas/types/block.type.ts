@@ -19,6 +19,7 @@ export interface FeatureBlockItem {
 export interface BlockField {
   name: string;
   value: string | number | boolean;
+  type: 'int' | 'float' | 'bool' | 'str';
   isRequired: boolean;
 }
 
