@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axiosInstance from '@/shared/api/config/axios-instance';
 import trainKey from '@features/train/api/train-key';
-import { FeatureMapProps, CreateFeatureMapProps, FeatureMapResponse } from '@features/train/types/analyze.type';
+import { FeatureMapProps, CreateFeatureMapProps } from '@features/train/types/analyze.type';
 
 const createFeatureMap = async ({ projectName, resultName, epochName, deviceIndex, image }: CreateFeatureMapProps) => {
   try {
@@ -32,7 +32,6 @@ const createFeatureMap = async ({ projectName, resultName, epochName, deviceInde
         device_index: deviceIndex,
       },
     });
-
     return response.data;
   } catch (error) {
     console.error('Feature map creation error:', error);
@@ -70,11 +69,10 @@ export const useCreateFeatureMap = () => {
 
   return useMutation({
     mutationFn: createFeatureMap,
-    onSuccess: (data: FeatureMapResponse, variables) => {
-      queryClient.setQueryData<FeatureMapResponse>(
-        trainKey.featureMap(variables.projectName, variables.resultName, variables.epochName, variables.deviceIndex),
-        data
-      );
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: trainKey.heatMap(variables.projectName, variables.resultName, variables.epochName),
+      });
     },
     onError: (error) => {
       console.error('Feature map creation failed:', error);
