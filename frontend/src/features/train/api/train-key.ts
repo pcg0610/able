@@ -9,6 +9,15 @@ const trainKey = {
     index,
     size,
   ],
+  search: (projectName: string, resultName: string, keyword: string, index: number, size: number) => [
+    ...trainKey.default,
+    'search',
+    projectName,
+    resultName,
+    keyword,
+    index,
+    size,
+  ],
   checkpoint: (projectName: string, resultName: string) => [...trainKey.default, 'checkpoint', projectName, resultName],
   model: (projectName: string, resultName: string) => [...trainKey.default, 'model', projectName, resultName],
   featureMap: (projectName: string, resultName: string, epochName: string, deviceIndex: number) => [

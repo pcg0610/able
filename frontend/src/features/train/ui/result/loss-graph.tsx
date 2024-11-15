@@ -39,6 +39,7 @@ const LossGraph = ({ lossData }: LossGraphProps) => {
           strokeWidth={2}
           dot={false}
           name="Smoothed training loss"
+          animationDuration={600}
         />
         <Line
           type="monotone"
@@ -47,6 +48,7 @@ const LossGraph = ({ lossData }: LossGraphProps) => {
           strokeWidth={2}
           dot={false}
           name="Smoothed validation loss"
+          animationDuration={600}
         />
       </LineChart>
     </ResponsiveContainer>
