@@ -20,7 +20,7 @@ export const Header = styled.div`
 export const GridContainer = styled.div`
   display: grid;
   gap: 1.25rem;
-  grid-template-rows: 1.1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   flex-grow: 1;
   height: 100%;
 
