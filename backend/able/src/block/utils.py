@@ -156,12 +156,16 @@ def validate_params(cls, args: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str
 
     return valid_args, ignored_args, missing_args
 
-def convert_arg_type(arg, arg_type):
+def convert_arg_type(arg: str, arg_type):
     if arg_type == ArgType.INT:
         return int(arg)
     elif arg_type == ArgType.FLOAT:
         return float(arg)
     elif arg_type == ArgType.BOOL:
         return bool(arg)
+    elif arg_type == ArgType.MODEL_PARAMS:
+        return arg
+    elif arg_type == ArgType.LIST_INT:
+        return [int(e) for e in arg.split(",")]
     else:
         return None

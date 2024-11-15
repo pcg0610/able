@@ -8,7 +8,7 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import random_split, Dataset, Subset
 from typing import Iterator, Any
 
-from src.block.enums import BlockType
+from src.block.enums import BlockType, ArgType
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose
 
@@ -134,7 +134,7 @@ class Trainer:
 
                 _, predicted = torch.max(outputs, 1)  # 예측값 얻기
                 correct += (predicted == targets).sum().item()  # 맞춘 샘플 수 누적
-                total += targets.total_pages(0)  # 전체 샘플 수 누적
+                total += targets.size(0)  # 전체 샘플 수 누적
 
                 loss = self.criterion(outputs, targets)
 
@@ -157,7 +157,7 @@ class Trainer:
 
                 _, predicted = torch.max(outputs, 1)  # 예측값 얻기
                 correct += (predicted == targets).sum().item()  # 맞춘 샘플 수 누적
-                total += targets.total_pages(0)  # 전체 샘플 수 누적
+                total += targets.size(0)  # 전체 샘플 수 누적
 
         return correct / total # train accuracy 반환
 
@@ -215,7 +215,7 @@ class Trainer:
                 y_true.extend(labels.cpu().numpy())
                 y_pred.extend(predicted.cpu().numpy())
                 top1_correct += (predicted == labels).sum().item()  # Top-1 정답 카운트
-                total += labels.total_pages(0)
+                total += labels.size(0)
 
                 # Top-5 예측값
                 _, top5_pred = outputs.topk(5, dim=1)  # 각 샘플에 대해 상위 5개 예측
@@ -295,7 +295,7 @@ def convert_layer_block_to_module(layer_block: CanvasBlock) -> nn.Module | None:
     return convert_block_to_obj(layer_block)
 
 def convert_activation_block_to_module(activation_block: CanvasBlock) -> nn.Module | None:
-
+    torchvision.transforms.Resize()
     if activation_block.type != BlockType.ACTIVATION:
         return None
 
@@ -313,7 +313,7 @@ def convert_optimizer_block_to_optimizer(optimizer_block: CanvasBlock, parameter
     if optimizer_block.type != BlockType.OPTIMIZER:
         return None
 
-    optimizer_block.args.append(Arg(name="params", value=parameters, is_required=True))
+    optimizer_block.args.append(Arg(name="params", value=parameters, is_required=True, type=ArgType.MODEL_PARAMS))
 
     return convert_block_to_obj(optimizer_block)
 
@@ -476,13 +476,13 @@ def save_metadata(project_name: str, result_name: str, data_block: CanvasBlock, 
     # classes = find_argument(data_block, "classes")
 
     # 데이터 검증
-    if not all([data_path, input_shape, classes]):
+    if not all([data_path, classes]):
         raise ValueError("메타데이터 정보가 올바르지 않습니다.")
 
     # 메타데이터 저장
     metadata = TrainResultMetadata(
         data_path=data_path,
-        input_shape=input_shape,
+        input_shape=[227],
         classes=classes,
         status=TrainStatus.RUNNING
     )
