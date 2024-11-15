@@ -187,12 +187,10 @@ const CanvasResult = () => {
 
       handleFieldChange(firstNodeId, heatMap.originalImg);
       handleFieldChange(heatMapId, heatMap.heatmapImg);
+    } else if (!heatMap) {
+      resetImage();
     }
   }, [heatMap, canvas]);
-
-  useEffect(() => {
-    resetImage();
-  }, [epochName, resetImage]);
 
   return (
     <>
