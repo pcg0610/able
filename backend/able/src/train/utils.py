@@ -472,7 +472,7 @@ def save_metadata(project_name: str, result_name: str, data_block: CanvasBlock, 
 
     # 메타데이터 정보 추출
     data_path = find_argument(data_block, "data_path")
-    input_shape = find_argument(data_block, "input_shape")
+    # input_shape = find_argument(data_block, "input_shape")
     # classes = find_argument(data_block, "classes")
 
     # 데이터 검증
@@ -482,7 +482,7 @@ def save_metadata(project_name: str, result_name: str, data_block: CanvasBlock, 
     # 메타데이터 저장
     metadata = TrainResultMetadata(
         data_path=data_path,
-        input_shape=[227],
+        # input_shape=input_shape,
         classes=classes,
         status=TrainStatus.RUNNING
     )
