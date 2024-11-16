@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import logging
 import matplotlib.pyplot as plt
+import torch.nn.functional as F
 from PIL import Image
 from typing import List
 from pathlib import Path
@@ -113,18 +114,21 @@ class FeatureMapExtractor:
     
 
     def save_top_k_scores(self, k: int = 3) -> List[ClassScore]:
-        top_values, top_indices = self.output.topk(k, dim=1)
+        probabilities = F.softmax(self.output, dim=1)
+        top_values, top_indices = probabilities.topk(k, dim=1)
+
         top_values = top_values[0].cpu().detach().numpy()
         top_indices = top_indices[0].cpu().detach().numpy()
 
         class_names = get_class_names(self.result_path / METADATA)
-        logger.info(f"상위 {k}개의 클래스: {[class_names[idx] for idx in top_indices ]}")
-        logger.info(f"상위 {k}개의 클래스 점수: {top_values}")
+        logger.info(f"상위 {k}개의 클래스: {[class_names[idx] for idx in top_indices]}")
+        logger.info(f"상위 {k}개의 클래스 점수 (확률): {top_values}")
 
+        # 100점 만점으로 변환
         scores = [
             ClassScore(
                 class_name=class_names[idx] if class_names else f"Class {idx}",
-                class_score=round(score * 100) 
+                class_score=round(float(score) * 100)  # float 변환 후 100점 만점 계산
             )
             for idx, score in zip(top_indices, top_values)
         ]
