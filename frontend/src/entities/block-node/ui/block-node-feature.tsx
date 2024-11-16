@@ -89,24 +89,22 @@ const BlockNodeFeature = ({
                     그래프 숨기기
                   </S.Title>
                   <S.ToggleButton onClick={toggleGraphVisibility}>
-                    {isGraphVisible ? '▲' : '▼'}
+                    {isGraphVisible ? '△' : '▼'}
                   </S.ToggleButton>
                 </S.Header>
-                {isGraphVisible && (
-                  <S.BarContainer>
-                    {classScores.map((score, index) => (
-                      <S.BarWrapper key={index}>
-                        <S.BarLabel>{score.className}</S.BarLabel>
-                        <S.Bar
-                          height={score.classScore}
-                          color={index === 0 ? '#00274d' : index === 1 ? '#5b8db8' : '#aac4e1'}
-                        >
-                          <S.BarScore>{score.classScore}</S.BarScore>
-                        </S.Bar>
-                      </S.BarWrapper>
-                    ))}
-                  </S.BarContainer>
-                )}
+                <S.BarContainer isVisible={isGraphVisible}>
+                  {classScores.map((score, index) => (
+                    <S.BarWrapper key={index}>
+                      <S.BarLabel>{score.className}</S.BarLabel>
+                      <S.Bar
+                        height={score.classScore}
+                        color={index === 0 ? '#00274d' : index === 1 ? '#5b8db8' : '#aac4e1'}
+                      >
+                        <S.BarScore>{score.classScore}</S.BarScore>
+                      </S.Bar>
+                    </S.BarWrapper>
+                  ))}
+                </S.BarContainer>
               </S.GraphContainer>
             </NodeToolbar>
           </div>

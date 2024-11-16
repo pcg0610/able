@@ -147,13 +147,15 @@ export const ToggleButton = styled.button`
   cursor: pointer;
 `;
 
-export const BarContainer = styled.div`
+export const BarContainer = styled.div<{ isVisible: boolean }>`
   display: flex;
   flex-direction: row;
-  justify-content: space-between; /* 막대 사이에 균등 간격 */
-  align-items: flex-end; /* 모든 막대 하단 정렬 */
-  margin-top: 1rem;
-  gap: 1rem; /* 막대 간 간격 */
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  max-height: ${(props) => (props.isVisible ? '500px' : '0px')}; /* 열림/닫힘에 따라 높이 변경 */
+  overflow: hidden; /* 닫힐 때 내용 숨기기 */
+  transition: max-height 0.3s ease-in-out; /* 부드러운 전환 효과 */
 `;
 
 export const BarWrapper = styled.div`
@@ -163,6 +165,7 @@ export const BarWrapper = styled.div`
   align-items: center;
   text-align: center;
   width: 5rem;
+  margin-top: 1.25rem;
 `;
 
 export const Bar = styled.div<{ height: number; color: string }>`
