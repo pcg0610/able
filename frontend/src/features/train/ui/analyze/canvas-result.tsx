@@ -7,7 +7,6 @@ import {
   ReactFlowProvider,
   Background,
   BackgroundVariant,
-  Position,
   type Node as XYFlowNode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -134,12 +133,12 @@ const CanvasResult = () => {
         nds.map((node) =>
           node.id === nodeId
             ? {
-                ...node,
-                data: {
-                  ...node.data,
-                  featureMap: image,
-                },
-              }
+              ...node,
+              data: {
+                ...node.data,
+                featureMap: image,
+              },
+            }
             : node
         )
       );
@@ -198,6 +197,7 @@ const CanvasResult = () => {
     }
   }, [heatMap, canvas]);
 
+
   return (
     <>
       {isModalOpen && <DeviceSelectModal onClose={handleModalClose} onSubmit={handleCreateModel} />}
@@ -206,8 +206,6 @@ const CanvasResult = () => {
           ...node,
           data: {
             ...node.data,
-            forceToolbarVisible: true,
-            toolbarPosition: Position.Right,
             onFieldChange: (img: string) => handleFieldChange(node.id, img),
           },
         }))}
