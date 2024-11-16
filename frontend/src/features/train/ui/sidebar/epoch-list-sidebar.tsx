@@ -69,7 +69,10 @@ const EpochListSidebar = () => {
     if (keyword && searchEpoch) {
       setAllEpochs(searchEpoch);
     } else if (!keyword && epochData?.checkpoints) {
-      setAllEpochs((prevEpochs) => [...prevEpochs, ...epochData.checkpoints]);
+      setAllEpochs((prevEpochs) => {
+        const newEpochs = epochData.checkpoints.filter((epoch) => !prevEpochs.includes(epoch));
+        return [...prevEpochs, ...newEpochs];
+      });
     }
   }, [searchEpoch, epochData, keyword]);
 

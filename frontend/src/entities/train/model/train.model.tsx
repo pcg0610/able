@@ -15,7 +15,7 @@ export const useImageStore = create<ImageStore>((set) => ({
 
    setHeatMapImage: (data) => {
       set({
-         heatmapImage: data.heatmapImage,
+         heatmapImage: data.image,
          classScores: data.classScores,
       });
    },
