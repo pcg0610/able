@@ -26,7 +26,7 @@ const BlockNodeFeature = ({
   sourcePosition = Position.Bottom,
   targetPosition = Position.Top,
 }: BlockNodeFeatureProps) => {
-  const { uploadedImage, setUploadedImage, heatmapImage, classScores, heatMapId } = useImageStore();
+  const { uploadedImage, setUploadedImage, heatmapImage, classScores, heatMapId, resetImage } = useImageStore();
 
   const blockColor = useMemo(
     () => (data?.block?.type ? BLOCK_COLORS[data.block.type] : Common.colors.gray200),
@@ -40,6 +40,9 @@ const BlockNodeFeature = ({
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = () => {
+        if (uploadedImage) {
+          resetImage();
+        }
         setUploadedImage(reader.result as string);
       };
       reader.readAsDataURL(file);

@@ -7,7 +7,6 @@ import {
   ReactFlowProvider,
   Background,
   BackgroundVariant,
-  Position,
   type Node as XYFlowNode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -197,6 +196,7 @@ const CanvasResult = () => {
       resetImage();
     }
   }, [heatMap, canvas]);
+
 
   return (
     <>
