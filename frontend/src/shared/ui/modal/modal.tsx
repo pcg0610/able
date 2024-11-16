@@ -12,9 +12,7 @@ interface ModalProps {
   children: ReactNode;
   cancelText?: string;
   confirmText?: string;
-  isClosing?: boolean;
   isDelete?: boolean;
-  onAnimationEnd?: () => void;
 }
 
 const Modal = ({
@@ -25,12 +23,10 @@ const Modal = ({
   children,
   cancelText = '취소',
   confirmText = '확인',
-  isClosing,
   isDelete = false,
-  onAnimationEnd,
 }: ModalProps) => (
   <ModalPortal>
-    <S.ModalOverlay onClick={onClose} onAnimationEnd={onAnimationEnd} className={isClosing ? 'fadeOut' : 'fadeIn'}>
+    <S.ModalOverlay onClick={onClose}>
       <S.ModalWrapper onClick={(e) => e.stopPropagation()}>
         <S.ModalHeader>
           <S.Title>{title}</S.Title>
@@ -38,7 +34,9 @@ const Modal = ({
         </S.ModalHeader>
         <S.ModalBody>{children}</S.ModalBody>
         <S.ModalFooter>
-          <S.CancelButton isDelete={isDelete} onClick={isDelete ? onDelete : onClose}>{cancelText}</S.CancelButton>
+          <S.CancelButton isDelete={isDelete} onClick={isDelete ? onDelete : onClose}>
+            {cancelText}
+          </S.CancelButton>
           <S.ConfirmButton onClick={onConfirm}>{confirmText}</S.ConfirmButton>
         </S.ModalFooter>
       </S.ModalWrapper>
