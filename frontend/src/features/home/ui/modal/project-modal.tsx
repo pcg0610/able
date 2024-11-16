@@ -9,12 +9,10 @@ import Input from '@shared/ui/input/input';
 
 interface ProjectModalProps {
   onClose: () => void;
-  isClosing: boolean;
-  onAnimationEnd: () => void;
   type: 'create' | 'modify';
 }
 
-const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModalProps) => {
+const ProjectModal = ({ onClose, type }: ProjectModalProps) => {
   const isReadOnly = type === 'modify';
   const { currentProject } = useProjectStore();
   const [projectTitle, setProjectTitle] = useState(currentProject?.title || '');
@@ -91,11 +89,9 @@ const ProjectModal = ({ onClose, isClosing, onAnimationEnd, type }: ProjectModal
       onClose={onClose}
       onDelete={handleDeleteProject}
       onConfirm={handleCreateProject}
-      isClosing={isClosing}
-      onAnimationEnd={onAnimationEnd}
       title="프로젝트 정보를 입력하세요"
       confirmText={isReadOnly ? '수정' : '생성'}
-      cancelText={'삭제'}
+      cancelText={isReadOnly ? '삭제' : '취소'}
       isDelete={isReadOnly}
     >
       <Input
