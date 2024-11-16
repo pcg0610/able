@@ -46,8 +46,7 @@ const CanvasResult = () => {
   const [selectedNode, setSelectedNode] = useState<XYFlowNode | null>(null);
 
   const { projectName, resultName, epochName } = useProjectNameStore();
-  const { uploadedImage, heatMapId, setHeatMapId, setHeatMapImage, setAllImage, resetImage } = useImageStore();
-  const [hasSetInitialImages, setHasSetInitialImages] = useState(false);
+  const { uploadedImage, heatMapId, setHeatMapId, heatmapImage, setAllImage, resetImage } = useImageStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: canvas } = useModel(projectName, resultName);
@@ -90,13 +89,9 @@ const CanvasResult = () => {
         image: uploadedImage,
       },
       {
-        onSuccess: (data) => {
-          setHeatMapImage({
-            heatmapImage: data.image,
-            classScores: data.classScores,
-          });
+        onSuccess: () => {
           toast.success('추론에 성공했어요.');
-          handleFieldChange(heatMapId, data.image);
+          handleFieldChange(heatMapId, heatmapImage || '');
         },
         onError: () => {
           toast.error('추론에 실패했어요.');
@@ -154,17 +149,12 @@ const CanvasResult = () => {
     if (canvas) {
       const { blocks, edges } = canvas.canvas;
 
-      const newNodes = blocks.map((block) => {
-        if (block.type === 'activation' && !heatMapId) {
-          setHeatMapId(block.id);
-        }
-        return {
-          id: block.id,
-          type: 'custom',
-          position: JSON.parse(block.position),
-          data: { block, featureMap: '' },
-        };
-      });
+      const newNodes = blocks.map((block) => ({
+        id: block.id,
+        type: 'custom',
+        position: JSON.parse(block.position),
+        data: { block, featureMap: '' },
+      }));
 
       const newEdges = edges.map((edge) => ({
         id: edge.id,
@@ -179,8 +169,15 @@ const CanvasResult = () => {
   }, [canvas, setNodes, setEdges, setHeatMapId]);
 
   useEffect(() => {
-    if (heatMap && nodes.length > 0 && !hasSetInitialImages) {
+    if (canvas && heatMap && nodes.length > 0) {
       const firstNodeId = nodes[0].id;
+      const { blocks } = canvas.canvas;
+
+      blocks.map((block) => {
+        if (block.type === 'activation') {
+          setHeatMapId(block.id);
+        }
+      });
 
       setAllImage({
         uploadedImage: heatMap.originalImg,
@@ -190,15 +187,10 @@ const CanvasResult = () => {
 
       handleFieldChange(firstNodeId, heatMap.originalImg);
       handleFieldChange(heatMapId, heatMap.heatmapImg);
-
-      setHasSetInitialImages(true);
+    } else if (!heatMap) {
+      resetImage();
     }
-  }, [heatMap, nodes, hasSetInitialImages, heatMapId, setAllImage, handleFieldChange]);
-
-  useEffect(() => {
-    setHasSetInitialImages(false);
-    resetImage();
-  }, [epochName, resetImage]);
+  }, [heatMap, canvas]);
 
   return (
     <>
