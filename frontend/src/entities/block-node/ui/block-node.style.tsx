@@ -107,11 +107,7 @@ export const CustomUploadContainer = styled.div`
   align-items: center;
   justify-content: center;
   transition: border-color 0.3s ease;
-  color: #666666;
-
-  &:hover {
-    border-color: #666666;
-  }
+  color: ${Common.colors.gray400};
 `;
 
 export const HiddenInput = styled.input`
@@ -153,9 +149,9 @@ export const BarContainer = styled.div<{ isVisible: boolean }>`
   justify-content: space-between;
   align-items: flex-end;
   gap: 1rem;
-  max-height: ${(props) => (props.isVisible ? '500px' : '0px')}; /* 열림/닫힘에 따라 높이 변경 */
-  overflow: hidden; /* 닫힐 때 내용 숨기기 */
-  transition: max-height 0.3s ease-in-out; /* 부드러운 전환 효과 */
+  max-height: ${(props) => (props.isVisible ? '31.25rem' : '0rem')}; 
+  overflow: hidden; 
+  transition: max-height 0.3s ease-in-out; 
 `;
 
 export const BarWrapper = styled.div`
@@ -170,7 +166,7 @@ export const BarWrapper = styled.div`
 
 export const Bar = styled.div<{ height: number; color: string }>`
   width: 3.4375rem;
-  height: ${(props) => props.height * 30}px;
+  height: ${(props) => (props.height * 30) / 16}rem;
   background-color: ${(props) => props.color};
   border-radius: 0.125rem;
   display: flex;
