@@ -81,7 +81,7 @@ const BlockNodeFeature = ({
         ) : data.block.id === heatMapId && heatmapImage ? (
           <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
             <S.Image src={heatmapImage} alt={data.block.name} />
-            <NodeToolbar isVisible>
+            <NodeToolbar isVisible position={Position.Right} >
               <S.GraphContainer>
                 <S.Header>
                   <S.Title>

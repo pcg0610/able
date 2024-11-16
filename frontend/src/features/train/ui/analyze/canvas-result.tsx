@@ -134,12 +134,12 @@ const CanvasResult = () => {
         nds.map((node) =>
           node.id === nodeId
             ? {
-                ...node,
-                data: {
-                  ...node.data,
-                  featureMap: image,
-                },
-              }
+              ...node,
+              data: {
+                ...node.data,
+                featureMap: image,
+              },
+            }
             : node
         )
       );
@@ -206,8 +206,6 @@ const CanvasResult = () => {
           ...node,
           data: {
             ...node.data,
-            forceToolbarVisible: true,
-            toolbarPosition: Position.Right,
             onFieldChange: (img: string) => handleFieldChange(node.id, img),
           },
         }))}
