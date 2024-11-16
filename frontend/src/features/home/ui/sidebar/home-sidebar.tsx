@@ -6,15 +6,14 @@ import Common from '@shared/styles/common';
 import { useProjects } from '@features/home/api/use-home.query';
 import { useProjectNameStore } from '@entities/project/model/project.model';
 
-import ProjectModal from '@/features/home/ui/modal/project-modal';
+import ProjectModal from '@features/home/ui/modal/project-modal';
 import BasicButton from '@shared/ui/button/basic-button';
 import FileIcon from '@icons/file.svg?react';
 import RocketIcon from '@icons/rocket.svg?react';
-import LoadingSpinner from '@icons/horizontal-loading.svg?react';
+import Spinner from '@shared/ui/loading/spinner';
 
 const HomeSideBar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const navigate = useNavigate();
 
   const { projectName, setProjectName } = useProjectNameStore();
@@ -26,7 +25,7 @@ const HomeSideBar = () => {
     }
   }, [projects, projectName, setProjectName]);
 
-  const handleClick = (project: string) => {
+  const handleProjectSelect = (project: string) => {
     setProjectName(project);
   };
 
@@ -36,18 +35,10 @@ const HomeSideBar = () => {
 
   const handleCreateProjectClick = () => {
     setIsModalOpen(true);
-    setIsClosing(false);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-  };
-
-  const handleAnimationEnd = () => {
-    if (isClosing) {
-      setIsModalOpen(false);
-      setIsClosing(false);
-    }
   };
 
   return (
@@ -66,16 +57,15 @@ const HomeSideBar = () => {
 
       <S.FolderSection>
         {isLoading ? (
-          <LoadingSpinner height={50} />
+          <Spinner height={50} />
         ) : (
           projects?.map((project: string, index: number) => (
-            <S.Folder key={index} isSelected={projectName === project} onClick={() => handleClick(project)}>
+            <S.Folder key={index} isSelected={projectName === project} onClick={() => handleProjectSelect(project)}>
               <FileIcon width={20} height={20} /> {project}
             </S.Folder>
           ))
         )}
       </S.FolderSection>
-
       <S.Footer onClick={handleServer}>
         <S.RocketCircle>
           <RocketIcon width={40} height={40} />
@@ -85,9 +75,7 @@ const HomeSideBar = () => {
           <S.FooterStatus>Running...</S.FooterStatus>
         </div>
       </S.Footer>
-      {isModalOpen && (
-        <ProjectModal onClose={closeModal} isClosing={isClosing} onAnimationEnd={handleAnimationEnd} type={'create'} />
-      )}
+      {isModalOpen && <ProjectModal onClose={closeModal} type={'create'} />}
     </S.SidebarContainer>
   );
 };
