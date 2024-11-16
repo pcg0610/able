@@ -167,7 +167,7 @@ export const BarWrapper = styled.div`
 
 export const Bar = styled.div<{ height: number; color: string }>`
   width: 3.4375rem;
-  height: ${(props) => (props.height * 30) / 16}rem;
+  height: ${(props) => (props.height) / 16}rem;
   background-color: ${(props) => props.color};
   border-radius: 0.125rem;
   display: flex;
