@@ -120,7 +120,6 @@ export const GraphContainer = styled.div`
   padding: 1rem;
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-  min-width: 15.625rem;
 `;
 
 export const Header = styled.div`
@@ -141,6 +140,8 @@ export const ToggleButton = styled.button`
   border: none;
   font-size: 1rem;
   cursor: pointer;
+  padding: 1rem; 
+  margin: -1rem;
 `;
 
 export const BarContainer = styled.div<{ isVisible: boolean }>`
@@ -189,4 +190,11 @@ export const BarLabel = styled.span`
   word-wrap: break-word;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+`;
+
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row; 
+  align-items: flex-start; 
+  gap: 1rem; 
 `;
