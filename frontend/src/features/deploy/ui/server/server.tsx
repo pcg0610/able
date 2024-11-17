@@ -36,6 +36,7 @@ const Server = () => {
             width="8.125rem"
             height="3rem"
             icon={<PlayIcon width={13} height={15} />}
+            disabled={isRunning}
             onClick={startServer}
           />
           <BasicButton
@@ -44,6 +45,7 @@ const Server = () => {
             width="8.125rem"
             height="3rem"
             icon={<RestartIcon width={24} height={24} />}
+            disabled={!isRunning}
             onClick={restartServer}
           />
           <BasicButton
@@ -52,6 +54,7 @@ const Server = () => {
             width="8.125rem"
             height="3rem"
             icon={<StopIcon width={30} height={30} />}
+            disabled={!isRunning}
             onClick={stopServer}
           />
         </S.ButtonWrapper>
