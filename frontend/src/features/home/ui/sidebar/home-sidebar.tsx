@@ -5,6 +5,7 @@ import * as S from '@features/home/ui/sidebar/home-sidebar.style';
 import Common from '@shared/styles/common';
 import { useProjects } from '@features/home/api/use-home.query';
 import { useProjectNameStore } from '@entities/project/model/project.model';
+import { useFetchDeployInfo } from '@features/deploy/api/use-deploy.query';
 
 import ProjectModal from '@features/home/ui/modal/project-modal';
 import BasicButton from '@shared/ui/button/basic-button';
@@ -18,6 +19,7 @@ const HomeSideBar = () => {
 
   const { projectName, setProjectName } = useProjectNameStore();
   const { data: projects, isLoading } = useProjects();
+  const { data: deployInfo } = useFetchDeployInfo();
 
   useEffect(() => {
     if (projects && projects.length > 0 && !projectName) {
@@ -71,8 +73,8 @@ const HomeSideBar = () => {
           <FastApiIcon />
         </S.FooterIcon>
         <div>
-          <S.FooterText>서버 확인하기</S.FooterText>
-          <S.FooterStatus>Running...</S.FooterStatus>
+          <S.FooterText>배포 서버 확인</S.FooterText>
+          <S.FooterStatus>{deployInfo?.status}</S.FooterStatus>
         </div>
       </S.Footer>
       {isModalOpen && <ProjectModal onClose={closeModal} type={'create'} />}

@@ -75,7 +75,7 @@ export const Footer = styled.div`
   padding: 0.625rem;
   margin-top: auto;
   gap: 0.9375rem;
-  min-height: 6.25rem;
+  min-height: 5.4rem;
   transition-duration: 0.6s;
   cursor: pointer;
 
