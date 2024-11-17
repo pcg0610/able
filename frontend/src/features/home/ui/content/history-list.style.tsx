@@ -5,8 +5,7 @@ import Common from '@shared/styles/common';
 export const HistoryListWrapper = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-top: 16px;
-  font-size: 14px;
+  font-size: ${Common.fontSizes.sm};
   color: #333;
   table-layout: fixed;
 `;
