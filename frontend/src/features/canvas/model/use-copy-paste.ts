@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 
 import { BlockItem } from '@features/canvas/types/block.type';
 
-export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge = Edge>() {
+export const useCopyPaste = <NodeType extends Node = Node, EdgeType extends Edge = Edge>() => {
   // 현재 마우스 위치 저장 (붙여넣기 시 마우스 위치를 기준으로 노드 배치)
   const mousePosRef = useRef<XYPosition>({ x: 0, y: 0 });
   // React Flow의 Dom 노드 가져오기
@@ -151,9 +151,9 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
   useShortcut(['Meta+v', 'Control+v'], paste);
 
   return { cut, copy, paste, bufferedNodes, bufferedEdges };
-}
+};
 
-function useShortcut(keyCode: KeyCode, callback: () => void): void {
+const useShortcut = (keyCode: KeyCode, callback: () => void): void => {
   const [didRun, setDidRun] = useState(false);
   const shouldRun = useKeyPress(keyCode); // 특정 키가 눌렸는지 감지
 
@@ -166,6 +166,6 @@ function useShortcut(keyCode: KeyCode, callback: () => void): void {
       setDidRun(shouldRun);
     }
   }, [shouldRun, didRun, callback]);
-}
+};
 
 export default useCopyPaste;
