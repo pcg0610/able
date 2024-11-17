@@ -58,6 +58,7 @@ base_dir = Path(__file__).parent.parent
 
 # assets 폴더를 정적 파일 경로로 설정
 app.mount("/assets", StaticFiles(directory=base_dir / "static/assets"), name="assets")
+app.mount("/fonts", StaticFiles(directory="static/fonts"), name="fonts")
 
 # static 폴더를 템플릿 경로로 설정
 templates = Jinja2Templates(directory=base_dir / "static")
