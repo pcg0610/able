@@ -1,14 +1,12 @@
-import { Position, useReactFlow } from '@xyflow/react';
+import { Handle, Position, useReactFlow } from '@xyflow/react';
 import { memo, useMemo, useState } from 'react';
 
 import * as S from '@entities/block-node/ui/block-node.style';
 import Common from '@shared/styles/common';
-import { CONNECTION_LIMIT_COOUNT } from '@entities/block-node/constants/node.constant';
 import { BLOCK_COLORS } from '@shared/constants/block';
 import type { BlockItem } from '@features/canvas/types/block.type';
 import { capitalizeFirstLetter } from '@shared/utils/formatters.util';
 
-import CustomHandle from '@entities/block-node/ui/custom-handle';
 import ArrowButton from '@/shared/ui/button/arrow-button';
 
 interface BlockNodeProps {
@@ -43,7 +41,7 @@ const BlockNode = ({
 
   return (
     <S.Container blockColor={blockColor} isConnected={isConnected} isSelected={isSelected}>
-      <CustomHandle type="target" position={targetPosition} connectionCount={CONNECTION_LIMIT_COOUNT} />
+      <Handle type="target" position={targetPosition} />
       <S.Label>
         <span>{capitalizeFirstLetter(block?.name || 'Unknown')}</span>
         <ArrowButton
@@ -76,7 +74,7 @@ const BlockNode = ({
           </S.InputWrapper>
         ))}
       </S.FieldWrapper>
-      <CustomHandle type="source" position={sourcePosition} connectionCount={CONNECTION_LIMIT_COOUNT} />
+      <Handle type="source" position={sourcePosition} />
     </S.Container>
   );
 };
