@@ -10,6 +10,9 @@ import {
   type KeyCode,
 } from '@xyflow/react';
 import { v4 as uuidv4 } from 'uuid';
+import toast from 'react-hot-toast';
+
+import { BlockItem } from '@features/canvas/types/block.type';
 
 export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge = Edge>() {
   // 현재 마우스 위치 저장 (붙여넣기 시 마우스 위치를 기준으로 노드 배치)
@@ -61,6 +64,14 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
     // 선택된 노드와 관련 엣지를 가져와 bufferedNodes/bufferedEdges에 저장
     // getConnectedEdges: 선택된 노드와 연결된 엣지 찾기
     const selectedNodes = getNodes().filter((node) => node.selected);
+    console.log(selectedNodes);
+
+    // data 블록은 복사 불가
+    if (selectedNodes.some((node) => (node.data?.block as BlockItem).type === 'data')) {
+      toast.error('Data 블록은 하나만 존재해요.');
+      return;
+    }
+
     const selectedEdges = getConnectedEdges(selectedNodes, getEdges()).filter((edge) => {
       const isExternalSource = selectedNodes.every((n) => n.id !== edge.source);
       const isExternalTarget = selectedNodes.every((n) => n.id !== edge.target);
@@ -76,6 +87,12 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
   const cut = useCallback(() => {
     // copy 동작과 유사
     const selectedNodes = getNodes().filter((node) => node.selected);
+
+    // data 블록은 복사 불가
+    if (selectedNodes.some((node) => (node.data?.block as BlockItem).type === 'data')) {
+      toast.error('Data 블록은 하나만 존재해요.');
+      return;
+    }
     const selectedEdges = getConnectedEdges(selectedNodes, getEdges()).filter((edge) => {
       const isExternalSource = selectedNodes.every((n) => n.id !== edge.source);
       const isExternalTarget = selectedNodes.every((n) => n.id !== edge.target);
