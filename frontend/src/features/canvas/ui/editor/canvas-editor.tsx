@@ -69,15 +69,12 @@ const CanvasEditor = () => {
     nodes,
     selectedNode,
   });
+  useCopyPaste();
 
   const { screenToFlowPosition } = useReactFlow();
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
-
-  const { bufferedNodes } = useCopyPaste();
-  const canCopy = nodes.some(({ selected }) => selected);
-  const canPaste = bufferedNodes.length > 0;
 
   // 초기에 백엔드에서 캔버스 정보를 받아오면 노드와 엣지 상태를 업데이트
   useEffect(() => {
