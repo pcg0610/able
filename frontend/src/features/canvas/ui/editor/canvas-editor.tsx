@@ -38,6 +38,7 @@ import { useStartTrain } from '@features/canvas/api/use-train.mutation';
 import { useNodeDropHandler } from '@features/canvas/model/use-node-drop-handler.model';
 import { useNodeChangeHandler } from '@features/canvas/model/use-node-change-handler.modle';
 import { useEdgeChangeHandler } from '@features/canvas/model/use-edge-change-handler.model';
+import { useCopyPaste } from '@features/canvas/model/use-copy-paste';
 
 import BlockNode from '@entities/block-node/ui/block-node';
 import BasicButton from '@shared/ui/button/basic-button';
@@ -73,6 +74,10 @@ const CanvasEditor = () => {
   const { dropRef } = useNodeDropHandler({ setNodes, screenToFlowPosition });
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
+
+  const { bufferedNodes } = useCopyPaste();
+  const canCopy = nodes.some(({ selected }) => selected);
+  const canPaste = bufferedNodes.length > 0;
 
   // 초기에 백엔드에서 캔버스 정보를 받아오면 노드와 엣지 상태를 업데이트
   useEffect(() => {
