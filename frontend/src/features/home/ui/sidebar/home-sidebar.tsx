@@ -9,7 +9,7 @@ import { useProjectNameStore } from '@entities/project/model/project.model';
 import ProjectModal from '@features/home/ui/modal/project-modal';
 import BasicButton from '@shared/ui/button/basic-button';
 import FileIcon from '@icons/file.svg?react';
-import RocketIcon from '@icons/rocket.svg?react';
+import FastApiIcon from '@icons/fast-api.svg?react';
 import Spinner from '@shared/ui/loading/spinner';
 
 const HomeSideBar = () => {
@@ -43,7 +43,7 @@ const HomeSideBar = () => {
 
   return (
     <S.SidebarContainer>
-      <S.Title>내 프로젝트</S.Title>
+      <S.Title>프로젝트 목록</S.Title>
       <S.Subtitle>내가 생성한 모델 모아보기</S.Subtitle>
       <BasicButton
         color={Common.colors.primary}
@@ -67,9 +67,9 @@ const HomeSideBar = () => {
         )}
       </S.FolderSection>
       <S.Footer onClick={handleServer}>
-        <S.RocketCircle>
-          <RocketIcon width={40} height={40} />
-        </S.RocketCircle>
+        <S.FooterIcon>
+          <FastApiIcon />
+        </S.FooterIcon>
         <div>
           <S.FooterText>서버 확인하기</S.FooterText>
           <S.FooterStatus>Running...</S.FooterStatus>

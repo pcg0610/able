@@ -12,7 +12,6 @@ import Pagination from '@shared/ui/pagination/pagination';
 import ProjectModal from '@features/home/ui/modal/project-modal';
 import WritingIcon from '@icons/writing.svg?react';
 import ClockIcon from '@icons/clock.svg?react';
-import FolderIcon from '@icons/folder.svg?react';
 import SettingIcon from '@icons/setting.svg?react';
 import Skeleton from '@/shared/ui/loading/skeleton';
 
@@ -54,7 +53,6 @@ const HomeContent = () => {
       <S.HomeContentWrapper>
         <div>
           <S.Title>
-            <FolderIcon width={32} height={32} />
             {currentProject?.title ? <S.Title>{currentProject?.title}</S.Title> : <Skeleton width={8} height={1.95} />}
             <SettingIcon
               width={20}
