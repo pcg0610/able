@@ -9,6 +9,7 @@ import {
   useStore,
   type KeyCode,
 } from '@xyflow/react';
+import { v4 as uuidv4 } from 'uuid';
 
 export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge = Edge>() {
   // 현재 마우스 위치 저장 (붙여넣기 시 마우스 위치를 기준으로 노드 배치)
@@ -106,7 +107,7 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
       const now = Date.now();
 
       const newNodes: NodeType[] = bufferedNodes.map((node) => {
-        const id = `${node.id}-${now}`;
+        const id = uuidv4();
         const x = pasteX + (node.position.x - minX);
         const y = pasteY + (node.position.y - minY);
 
@@ -115,7 +116,7 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
 
       // 새 노드/엣지 배열 생성
       const newEdges: EdgeType[] = bufferedEdges.map((edge) => {
-        const id = `${edge.id}-${now}`;
+        const id = uuidv4();
         const source = `${edge.source}-${now}`;
         const target = `${edge.target}-${now}`;
 
