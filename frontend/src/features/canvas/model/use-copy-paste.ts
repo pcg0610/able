@@ -11,24 +11,25 @@ import {
 } from '@xyflow/react';
 
 export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge = Edge>() {
+  // 현재 마우스 위치 저장 (붙여넣기 시 마우스 위치를 기준으로 노드 배치)
   const mousePosRef = useRef<XYPosition>({ x: 0, y: 0 });
+  // React Flow의 Dom 노드 가져오기
   const rfDomNode = useStore((state) => state.domNode);
 
   const { getNodes, setNodes, getEdges, setEdges, screenToFlowPosition } = useReactFlow<NodeType, EdgeType>();
 
-  // Set up the paste buffers to store the copied nodes and edges.
+  // 복사한 노드/엣지를 저장하기 위한 노드 배열/엣지 배열
   const [bufferedNodes, setBufferedNodes] = useState([] as NodeType[]);
   const [bufferedEdges, setBufferedEdges] = useState([] as EdgeType[]);
 
-  // initialize the copy/paste hook
-  // 1. remove native copy/paste/cut handlers
-  // 2. add mouse move handler to keep track of the current mouse position
   useEffect(() => {
+    // native 이벤트(cut, copy, paste)를 막고, React Flow의 커스텀 동작을 수행하기 위해 설정
     const events = ['cut', 'copy', 'paste'];
 
     if (rfDomNode) {
-      const preventDefault = (e: Event) => e.preventDefault();
+      const preventDefault = (e: Event) => e.preventDefault(); // 기본 동작 막기
 
+      // 마우스 이동 이벤트 (현재 마우스 위치 저장)
       const onMouseMove = (event: MouseEvent) => {
         mousePosRef.current = {
           x: event.clientX,
@@ -36,12 +37,14 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
         };
       };
 
+      // 이벤트 핸들러를 React Flow DOM 노드에 추가
       for (const event of events) {
         rfDomNode.addEventListener(event, preventDefault);
       }
 
       rfDomNode.addEventListener('mousemove', onMouseMove);
 
+      // 컴포넌트 언마운트 시 이벤트 핸들러 제거
       return () => {
         for (const event of events) {
           rfDomNode.removeEventListener(event, preventDefault);
@@ -52,7 +55,10 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
     }
   }, [rfDomNode]);
 
+  // 복사하기
   const copy = useCallback(() => {
+    // 선택된 노드와 관련 엣지를 가져와 bufferedNodes/bufferedEdges에 저장
+    // getConnectedEdges: 선택된 노드와 연결된 엣지 찾기
     const selectedNodes = getNodes().filter((node) => node.selected);
     const selectedEdges = getConnectedEdges(selectedNodes, getEdges()).filter((edge) => {
       const isExternalSource = selectedNodes.every((n) => n.id !== edge.source);
@@ -65,7 +71,9 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
     setBufferedEdges(selectedEdges);
   }, [getNodes, getEdges]);
 
+  // 잘라내기
   const cut = useCallback(() => {
+    // copy 동작과 유사
     const selectedNodes = getNodes().filter((node) => node.selected);
     const selectedEdges = getConnectedEdges(selectedNodes, getEdges()).filter((edge) => {
       const isExternalSource = selectedNodes.every((n) => n.id !== edge.source);
@@ -77,11 +85,12 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
     setBufferedNodes(selectedNodes);
     setBufferedEdges(selectedEdges);
 
-    // A cut action needs to remove the copied nodes and edges from the graph.
+    // 선택된 노드/엣지 삭제
     setNodes((nodes) => nodes.filter((node) => !node.selected));
     setEdges((edges) => edges.filter((edge) => !selectedEdges.includes(edge)));
   }, [getNodes, setNodes, getEdges, setEdges]);
 
+  // 붙여넣기
   const paste = useCallback(
     (
       { x: pasteX, y: pasteY } = screenToFlowPosition({
@@ -89,6 +98,8 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
         y: mousePosRef.current.y,
       })
     ) => {
+      // 붙여넣을 위치(pasteX, pasteY) 계산
+      // minX, minY: 복사된 노드의 최상단 좌표를 기준으로 이동
       const minX = Math.min(...bufferedNodes.map((s) => s.position.x));
       const minY = Math.min(...bufferedNodes.map((s) => s.position.y));
 
@@ -102,6 +113,7 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
         return { ...node, id, position: { x, y } };
       });
 
+      // 새 노드/엣지 배열 생성
       const newEdges: EdgeType[] = bufferedEdges.map((edge) => {
         const id = `${edge.id}-${now}`;
         const source = `${edge.source}-${now}`;
@@ -125,8 +137,9 @@ export function useCopyPaste<NodeType extends Node = Node, EdgeType extends Edge
 
 function useShortcut(keyCode: KeyCode, callback: () => void): void {
   const [didRun, setDidRun] = useState(false);
-  const shouldRun = useKeyPress(keyCode);
+  const shouldRun = useKeyPress(keyCode); // 특정 키가 눌렸는지 감지
 
+  // 키 입력 이벶ㄴ트가 발생하면 callback 실행
   useEffect(() => {
     if (shouldRun && !didRun) {
       callback();
