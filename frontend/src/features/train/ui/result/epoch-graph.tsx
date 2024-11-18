@@ -35,6 +35,7 @@ const EpochGraph = ({ epochData }: EpochGraphProps) => {
           strokeWidth={2}
           dot={false}
           name="accuracy"
+          animationDuration={600}
         />
       </LineChart>
     </ResponsiveContainer>

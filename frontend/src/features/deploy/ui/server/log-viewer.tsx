@@ -9,23 +9,33 @@ const LogViewer = () => {
   const [logs, setLogs] = useState<string>('');
 
   useEffect(() => {
+    let isUnmounted = false;
+
     const connectWebSocket = () => {
       ws.current = new WebSocket(websocketUrl);
 
       ws.current.onopen = () => {
+        if (isUnmounted) return;
         setLogs('');
       };
 
       ws.current.onmessage = (event) => {
+        if (isUnmounted) return;
         setLogs(event.data);
       };
 
       ws.current.onclose = () => {
+        if (isUnmounted) return;
         setLogs('WebSocket Disconnected');
-        setTimeout(connectWebSocket, 5000);
+
+        // 컴포넌트가 언마운트되지 않았을 때만 재연결 시도
+        if (!isUnmounted) {
+          setTimeout(connectWebSocket, 5000);
+        }
       };
 
       ws.current.onerror = () => {
+        if (isUnmounted) return;
         setLogs('WebSocket connection error occurred.');
       };
     };
@@ -33,8 +43,17 @@ const LogViewer = () => {
     connectWebSocket();
 
     return () => {
-      if (ws.current && ws.current.readyState === 1) {
-        ws.current.close();
+      isUnmounted = true;
+
+      if (ws.current) {
+        ws.current.onopen = null;
+        ws.current.onmessage = null;
+        ws.current.onclose = null;
+        ws.current.onerror = null;
+
+        if (ws.current.readyState === WebSocket.OPEN) {
+          ws.current.close();
+        }
       }
     };
   }, [websocketUrl]);

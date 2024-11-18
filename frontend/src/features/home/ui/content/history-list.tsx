@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 import { HISTORY_PAGE_LIMIT } from '@features/home/constants/history.constant';
 import type { HistoryItem } from '@features/home/types/home.type';
@@ -15,9 +16,13 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
   const { setResultName } = useProjectNameStore();
   const emptyRows = HISTORY_PAGE_LIMIT - trainSummaries.length;
 
-  const handleHistoryClick = (result: string) => {
-    setResultName(result);
-    navigate('/train');
+  const handleHistoryClick = (result: string, status: string) => {
+    if (status === '완료') {
+      setResultName(result);
+      navigate('/train');
+    } else {
+      toast.error('빌드에 실패한 모델이에요.');
+    }
   };
 
   return (
@@ -44,7 +49,10 @@ const HistoryList = ({ trainSummaries }: HistoryListProps) => {
         ) : (
           <>
             {trainSummaries.map((summary) => (
-              <S.HistoryRow key={summary.index} onClick={() => handleHistoryClick(summary.originDirName)}>
+              <S.HistoryRow
+                key={summary.index}
+                onClick={() => handleHistoryClick(summary.originDirName, summary.status)}
+              >
                 <S.HistoryCell width="10%">{summary.index}</S.HistoryCell>
                 <S.HistoryCell width="40%">{summary.date}</S.HistoryCell>
                 <S.HistoryCell width="20%">{summary.accuracy}</S.HistoryCell>

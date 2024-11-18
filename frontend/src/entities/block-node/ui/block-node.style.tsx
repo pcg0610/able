@@ -2,18 +2,18 @@ import styled from '@emotion/styled';
 import Common from '@shared/styles/common';
 
 export const Container = styled.div<{ blockColor: string; isConnected: boolean; isSelected: boolean }>`
-  width: 15.625rem;
-  border-radius: 0.25rem;
+  width: 250px;
+  border-radius: 4px;
   background-color: ${({ blockColor }) => blockColor};
-  border: 0.0625rem solid ${({ blockColor }) => blockColor};
+  border: 1px solid ${({ blockColor }) => blockColor};
   overflow: hidden;
   opacity: ${({ isConnected, isSelected }) => (isSelected || isConnected ? 1 : 0.3)};
-  box-shadow: ${({ isSelected, blockColor }) => (isSelected ? `0 0 0.4rem ${blockColor}` : '')};
+  box-shadow: ${({ isSelected, blockColor }) => (isSelected ? `0 0 6.4px ${blockColor}` : '')};
 `;
 
 export const Label = styled.div`
   width: 100%;
-  padding: 0.625rem 0.75rem;
+  padding: 10px 12px;
   display: flex;
   justify-content: space-between;
 
@@ -30,8 +30,8 @@ export const InputWrapper = styled.div<{ blockColor: string }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.4rem 0.75rem;
-  border-bottom: 0.0625rem solid ${({ blockColor }) => blockColor};
+  padding: 6.4px 12px;
+  border-bottom: 1px solid ${({ blockColor }) => blockColor};
 
   &:last-of-type {
     border-bottom: none;
@@ -44,10 +44,10 @@ export const Name = styled.label`
 
 export const Checkbox = styled.input<{ blockColor: string }>`
   appearance: none;
-  width: 1rem;
-  height: 1rem;
-  border: 1px solid ${Common.colors.gray200};
-  border-radius: 0.1rem;
+  width: 16px;
+  height: 16px;
+  border: 0.0625rem solid ${Common.colors.gray200};
+  border-radius: 1.6px;
   background-color: ${Common.colors.white};
   cursor: pointer;
   position: relative;
@@ -74,15 +74,15 @@ export const Checkbox = styled.input<{ blockColor: string }>`
 
 export const Input = styled.input`
   width: 40%;
-  height: 1.5rem;
-  padding: 0 0.5rem;
+  height: 24px;
+  padding: 0 8px;
 
   font-size: ${Common.fontSizes.xs};
   color: ${Common.colors.gray500};
   text-align: end;
 
-  border: 1px solid ${Common.colors.gray200};
-  border-radius: 0.1rem;
+  border: 0.0625rem solid ${Common.colors.gray200};
+  border-radius: 1.6px;
   outline: none;
 
   ::placeholder {
@@ -92,14 +92,14 @@ export const Input = styled.input`
 
 export const Image = styled.img`
   width: 100%;
-  max-height: 9.375rem;
+  max-height: 150px;
   object-fit: contain;
 `;
 
 export const CustomUploadContainer = styled.div`
   border: none;
-  padding: 1.5625rem;
-  min-height: 9.375rem;
+  padding: 25px;
+  min-height: 150px;
   text-align: center;
   cursor: pointer;
   display: flex;
@@ -107,65 +107,94 @@ export const CustomUploadContainer = styled.div`
   align-items: center;
   justify-content: center;
   transition: border-color 0.3s ease;
-  color: #666666;
-
-  &:hover {
-    border-color: #666666;
-  }
+  color: ${Common.colors.gray400};
 `;
 
 export const HiddenInput = styled.input`
   display: none;
 `;
 
-export const BarContainer = styled.div`
+
+export const GraphContainer = styled.div`
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+`;
+
+export const Header = styled.div`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const Title = styled.div`
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  gap: 0.3125rem;
+`;
+
+export const ToggleButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 1rem; 
+  margin: -1rem;
+`;
+
+export const BarContainer = styled.div<{ isVisible: boolean }>`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: flex-end;
-  justify-content: center;
-  padding: 10px;
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  gap: 1rem;
+  max-height: ${(props) => (props.isVisible ? '31.25rem' : '0rem')}; 
+  overflow: hidden; 
+  transition: max-height 0.3s ease-in-out; 
 `;
 
 export const BarWrapper = styled.div`
+  flex: 1; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 8px;
+  text-align: center;
+  width: 5rem;
+  margin-top: 1.25rem;
 `;
 
 export const Bar = styled.div<{ height: number; color: string }>`
-  width: 40px;
-  height: ${(props) => props.height}px;
+  width: 3.4375rem;
+  height: ${(props) => (props.height) / 16}rem;
   background-color: ${(props) => props.color};
-  border-radius: 4px 4px 0 0;
+  border-radius: 0.125rem;
   display: flex;
-  align-items: flex-end;
   justify-content: center;
-`;
-
-export const BarLabel = styled.span`
-  margin-top: 8px;
-  font-weight: bold;
-  font-size: 12px;
-  color: #333;
+  align-items: flex-end;
+  padding-bottom: 0.25rem;
+  transition: height 0.3s ease;
 `;
 
 export const BarScore = styled.span`
-  font-size: 12px;
-  color: #ffffff;
-  margin-bottom: 4px;
-  font-weight: bold;
+  font-size: ${Common.fontSizes.xs};
+  color: white;
 `;
 
-export const GraphButton = styled.button`
-  position: absolute;
-  top: -30px;
-  right: 10px;
-  cursor: pointer;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 4px 3px;
+export const BarLabel = styled.span`
+  margin-bottom: 0.3125rem;
+  font-size: ${Common.fontSizes.sm};
+  font-weight: ${Common.fontWeights.medium};
+  color: ${Common.colors.gray400};
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+`;
+
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row; 
+  align-items: flex-start; 
+  gap: 1rem; 
 `;

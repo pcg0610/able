@@ -16,3 +16,5 @@ class ArgType(str, Enum):
     FLOAT = "float"
     BOOL = "bool"
     STR = "str"
+    LIST_INT = "list_int"
+    MODEL_PARAMS = "model_params"

@@ -9,13 +9,10 @@ def format_path_name(uri: str) -> str:
 def generate_router_content(request: RegisterApiRequest) -> str:
     return f"""
 import torch
-import base64
 import io
-import json
-import numpy as np
 
 from PIL import Image
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, UploadFile, File
 from deploy_server.src.schemas import InferenceResponse
 from src.file.path_manager import PathManager
 from src.file.utils import get_file
@@ -30,7 +27,7 @@ router = APIRouter()
 path_manager = PathManager()
 
 @router.post("{request.uri}")
-async def path_name_route(image: str = Body(...)):
+async def path_name_route(file: UploadFile = File(...)):
 
     project_name = "{request.project_name}"
     train_result = "{request.train_result}"
@@ -40,9 +37,8 @@ async def path_name_route(image: str = Body(...)):
     metadata = TrainResultMetadata(**str_to_json(get_file(train_result_metadata_path)))
 
     # base64를 이미지로 변환 
-    image = base64.b64decode(image)
+    image = await file.read()
     image = Image.open(io.BytesIO(image))
-    image = np.array(image)
 
     # 전처리 파이프라인 가져오기
     transform_pipeline = load_transform_pipeline(project_name, train_result)

@@ -10,6 +10,7 @@ interface BasicButtonProps {
   height?: string;
   text: string;
   icon?: ReactNode;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
@@ -20,10 +21,18 @@ const BasicButton = ({
   height,
   text,
   icon,
+  disabled = false,
   onClick,
 }: BasicButtonProps) => {
   return (
-    <StyledButton color={color} backgroundColor={backgroundColor} width={width} height={height} onClick={onClick}>
+    <StyledButton
+      color={color}
+      backgroundColor={backgroundColor}
+      width={width}
+      height={height}
+      disabled={disabled}
+      onClick={onClick}
+    >
       {icon && <StyledIcon>{icon}</StyledIcon>}
       {text}
     </StyledButton>
