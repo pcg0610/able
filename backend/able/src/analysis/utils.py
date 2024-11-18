@@ -134,7 +134,7 @@ class FeatureMapExtractor:
             )
             for idx, score in zip(top_indices, top_values)
         ]
-        create_file(self.checkpoint_path / ANALYSIS_RESULT, json_to_str(AnalysisResult(class_scores=scores, heatmap_block_id=self.heatmap_block_id)))
+        create_file(self.checkpoint_path / ANALYSIS_RESULT, json_to_str(AnalysisResult(class_scores=scores, heatmap_block_id=self.heatmap_block_id.replace("layers.", ""))))
 
         return scores
 

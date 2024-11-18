@@ -63,9 +63,9 @@ def get_heatmap(project_name: str, result_name:str, checkpoint_name:str) -> Opti
     try: 
         heatmap = encode_image_to_base64(read_image_file(checkpoint_path / HEATMAP))
         original = encode_image_to_base64(read_image_file(checkpoint_path / ORIGINAL))
-        class_scores = ClassScores(**str_to_json(get_file(checkpoint_path / ANALYSIS_RESULT)))
+        analysis_result = AnalysisResult(**str_to_json(get_file(checkpoint_path / ANALYSIS_RESULT)))
     except Exception as e:
         logger.info(f"이전에 진행된 분석 결과가 없음: {e}")
         return None
     
-    return HeatMapResponse(original_img=original, heatmap_img=heatmap, class_scores=class_scores.class_scores)
+    return HeatMapResponse(original_img=original, heatmap_img=heatmap, class_scores=analysis_result.class_scores, heatmap_block_id=analysis_result.heatmap_block_id )
