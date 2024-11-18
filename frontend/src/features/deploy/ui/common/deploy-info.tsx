@@ -42,6 +42,11 @@ const InfoContainer = ({ title }: InfoContainerProps) => {
               target="_blank"
               rel="noopener noreferrer"
               isRunning={deployInfo?.status === 'running'}
+              onClick={(e) => {
+                if (deployInfo?.status !== 'running') {
+                  e.preventDefault();
+                }
+              }}
             >
               {docsUrl}
             </S.Link>

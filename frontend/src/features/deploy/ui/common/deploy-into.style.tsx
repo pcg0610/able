@@ -45,6 +45,7 @@ export const Value = styled.span`
 export const Link = styled.a<{ isRunning: boolean }>`
   color: ${({ isRunning }) => (isRunning ? Common.colors.primary : Common.colors.gray400)};
   text-decoration-line: none;
+  cursor: ${({ isRunning }) => (isRunning ? 'pointer' : 'auto')};
 `;
 
 export const Status = styled.span`
