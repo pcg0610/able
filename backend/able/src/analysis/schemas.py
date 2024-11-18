@@ -8,6 +8,10 @@ class ClassScore(ImmutableBaseModel):
 class ClassScores(ImmutableBaseModel):
     class_scores: List[ClassScore]
 
+class AnalysisResult(ImmutableBaseModel):
+    class_scores: List[ClassScore]
+    heatmap_block_id: str
+
 class FeatureMap(ImmutableBaseModel):
     block_id: str
     img: Optional[str]
@@ -19,7 +23,8 @@ class CheckpointResponse(ImmutableBaseModel):
 class AnalyzeResponse(ImmutableBaseModel):
     image: str
     class_scores: List[ClassScore]
-
+    heatmap_block_id: str
+    
 class FeatureMapRequest(ImmutableBaseModel):
     project_name: str
     result_name: str
