@@ -15,4 +15,5 @@ export const ContentContainer = styled.div`
   flex: 1;
   padding: 3.5rem 4rem;
   box-sizing: border-box;
+  overflow-y: auto;
 `;

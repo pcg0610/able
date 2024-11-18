@@ -25,6 +25,7 @@ export const ProjectContentContainer = styled.div`
 
 export const CanvasContainer = styled.div`
   width: 50%;
+  padding-right: 3rem;
 `;
 
 export const HistoryContainer = styled.div`
@@ -49,8 +50,8 @@ export const Description = styled.p`
 `;
 
 export const CanvasImage = styled.img`
-  width: 30rem;
-  height: 20rem;
+  width: 100%;
+  height: 20.75rem;
   border-radius: 0.5rem;
   object-fit: cover;
   cursor: pointer;

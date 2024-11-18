@@ -88,11 +88,13 @@ const HomeContent = () => {
             </S.SubTitle>
             <S.HistoryWrapper>
               <HistoryList trainSummaries={historyData?.trainSummaries || []} />
-              <Pagination
-                currentPage={currentPage}
-                totalPages={historyData?.totalPages || 0}
-                onPageChange={setCurrentPage}
-              />
+              {historyData?.trainSummaries && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={historyData?.totalPages || 0}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </S.HistoryWrapper>
           </S.HistoryContainer>
         </S.ProjectContentContainer>
