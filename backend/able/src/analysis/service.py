@@ -47,10 +47,10 @@ async def analyze(project_name: str, result_name: str, checkpoint_name:str, devi
     model = load_model(model_path, device)
 
     extractor = FeatureMapExtractor(model, project_name, result_name, result_path, checkpoint_path, feature_maps_path, img_path, device)
-    scores = extractor.analyze()
+    result = extractor.analyze()
 
     heatmap_img = encode_image_to_base64(read_image_file(checkpoint_path / HEATMAP))
-    return AnalyzeResponse(image=heatmap_img, class_scores=scores)
+    return AnalyzeResponse(image=heatmap_img, class_scores=result.class_scores, heatmap_block_id=result.heatmap_block_id)
 
 def get_block_graph(project_name: str, result_name: str) -> Canvas :
     block_graph_path = pathManager.get_train_result_path(project_name, result_name) / BLOCK_GRAPH
@@ -63,9 +63,9 @@ def get_heatmap(project_name: str, result_name:str, checkpoint_name:str) -> Opti
     try: 
         heatmap = encode_image_to_base64(read_image_file(checkpoint_path / HEATMAP))
         original = encode_image_to_base64(read_image_file(checkpoint_path / ORIGINAL))
-        class_scores = ClassScores(**str_to_json(get_file(checkpoint_path / ANALYSIS_RESULT)))
+        analysis_result = AnalysisResult(**str_to_json(get_file(checkpoint_path / ANALYSIS_RESULT)))
     except Exception as e:
         logger.info(f"이전에 진행된 분석 결과가 없음: {e}")
         return None
     
-    return HeatMapResponse(original_img=original, heatmap_img=heatmap, class_scores=class_scores.class_scores)
+    return HeatMapResponse(original_img=original, heatmap_img=heatmap, class_scores=analysis_result.class_scores, heatmap_block_id=analysis_result.heatmap_block_id )
