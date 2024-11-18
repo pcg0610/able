@@ -6,7 +6,6 @@ export const HistoryListWrapper = styled.table`
   width: 100%;
   border-collapse: collapse;
   font-size: ${Common.fontSizes.sm};
-  color: #333;
   table-layout: fixed;
 `;
 
@@ -17,6 +16,10 @@ export const HistoryRow = styled.tr`
   &:last-of-type {
     border-bottom: none;
   }
+
+  &:hover {
+    background-color: ${Common.colors.gray100};
+  }
 `;
 
 export const HistoryCell = styled.td`
@@ -25,7 +28,14 @@ export const HistoryCell = styled.td`
   width: ${({ width }) => width || 'auto'};
 `;
 
+export const HistoryEmpty = styled.td`
+  text-align: center;
+  vertical-align: middle;
+  height: 18.175rem;
+  width: 100%;
+`;
+
 export const StatusText = styled.span<{ status: string }>`
-  color: ${({ status }) => (status === '완료' ? '#1a73e8' : '#ff5252')};
-  font-weight: bold;
+  color: ${({ status }) => (status === '완료' ? Common.colors.primary : '#ff5252')};
+  font-weight: ${Common.fontWeights.semiBold};
 `;
