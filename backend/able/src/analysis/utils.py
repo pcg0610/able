@@ -14,7 +14,7 @@ from src.canvas.schemas import CanvasBlock, Canvas
 from src.file.utils import get_file, create_file
 from src.utils import str_to_json, json_to_str
 from src.analysis.exceptions import ModelLoadException
-from src.analysis.schemas import ClassScore, ClassScores
+from src.analysis.schemas import ClassScore, ClassScores, AnalysisResult
 from src.train.schemas import TrainResultMetadata
 from src.file.constants import *
 
@@ -33,10 +33,11 @@ class FeatureMapExtractor:
         self.feature_maps_path = feature_maps_path
         self.final_feature_map = None 
         self.output = None  
+        self.heatmap_block_id : str = None
 
         self.img_path = img_path
 
-    def analyze(self) -> ClassScores:
+    def analyze(self) -> AnalysisResult:
         self.build_model()
         self.model.eval()
 
@@ -46,7 +47,7 @@ class FeatureMapExtractor:
         self.output = self.model(input_img)
         self.save_heatmap()
         scores = self.save_top_k_scores()
-        return scores
+        return AnalysisResult(class_scores=scores, heatmap_block_id=self.heatmap_block_id.replace("layers.", ""))
     
     def build_model(self):
         if self.model is None:
@@ -55,6 +56,7 @@ class FeatureMapExtractor:
 
         last_conv_layer_name = None
         for name, module in self.model.named_modules():
+            self.heatmap_block_id = name
             if isinstance(module, nn.Conv2d):
                 last_conv_layer_name, last_module = name, module
                 module.register_forward_hook(self.get_hook_fn(name))
@@ -132,7 +134,7 @@ class FeatureMapExtractor:
             )
             for idx, score in zip(top_indices, top_values)
         ]
-        create_file(self.checkpoint_path / ANALYSIS_RESULT, json_to_str(ClassScores(class_scores=scores)))
+        create_file(self.checkpoint_path / ANALYSIS_RESULT, json_to_str(AnalysisResult(class_scores=scores, heatmap_block_id=self.heatmap_block_id.replace("layers.", ""))))
 
         return scores
 
