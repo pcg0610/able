@@ -93,13 +93,13 @@ export const FooterIcon = styled.div`
 `;
 
 export const FooterText = styled.div`
-  font-size: ${Common.fontSizes.xl};
-  font-weight: bold;
-  color: #343a40;
+  font-size: ${Common.fontSizes.lg};
+  font-weight: ${Common.fontWeights.medium};
+  color: ${Common.colors.gray500};
 `;
 
 export const FooterStatus = styled.div`
-  font-size: 0.75rem;
-  color: #6c757d;
+  font-size: ${Common.fontSizes.sm};
+  color: ${Common.colors.gray400};
   margin-top: 0.25rem;
 `;

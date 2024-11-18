@@ -50,7 +50,7 @@ const HomeSideBar = () => {
       <BasicButton
         color={Common.colors.primary}
         backgroundColor={Common.colors.secondary}
-        text="프로젝트 만들기"
+        text="프로젝트 생성"
         width="100%"
         onClick={() => {
           handleCreateProjectClick();
