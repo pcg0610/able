@@ -124,8 +124,8 @@ ABLE은 **버튼 클릭만으로 FastAPI 프레임워크 기반의 서버를 실
 | :---: | :---: |
 | API 추가 및 목록 조회 | <img width="600" src="assets/add-search-api.gif"> | 
 | 서버 시작 | <img width="600" src="assets/start-server.gif"> | 
-| API 테스트 | <img width="600" src="assets/delete-api.gif"> |
-| API 삭제 및 서버 종료 | <img width="600" src="assets/test-api.gif"> |
+| API 테스트 | <img width="600" src="assets/test-api.gif"> |
+| API 삭제 및 서버 종료 | <img width="600" src="assets/delete-api.gif"> |
 
 </br>
 
