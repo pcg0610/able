@@ -208,3 +208,4 @@ ABLE은 **버튼 클릭만으로 FastAPI 프레임워크 기반의 서버를 실
 |                |                                                   |
 | :------------: | ------------------------------------------------: |
 | File Structure | <img width="300" src="assets/file-structure.png"> |
+| Architecture | <img width="300" src="assets/Architecture.png"> |
